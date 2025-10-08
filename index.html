@@ -1,47 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>U.S. LawShield Plinko</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Anton&family=Oswald:wght@400;700&family=PT+Sans:wght@400;700&display=block" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-This updated code addresses your concerns with the following changes:
+    body {
+      font-family: 'Oswald', sans-serif;
+      background: linear-gradient(135deg, #0e1d61 0%, #1a2a7a 100%);
+      padding: 20px;
+      min-height: 100vh;
+      position: relative;
+      color: white;
+    }
 
-1. **Added Ramp for Momentum Build-Up**:
-   - Increased the canvas height from 800px to 900px to add a 100px ramp at the top of the board.
-   - The ramp is visually represented as a gray trapezoid (`#4a4a4a`) at the top, angled at 30 degrees downward (`RAMP_SLOPE = -Math.PI / 6`).
-   - When the disc is dropped within the ramp zone (`y < RAMP_HEIGHT`), it experiences acceleration based on the ramp’s slope (vertical and horizontal components of gravity), allowing it to build momentum before hitting the pegs.
-   - Extended the drop zone (`DROP_ZONE_Y_MAX`) to 150px to include the ramp, so users can drop the disc anywhere in this area.
-   - Applied a moderate friction coefficient (`RAMP_FRICTION = 0.95`) on the ramp to simulate a smooth surface, slightly slowing the disc but allowing momentum to build.
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+      padding: 30px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
 
-2. **Friction-Heavy Board**:
-   - Implemented a high friction coefficient (`BOARD_FRICTION = 0.93`) for the main board (below the ramp), reducing velocity more significantly to mimic a friction-heavy surface, as seen in the Price is Right Plinko game where the board slightly resists the disc’s motion.
+    .logo-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
 
-3. **Maintained Bouncy and Random Peg Interactions**:
-   - Kept the high elasticity for peg collisions (0.99) to ensure very bouncy reactions, mimicking the sharp rebounds in the Price is Right game.
-   - Maintained the random perturbation (1.5) for peg collisions to ensure highly unpredictable, zig-zagging paths.
-   - Ensured a minimum vertical velocity (0.5) to prevent the disc from stalling.
+    .main-title {
+      font-family: 'Anton', sans-serif;
+      font-size: 3.8em;
+      font-weight: 900;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+      -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+    }
 
-4. **Prevented Wall Sticking**:
-   - Kept the position offset (`+2` pixels) for wall collisions, with high elasticity (0.98) and randomness (0.8) to prevent sticking and ensure energetic bounces off the side walls.
+    .subtitle {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.4em;
+      font-weight: 700;
+      color: #0e1d61;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 15px 0;
+      background: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      display: inline-block;
+    }
 
-5. **Lightweight Gravity**:
-   - Maintained gravity at 0.12 for both the ramp and board phases, ensuring the disc remains lightweight and bounces multiple times (typically 5-10 seconds to reach the bottom, as in the real game).
+    .tagline {
+      font-family: 'PT Sans', sans-serif;
+      font-size: 1.1em;
+      font-weight: 700;
+      color: #e7d386;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 10px;
+    }
 
-6. **Streamlined Disc Retrieval System**:
-   - Continued showing only available discs in the sidebar, labeled as “Disc #N” with an SVG icon for clarity.
-   - Kept visual feedback: discs scale up (1.1x) and fade when dragged, indicating possession.
-   - Maintained the instruction: “Drag a disc to the top of the board and release to drop!” and the “Earn More Discs” button for intuitive navigation.
+    .player-info {
+      text-align: center;
+      color: white;
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(231, 211, 134, 0.2);
+      border-radius: 10px;
+      font-weight: 600;
+    }
 
-7. **Robust Drag-and-Drop**:
-   - Ensured the drag-and-drop system is reliable by validating `draggingIndex` and preventing interaction when a disc is in motion.
-   - Discs can be dropped anywhere within the top 150px of the canvas, including the ramp, and within board bounds.
+    .controls {
+      text-align: center;
+      margin-bottom: 30px;
+    }
 
-**Physics Explanation (Price is Right Plinko Behavior)**:
-- In the Price is Right Plinko game, discs are dropped from a ramp or slot at the top, gaining initial momentum before hitting a field of pegs. The board is slightly frictional (often felt-covered), slowing the disc’s motion, while pegs are rigid, causing sharp, random bounces. The disc’s lightweight nature (~50-100g) and low gravity result in a 5-10 second descent with frequent, unpredictable zig-zags.
-- The updated code replicates this by:
-  - Adding a 100px ramp with a 30-degree slope, applying slope-based acceleration to build momentum.
-  - Using a friction-heavy board (`BOARD_FRICTION = 0.93`) to slow the disc’s motion, mimicking the felt-like surface.
-  - Maintaining high peg elasticity (0.99) and strong randomness (1.5) for lively, unpredictable bounces.
-  - Keeping low gravity (0.12) for a slow, bouncy descent.
-  - Implementing position corrections and minimum velocity to prevent sticking.
+    button {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1em;
+      font-weight: 700;
+      padding: 12px 30px;
+      margin: 0 10px 10px 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
-To apply these changes:
-1. Replace the contents of `index.html` in your repository[](https://github.com/sherrymorse/uslawshield-plinko/edit/main/index.html).
-2. Commit and push to update the live site[](https://sherrymorse.github.io/uslawshield-plinko/).
+    .btn-primary {
+      background: linear-gradient(135deg, #d51e47 0%, #b01838 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(213, 30, 71, 0.4);
+    }
 
-The disc should now gain momentum on the ramp, experience a friction-heavy board, and exhibit very random, bouncy peg interactions, closely matching the Price is Right Plinko experience. If the ramp behavior or physics still feel off (e.g., insufficient momentum or incorrect bounce), please describe the specific issue, and I can fine-tune the parameters further.
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(213, 30, 71, 0.6);
+    }
+
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #0e1d61;
+      border: 2px solid #0e1d61;
+    }
+
+    .btn-secondary:hover {
+      background: #0e1d61;
+      color: white;
+    }
+
+    .game-container {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .plinko-board {
+      background: linear-gradient(180deg, #1a2a7a 0%, #0e1d61 100%);
+      border: 4px solid #e7d386;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    #plinkoCanvas {
+      display: block;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 10px;
+      cursor: grab;
+    }
+
+    .drop-controls {
+      text-align: center;
+      margin-top: 15px;
+      position: relative;
+      height: 60px;
+    }
+
+    .disc-sidebar {
+      background: rgba(255, 255, 255, 0.98);
+      border: 3px solid #0e1d61;
+      border-radius: 10px;
+      padding: 15px;
+      width: 300px;
+      max-height: 600px;
+      overflow-y: auto;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .disc-sidebar h3 {
+      font-family: 'Oswald', sans-serif;
+      color: #0e1d61;
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+
+    .disc-section {
+      margin-bottom: 20px;
+    }
+
+    .disc-section h4 {
+      color: #d51e47;
+      margin-bottom: 10px;
+      font-size: 1em;
+    }
+
+    .disc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .disc-item {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 5px;
+      border-left: 4px solid #d51e47;
+      font-size: 0.9em;
+      color: #333;
+      display: flex;
+      align-items: center;
+      cursor: grab;
+    }
+
+    .disc-item:active {
+      cursor: grabbing;
+    }
+
+    .disc-item svg {
+      margin-right: 10px;
+    }
+
+    .instructions {
+      font-size: 0.85em;
+      color: #e7d386;
+      text-align: center;
+      margin-bottom: 15px;
+      padding: 5px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+    }
+
+    .disc-count {
+      font-size: 1em;
+      color: #d51e47;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .earn-more {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px;
+      background: linear-gradient(135deg, #d51e47 0%, #b01838 100%);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .earn-more:hover {
+      opacity: 0.9;
+    }
+
+    .total-score {
+      text-align: center;
+      font-size: 1.5em;
+      margin-top: 20px;
+      color: #e7d386;
+      font-weight: 700;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-content {
+      background-color: white;
+      margin: 10% auto;
+      padding: 30px;
+      border: 4px solid #0e1d61;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.8em;
+      color: #0e1d61;
+      margin-bottom: 10px;
+    }
+
+    .modal-body label {
+      display: block;
+      font-weight: 700;
+      color: #0e1d61;
+      margin-bottom: 8px;
+      font-size: 1.1em;
+    }
+
+    .modal-body select, .modal-body input {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.1em;
+      border: 2px solid #0e1d61;
+      border-radius: 8px;
+      font-family: 'Oswald', sans-serif;
+    }
+
+    .modal-body input[type="text"]#memberIdInput {
+      text-transform: uppercase;
+      font-family: monospace;
+    }
+
+    .modal-body input:focus, .modal-body select:focus {
+      outline: none;
+      border-color: #d51e47;
+      box-shadow: 0 0 10px rgba(213, 30, 71, 0.3);
+    }
+
+    .error-message {
+      color: #d51e47;
+      font-size: 0.9em;
+      margin-top: 8px;
+      display: none;
+      font-weight: 600;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .close-btn {
+      background: #6c757d;
+      color: white;
+    }
+
+    .close-btn:hover {
+      background: #5a6268;
+    }
+
+    @media (max-width: 768px) {
+      .game-container {
+        flex-direction: column;
+      }
+      .disc-sidebar {
+        width: 100%;
+        max-height: 300px;
+      }
+      .main-title {
+        font-size: 2.5em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-container">
+      <svg width="80" height="90" viewBox="0 0 100 115" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 5L10 20V50C10 70 20 95 50 110C80 95 90 70 90 50V20L50 5Z" fill="#1e1e1e" stroke="#1e1e1e" stroke-width="2"/>
+        <path d="M50 8L13 22V50C13 69 19 92 50 106C81 92 87 69 87 50V22L50 8Z" fill="#d51e47"/>
+        <path d="M50 55L13 50V50C13 69 19 92 50 106C81 92 87 69 87 50V50L50 55Z" fill="#f4e5c2"/>
+        <rect x="20" y="35" width="60" height="12" fill="#0e1d61" rx="2"/>
+        <text x="50" y="44" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="white" text-anchor="middle">U.S. LawShield</text>
+        <g transform="translate(50, 70) scale(0.3)">
+          <line x1="0" y1="0" x2="0" y2="40" stroke="#0e1d61" stroke-width="3"/>
+          <line x1="-30" y1="0" x2="30" y2="0" stroke="#0e1d61" stroke-width="3"/>
+          <circle cx="-30" cy="-5" r="8" fill="none" stroke="#0e1d61" stroke-width="2"/>
+          <circle cx="30" cy="-5" r="8" fill="none" stroke="#0e1d61" stroke-width="2"/>
+        </g>
+      </svg>
+      <h1 class="main-title">U.S. LAWSHIELD</h1>
+    </div>
+    <div class="subtitle">EMPLOYEE ENGAGEMENT PLINKO</div>
+    <p class="tagline">LEGAL DEFENSE FOR SELF DEFENSE®</p>
+  </div>
+  <div class="player-info" id="playerInfo" style="display: none;"></div>
+  <div class="controls">
+    <button class="btn-primary" onclick="openEarnDiscModal()">Earn Plinko Disc</button>
+    <button class="btn-secondary" onclick="clearProgress()">Clear Progress</button>
+  </div>
+  <div class="game-container">
+    <div class="plinko-board">
+      <canvas id="plinkoCanvas" width="600" height="950"></canvas>
+      <div class="total-score" id="totalScore">Total Winnings: $0</div>
+    </div>
+    <div class="disc-sidebar">
+      <div class="instructions">Drag a disc to the top ramp and release to drop!</div>
+      <div class="disc-section">
+        <h4>Available Discs <span class="disc-count" id="availableCount"></span></h4>
+        <div class="disc-list" id="availableDiscList"></div>
+        <button class="earn-more" onclick="openEarnDiscModal()">Earn More Discs</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Name Modal (Login) -->
+  <div id="nameModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Welcome to U.S. LawShield Plinko!</h2>
+        <p style="color: #666; font-size: 0.95em;">Please enter your name to get started</p>
+      </div>
+      <div class="modal-body">
+        <label for="nameInput">Your Name:</label>
+        <input type="text" id="nameInput" placeholder="Enter your name" autocomplete="off">
+        <div class="error-message" id="nameError">Please enter your name</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" onclick="submitName()">Start Playing</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Earn Disc Modal -->
+  <div id="earnDiscModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Earn a Plinko Disc</h2>
+        <p style="color: #666; font-size: 0.95em;">Select an activity and enter a valid Member ID</p>
+      </div>
+      <div class="modal-body">
+        <label for="activitySelect">Activity:</label>
+        <select id="activitySelect">
+          <option value="">Select Activity</option>
+          <option value="Single PR">Single PR</option>
+          <option value="Dual PR">Dual PR</option>
+          <option value="Dual Monthly LOC">Dual Monthly LOC</option>
+          <option value="Single Monthly LOC">Single Monthly LOC</option>
+          <option value="Single Annual LOC">Single Annual LOC</option>
+          <option value="Dual Annual LOC">Dual Annual LOC</option>
+          <option value="Add Secondary Legacy (Monthly)">Add Secondary Legacy (Monthly)</option>
+          <option value="Add Secondary Legacy (Annual)">Add Secondary Legacy (Annual)</option>
+          <option value="Conversion to Explore">Conversion to Explore</option>
+          <option value="Conversion to Navigate">Conversion to Navigate</option>
+          <option value="Conversion to Discover">Conversion to Discover</option>
+          <option value="Add E-Shield">Add E-Shield</option>
+          <option value="LSLP (monthly)">LSLP (monthly)</option>
+          <option value="LSLP (Annual)">LSLP (Annual)</option>
+          <option value="Save">Save</option>
+          <option value="Winback (monthly)">Winback (monthly)</option>
+          <option value="Winback (annual)">Winback (annual)</option>
+        </select>
+        <label for="memberIdInput" style="margin-top: 15px;">Member ID:</label>
+        <input type="text" id="memberIdInput" placeholder="e.g., ABC123456" maxlength="10" autocomplete="off">
+        <div class="error-message" id="errorMessage">Invalid Member ID. Must be 2-3 letters followed by numbers (5-10 characters total)</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" onclick="submitEarnDisc()">Submit</button>
+        <button class="btn-secondary close-btn" onclick="closeEarnModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-app.js";
+    import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDzNTPcHXIgb7T73yX0ngLyuJkSiyUd3dA",
+      authDomain: "uslawshield-bingo.firebaseapp.com",
+      databaseURL: "https://uslawshield-bingo-default-rtdb.firebaseio.com",
+      projectId: "uslawshield-bingo",
+      storageBucket: "uslawshield-bingo.appspot.com",
+      messagingSenderId: "227127069053",
+      appId: "1:227127069053:web:be6acba57a6561ad9ce414",
+      measurementId: "G-Z2FXPKS7EY"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    let playerId = null;
+    let gameState = { discs: [], totalScore: 0 };
+    let canvas, ctx;
+    const BOARD_WIDTH = 600;
+    const BOARD_HEIGHT = 950; // Increased height for larger ramp
+    const DISC_RADIUS = 20;
+    const PEG_RADIUS = 5;
+    const NUM_ROWS = 12;
+    const NUM_SLOTS = 9;
+    const SLOT_VALUES = [100, 500, 1000, 0, 10000, 0, 1000, 500, 100];
+    const SLOT_COLORS = ['green', 'green', 'green', 'red', 'gold', 'red', 'green', 'green', 'green'];
+    let pegs = [];
+    let currentDisc = null;
+    let animationFrameId = null;
+    let dragging = false;
+    let draggingIndex = -1;
+    let dragX = 0;
+    let dragY = 0;
+    const DROP_ZONE_Y_MAX = 200; // Extended drop zone for larger ramp
+    const RAMP_HEIGHT = 150; // Increased ramp height to 150px
+    const RAMP_SLOPE = -Math.PI / 6; // 30-degree downward slope (radians)
+    const RAMP_FRICTION = 0.95; // Friction on ramp
+    const BOARD_FRICTION = 0.93; // Friction-heavy board
+    const bounceSound = new Audio('https://freesound.org/data/previews/51/51702_344017-lq.mp3');
+    const dropSound = new Audio('https://freesound.org/data/previews/750/750240_13765367-lq.mp3');
+    const winSound = new Audio('https://freesound.org/data/previews/507/507976_10722050-lq.mp3');
+    const loseSound = new Audio('https://freesound.org/data/previews/535/535236_11529372-lq.mp3');
+
+    function initPlinkoBoard() {
+      canvas = document.getElementById('plinkoCanvas');
+      ctx = canvas.getContext('2d');
+      createPegs();
+      drawBoard();
+    }
+
+    function createPegs() {
+      const rowSpacing = (BOARD_HEIGHT - RAMP_HEIGHT) / (NUM_ROWS + 1);
+      const colSpacing = BOARD_WIDTH / 8;
+      for (let row = 0; row < NUM_ROWS; row++) {
+        const numCols = row % 2 === 0 ? 9 : 8;
+        const offset = row % 2 === 0 ? 0 : colSpacing / 2;
+        for (let col = 0; col < numCols; col++) {
+          pegs.push({
+            x: offset + col * colSpacing,
+            y: RAMP_HEIGHT + rowSpacing + row * rowSpacing,
+          });
+        }
+      }
+    }
+
+    function drawBoard() {
+      ctx.clearRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
+      // Draw ramp (larger and more pronounced)
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(BOARD_WIDTH, 0);
+      ctx.lineTo(BOARD_WIDTH, RAMP_HEIGHT);
+      ctx.lineTo(0, RAMP_HEIGHT);
+      ctx.closePath();
+      ctx.fillStyle = '#4a4a4a'; // Darker gray for ramp visibility
+      ctx.fill();
+      ctx.strokeStyle = '#e7d386';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // Draw pegs
+      pegs.forEach(peg => {
+        ctx.beginPath();
+        ctx.arc(peg.x, peg.y, PEG_RADIUS, 0, Math.PI * 2);
+        ctx.fillStyle = '#e7d386';
+        ctx.fill();
+        ctx.strokeStyle = '#0e1d61';
+        ctx.stroke();
+      });
+      // Draw slots
+      const slotHeight = 50;
+      const slotWidth = BOARD_WIDTH / NUM_SLOTS;
+      for (let i = 0; i < NUM_SLOTS; i++) {
+        ctx.fillStyle = SLOT_COLORS[i];
+        ctx.fillRect(i * slotWidth, BOARD_HEIGHT - slotHeight, slotWidth, slotHeight);
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 20px Oswald';
+        ctx.textAlign = 'center';
+        ctx.fillText(`$${SLOT_VALUES[i]}`, i * slotWidth + slotWidth / 2, BOARD_HEIGHT - slotHeight / 2 + 5);
+      }
+      // Draw dragging disc if dragging
+      if (dragging) {
+        drawDisc(dragX, dragY);
+      }
+      // Draw animating disc
+      if (currentDisc) {
+        drawDisc(currentDisc.x, currentDisc.y);
+      }
+    }
+
+    function drawDisc(x, y) {
+      // Draw a detailed Plinko disc with 2D vector graphics
+      ctx.beginPath();
+      ctx.arc(x, y, DISC_RADIUS, 0, Math.PI * 2);
+      ctx.fillStyle = '#d51e47';
+      ctx.fill();
+      ctx.strokeStyle = 'white';
+      ctx.stroke();
+      // Add metallic shine
+      ctx.beginPath();
+      ctx.arc(x - 10, y - 10, DISC_RADIUS / 2, 0, Math.PI);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.fill();
+      // Add center dot for authenticity
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#e7d386';
+      ctx.fill();
+    }
+
+    function animateDisc() {
+      if (!currentDisc) return;
+
+      // Update position
+      currentDisc.x += currentDisc.vx;
+      currentDisc.y += currentDisc.vy;
+
+      if (currentDisc.y < RAMP_HEIGHT) {
+        // Ramp phase: apply slope-based acceleration
+        currentDisc.vy += 0.12 * Math.sin(RAMP_SLOPE); // Vertical component
+        currentDisc.vx += 0.12 * Math.cos(RAMP_SLOPE); // Horizontal component
+        currentDisc.vx *= RAMP_FRICTION; // Apply ramp friction
+        currentDisc.vy *= RAMP_FRICTION;
+      } else {
+        // Board phase: normal gravity with friction-heavy board
+        currentDisc.vy += 0.12; // Lightweight gravity
+        currentDisc.vx *= BOARD_FRICTION; // Heavy friction on board
+        currentDisc.vy *= BOARD_FRICTION;
+      }
+
+      // Wall collisions with improved bounce
+      if (currentDisc.x - DISC_RADIUS < 0) {
+        currentDisc.x = DISC_RADIUS + 2;
+        currentDisc.vx *= -0.98;
+        currentDisc.vy *= 0.95;
+        currentDisc.vx += (Math.random() - 0.5) * 0.8;
+        bounceSound.currentTime = 0;
+        bounceSound.play();
+      } else if (currentDisc.x + DISC_RADIUS > BOARD_WIDTH) {
+        currentDisc.x = BOARD_WIDTH - DISC_RADIUS - 2;
+        currentDisc.vx *= -0.98;
+        currentDisc.vy *= 0.95;
+        currentDisc.vx += (Math.random() - 0.5) * 0.8;
+        bounceSound.currentTime = 0;
+        bounceSound.play();
+      }
+
+      // Peg collisions with improved detection
+      pegs.forEach(peg => {
+        const dx = currentDisc.x - peg.x;
+        const dy = currentDisc.y - peg.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const minDist = DISC_RADIUS + PEG_RADIUS;
+
+        if (dist < minDist) {
+          bounceSound.currentTime = 0;
+          bounceSound.play();
+
+          // Normalize direction
+          const nx = dx / (dist || 1);
+          const ny = dy / (dist || 1);
+
+          // Position correction to prevent sticking
+          const overlap = minDist - dist;
+          currentDisc.x += nx * overlap * 0.8;
+          currentDisc.y += ny * overlap * 0.8;
+
+          // Reflect velocity
+          const dot = currentDisc.vx * nx + currentDisc.vy * ny;
+          currentDisc.vx -= 2 * dot * nx;
+          currentDisc.vy -= 2 * dot * ny;
+
+          // Very bouncy pegs
+          currentDisc.vx *= 0.99;
+          currentDisc.vy *= 0.99;
+
+          // Very random bounces
+          currentDisc.vx += (Math.random() - 0.5) * 1.5;
+          currentDisc.vy += (Math.random() - 0.5) * 1.5;
+
+          // Ensure disc doesn't get trapped
+          currentDisc.vy = Math.max(currentDisc.vy, 0.5);
+        }
+      });
+
+      // Slot landing
+      if (currentDisc.y + DISC_RADIUS > BOARD_HEIGHT - 50) {
+        const slotIndex = Math.floor(currentDisc.x / (BOARD_WIDTH / NUM_SLOTS));
+        const winnings = SLOT_VALUES[slotIndex] || 0;
+        gameState.totalScore += winnings;
+        document.getElementById('totalScore').textContent = `Total Winnings: $${gameState.totalScore}`;
+        if (winnings > 0) {
+          winSound.currentTime = 0;
+          winSound.play();
+        } else {
+          loseSound.currentTime = 0;
+          loseSound.play();
+        }
+        currentDisc = null;
+        saveGameState();
+        drawBoard();
+        cancelAnimationFrame(animationFrameId);
+        return;
+      }
+
+      drawBoard();
+      animationFrameId = requestAnimationFrame(animateDisc);
+    }
+
+    function getCanvasRelativePosition(event) {
+      const rect = canvas.getBoundingRect();
+      return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+      };
+    }
+
+    function handleMouseDown(event) {
+      if (dragging || currentDisc) return;
+      const target = event.target.closest('.disc-item');
+      if (target) {
+        draggingIndex = parseInt(target.dataset.index);
+        if (draggingIndex >= 0 && !gameState.discs[draggingIndex].used) {
+          dragging = true;
+          target.style.opacity = '0.5';
+          target.style.transform = 'scale(1.1)';
+          const pos = getCanvasRelativePosition(event);
+          dragX = pos.x;
+          dragY = pos.y;
+          drawBoard();
+        }
+      }
+    }
+
+    function handleMouseMove(event) {
+      if (dragging) {
+        const pos = getCanvasRelativePosition(event);
+        dragX = Math.max(DISC_RADIUS, Math.min(BOARD_WIDTH - DISC_RADIUS, pos.x));
+        dragY = pos.y;
+        drawBoard();
+      }
+    }
+
+    function handleMouseUp(event) {
+      if (dragging) {
+        const pos = getCanvasRelativePosition(event);
+        const items = document.querySelectorAll('.disc-item');
+        if (items[draggingIndex]) {
+          items[draggingIndex].style.opacity = '1';
+          items[draggingIndex].style.transform = 'scale(1)';
+          if (pos.y < DROP_ZONE_Y_MAX && pos.x >= DISC_RADIUS && pos.x <= BOARD_WIDTH - DISC_RADIUS) {
+            gameState.discs[draggingIndex].used = true;
+            currentDisc = {
+              x: pos.x,
+              y: pos.y, // Start at drop position within ramp
+              vx: (Math.random() - 0.5) * 1.5,
+              vy: 0
+            };
+            dropSound.currentTime = 0;
+            dropSound.play();
+            animateDisc();
+            updateDiscList();
+            saveGameState();
+          }
+        }
+        dragging = false;
+        draggingIndex = -1;
+        drawBoard();
+      }
+    }
+
+    function getOrCreatePlayerId() {
+      let id = localStorage.getItem('uslPlinkoPlayerId');
+      if (!id) {
+        id = 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('uslPlinkoPlayerId', id);
+      }
+      return id;
+    }
+
+    async function loadGameState() {
+      playerId = getOrCreatePlayerId();
+      const gameRef = ref(database, 'plinkoGames/' + playerId);
+      const snapshot = await get(gameRef);
+      if (snapshot.exists()) {
+        gameState = snapshot.val();
+      }
+    }
+
+    async function saveGameState() {
+      if (!playerId) return;
+      await set(ref(database, 'plinkoGames/' + playerId), gameState);
+    }
+
+    function showPlayerInfo() {
+      const playerInfo = document.getElementById('playerInfo');
+      playerInfo.innerHTML = `Welcome, ${gameState.playerName}! 🎯 Discs Available: ${gameState.discs.filter(d => !d.used).length}`;
+      playerInfo.style.display = 'block';
+    }
+
+    function updateDiscList() {
+      const availableList = document.getElementById('availableDiscList');
+      availableList.innerHTML = '';
+      gameState.discs.forEach((disc, index) => {
+        if (disc.used) return;
+        const item = document.createElement('div');
+        item.className = 'disc-item';
+        item.dataset.index = index;
+        item.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 20 20">
+            <circle cx="10" cy="10" r="9" fill="#d51e47" stroke="white" stroke-width="1"/>
+            <circle cx="7" cy="7" r="4" fill="rgba(255, 255, 255, 0.3)"/>
+            <circle cx="10" cy="10" r="2" fill="#e7d386"/>
+          </svg>
+          Disc #${index + 1}
+        `;
+        availableList.appendChild(item);
+      });
+      document.getElementById('availableCount').textContent = `(${gameState.discs.filter(d => !d.used).length})`;
+    }
+
+    window.openEarnDiscModal = function() {
+      document.getElementById('earnDiscModal').style.display = 'block';
+      document.getElementById('activitySelect').value = '';
+      document.getElementById('memberIdInput').value = '';
+      document.getElementById('errorMessage').style.display = 'none';
+      document.getElementById('activitySelect').focus();
+    };
+
+    window.closeEarnModal = function() {
+      document.getElementById('earnDiscModal').style.display = 'none';
+    };
+
+    window.submitEarnDisc = function() {
+      const activity = document.getElementById('activitySelect').value;
+      const memberId = document.getElementById('memberIdInput').value.trim().toUpperCase();
+
+      if (!activity) {
+        document.getElementById('errorMessage').textContent = 'Please select an activity';
+        document.getElementById('errorMessage').style.display = 'block';
+        return;
+      }
+
+      if (!validateMemberId(memberId)) {
+        document.getElementById('errorMessage').textContent = 'Invalid Member ID. Must be 2-3 letters followed by numbers (5-10 characters total)';
+        document.getElementById('errorMessage').style.display = 'block';
+        document.getElementById('memberIdInput').focus();
+        return;
+      }
+
+      gameState.discs.push({ activity, memberId, used: false });
+      closeEarnModal();
+      updateDiscList();
+      showPlayerInfo();
+      saveGameState();
+    };
+
+    function validateMemberId(memberId) {
+      const trimmed = memberId.trim().toUpperCase();
+      const regex = /^[A-Z]{2,3}\d+$/;
+      if (trimmed.length < 5 || trimmed.length > 10) return false;
+      return regex.test(trimmed);
+    }
+
+    window.submitName = async function() {
+      const name = document.getElementById('nameInput').value.trim();
+      if (!name) {
+        document.getElementById('nameError').style.display = 'block';
+        document.getElementById('nameInput').focus();
+        return;
+      }
+      gameState.playerName = name;
+      document.getElementById('nameModal').style.display = 'none';
+      showPlayerInfo();
+      saveGameState();
+    };
+
+    window.clearProgress = function() {
+      if (confirm('Clear all discs and score? This cannot be undone.')) {
+        gameState.discs = [];
+        gameState.totalScore = 0;
+        updateDiscList();
+        document.getElementById('totalScore').textContent = 'Total Winnings: $0';
+        saveGameState();
+      }
+    };
+
+    window.onload = async function() {
+      await loadGameState();
+      initPlinkoBoard();
+      updateDiscList();
+      showPlayerInfo();
+
+      if (!gameState.playerName) {
+        document.getElementById('nameModal').style.display = 'block';
+        document.getElementById('nameInput').focus();
+      }
+
+      // Add event listeners for dragging
+      document.addEventListener('mousedown', handleMouseDown);
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+
+      // Add enter key support for modals
+      document.getElementById('nameInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') submitName();
+      });
+      document.getElementById('memberIdInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') submitEarnDisc();
+      });
+    };
+  </script>
+</body>
+</html>
