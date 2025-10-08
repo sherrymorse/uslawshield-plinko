@@ -329,11 +329,7 @@
       createPegs();
       drawBoard();
       
-      canvas.addEventListener('mousedown', handleCanvasMouseDown);
-      canvas.addEventListener('mousemove', handleCanvasMouseMove);
-      canvas.addEventListener('mouseup', handleCanvasMouseUp);
-      document.addEventListener('mousemove', handleDocumentMouseMove);
-      document.addEventListener('mouseup', handleDocumentMouseUp);
+      canvas.addEventListener('click', handleCanvasClick);
     }
 
     function createPegs() {
@@ -395,11 +391,7 @@
         ctx.fillStyle = 'white';
         ctx.font = 'bold 20px Oswald';
         ctx.textAlign = 'center';
-        ctx.fillText(`${SLOT_VALUES[i]}`, i * slotWidth + slotWidth / 2, BOARD_HEIGHT - slotHeight / 2 + 7);
-      }
-      
-      if (dragging && dragX && dragY) {
-        drawDisc(dragX, dragY);
+        ctx.fillText(`$${SLOT_VALUES[i]}`, i * slotWidth + slotWidth / 2, BOARD_HEIGHT - slotHeight / 2 + 7);
       }
       
       if (currentDisc) {
