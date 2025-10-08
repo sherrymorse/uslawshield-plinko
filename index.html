@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>U.S. LawShield Plinko</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Anton&family=Oswald:wght@400;700&family=PT+Sans:wght@400;700&display=block" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Anton&family=Oswald:wght@400;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -500,6 +500,8 @@
     let dragX = 0;
     let dragY = 0;
     const DROP_ZONE_Y_MAX = 100; // Top 100px of canvas for dropping
+    const RAMP_HEIGHT = 50; // Height for ramp phase
+    const RAMP_ACCEL = 0.2; // Acceleration on ramp
     const bounceSound = new Audio('https://freesound.org/data/previews/51/51702_344017-lq.mp3');
     const dropSound = new Audio('https://freesound.org/data/previews/750/750240_13765367-lq.mp3');
     const winSound = new Audio('https://freesound.org/data/previews/507/507976_10722050-lq.mp3');
@@ -517,7 +519,7 @@
       const colSpacing = BOARD_WIDTH / 8;
       for (let row = 0; row < NUM_ROWS; row++) {
         const numCols = row % 2 === 0 ? 9 : 8;
-        const offset = row % 2 === 0 ? 0 : colSpacing / 2;
+        const offset = row % 2 == 0 ? 0 : colSpacing / 2;
         for (let col = 0; col < numCols; col++) {
           pegs.push({
             x: offset + col * colSpacing,
@@ -585,18 +587,24 @@
       // Update position
       currentDisc.x += currentDisc.vx;
       currentDisc.y += currentDisc.vy;
-      currentDisc.vy += 0.12; // Gravity maintained for lightweight feel
 
-      // Add damping (air resistance)
-      currentDisc.vx *= 0.98;
-      currentDisc.vy *= 0.98;
+      if (currentDisc.y < RAMP_HEIGHT) {
+        // Ramp phase: build momentum with horizontal acceleration if needed, but since drop from top, add slight down force
+        currentDisc.vy += 0.12; // Normal gravity on ramp
+      } else {
+        currentDisc.vy += 0.12; // Normal gravity
+      }
+
+      // Add damping (air resistance) - friction heavy
+      currentDisc.vx *= 0.95;
+      currentDisc.vy *= 0.95;
 
       // Wall collisions with improved bounce
       if (currentDisc.x - DISC_RADIUS < 0) {
         currentDisc.x = DISC_RADIUS + 2;
-        currentDisc.vx *= -0.98; // Increased elasticity for stronger bounce
+        currentDisc.vx *= -0.98;
         currentDisc.vy *= 0.95;
-        currentDisc.vx += (Math.random() - 0.5) * 0.8; // Increased randomness
+        currentDisc.vx += (Math.random() - 0.5) * 0.8;
         bounceSound.currentTime = 0;
         bounceSound.play();
       } else if (currentDisc.x + DISC_RADIUS > BOARD_WIDTH) {
@@ -634,11 +642,11 @@
           currentDisc.vy -= 2 * dot * ny;
 
           // Increased bounce factor for livelier reaction
-          currentDisc.vx *= 0.99; // Near-perfect elasticity
+          currentDisc.vx *= 0.99;
           currentDisc.vy *= 0.99;
 
           // Increased random perturbation for more unpredictable bounces
-          currentDisc.vx += (Math.random() - 0.5) * 1.5; // Stronger randomness
+          currentDisc.vx += (Math.random() - 0.5) * 1.5;
           currentDisc.vy += (Math.random() - 0.5) * 1.5;
 
           // Ensure disc doesn't get trapped
@@ -671,7 +679,7 @@
     }
 
     function getCanvasRelativePosition(event) {
-      const rect = canvas.getBoundingClientRect();
+      const rect = canvas.getBoundingRect();
       return {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top
