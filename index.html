@@ -566,10 +566,12 @@
       document.getElementById('earnDiscModal').style.display = 'none';
     };
 
-    window.submitEarnDisc = function() {
+    window.submitEarnDisc = async function() {
       const activity = document.getElementById('activitySelect').value;
       const memberId = document.getElementById('memberIdInput').value.trim().toUpperCase();
       const errorMsg = document.getElementById('errorMessage');
+
+      console.log('Submit clicked:', { activity, memberId });
 
       if (!activity) {
         errorMsg.textContent = 'Please select an activity';
@@ -586,7 +588,8 @@
       gameState.discs.push({ activity, memberId, used: false });
       closeEarnModal();
       updateDiscList();
-      saveGameState();
+      await saveGameState();
+      console.log('Disc added successfully');
     };
 
     function validateMemberId(memberId) {
@@ -630,8 +633,14 @@
       document.getElementById('nameInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') submitName();
       });
+      document.getElementById('activitySelect').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') submitEarnDisc();
+      });
       document.getElementById('memberIdInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') submitEarnDisc();
+      });
+      document.getElementById('memberIdInput').addEventListener('input', (e) => {
+        e.target.value = e.target.value.toUpperCase();
       });
       document.getElementById('totalScore').textContent = `Total Winnings: $${gameState.totalScore}`;
     };
