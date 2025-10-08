@@ -329,7 +329,11 @@
       createPegs();
       drawBoard();
       
-      canvas.addEventListener('click', handleCanvasClick);
+      canvas.addEventListener('mousedown', handleCanvasMouseDown);
+      canvas.addEventListener('mousemove', handleCanvasMouseMove);
+      canvas.addEventListener('mouseup', handleCanvasMouseUp);
+      document.addEventListener('mousemove', handleDocumentMouseMove);
+      document.addEventListener('mouseup', handleDocumentMouseUp);
     }
 
     function createPegs() {
@@ -391,7 +395,11 @@
         ctx.fillStyle = 'white';
         ctx.font = 'bold 20px Oswald';
         ctx.textAlign = 'center';
-        ctx.fillText(`$${SLOT_VALUES[i]}`, i * slotWidth + slotWidth / 2, BOARD_HEIGHT - slotHeight / 2 + 7);
+        ctx.fillText(`${SLOT_VALUES[i]}`, i * slotWidth + slotWidth / 2, BOARD_HEIGHT - slotHeight / 2 + 7);
+      }
+      
+      if (dragging && dragX && dragY) {
+        drawDisc(dragX, dragY);
       }
       
       if (currentDisc) {
@@ -508,10 +516,106 @@
       }
     }
 
-    function selectDisc(index) {
+    function handleCanvasMouseDown(e) {
+      // Not used for drag initiation anymore
+    }
+
+    function handleCanvasMouseMove(e) {
+      if (!dragging) return;
+      const rect = canvas.getBoundingClientRect();
+      let x = e.clientX - rect.left;
+      let y = e.clientY - rect.top;
+      
+      x = Math.max(DISC_RADIUS, Math.min(BOARD_WIDTH - DISC_RADIUS, x));
+      y = Math.min(y, DROP_ZONE_Y_MAX);
+      
+      dragX = x;
+      dragY = y;
+      drawBoard();
+    }
+
+    function handleCanvasMouseUp(e) {
+      if (!dragging) return;
+      
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      if (y <= DROP_ZONE_Y_MAX && x >= DISC_RADIUS && x <= BOARD_WIDTH - DISC_RADIUS) {
+        gameState.discs[draggingIndex].used = true;
+        currentDisc = {
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 2,
+          vy: 0
+        };
+        updateDiscList();
+        saveGameState();
+        animateDisc();
+      }
+      
+      dragging = false;
+      draggingIndex = -1;
+      dragX = 0;
+      dragY = 0;
+      drawBoard();
+    }
+
+    function handleDocumentMouseMove(e) {
+      if (!dragging) return;
+      const rect = canvas.getBoundingClientRect();
+      let x = e.clientX - rect.left;
+      let y = e.clientY - rect.top;
+      
+      x = Math.max(DISC_RADIUS, Math.min(BOARD_WIDTH - DISC_RADIUS, x));
+      y = Math.min(y, DROP_ZONE_Y_MAX);
+      
+      dragX = x;
+      dragY = y;
+      drawBoard();
+    }
+
+    function handleDocumentMouseUp(e) {
+      if (!dragging) return;
+      
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      if (y <= DROP_ZONE_Y_MAX && x >= DISC_RADIUS && x <= BOARD_WIDTH - DISC_RADIUS) {
+        gameState.discs[draggingIndex].used = true;
+        currentDisc = {
+          x: x,
+          y: y,
+          vx: (Math.random() - 0.5) * 2,
+          vy: 0
+        };
+        updateDiscList();
+        saveGameState();
+        animateDisc();
+      }
+      
+      dragging = false;
+      draggingIndex = -1;
+      dragX = 0;
+      dragY = 0;
+      const items = document.querySelectorAll('.disc-item');
+      items.forEach(item => {
+        item.style.opacity = '1';
+        item.style.transform = 'scale(1)';
+      });
+      drawBoard();
+    }
+
+    function startDrag(index) {
       if (currentDisc || gameState.discs[index].used) return;
-      selectedDiscIndex = index;
-      updateDiscList();
+      dragging = true;
+      draggingIndex = index;
+      const item = document.querySelectorAll('.disc-item')[index];
+      if (item) {
+        item.style.opacity = '0.5';
+        item.style.transform = 'scale(1.1)';
+      }
     }
 
     function getOrCreatePlayerId() {
@@ -549,13 +653,18 @@
       list.innerHTML = '';
       const available = gameState.discs.filter((d, i) => !d.used);
       
+      let availableIndex = 0;
       gameState.discs.forEach((disc, index) => {
         if (disc.used) return;
         const item = document.createElement('div');
-        item.className = 'disc-item' + (selectedDiscIndex === index ? ' selected' : '');
-        item.onclick = () => selectDisc(index);
+        item.className = 'disc-item';
+        item.onmousedown = (e) => {
+          e.preventDefault();
+          startDrag(index);
+        };
         item.innerHTML = `🎯 Disc #${index + 1}`;
         list.appendChild(item);
+        availableIndex++;
       });
       
       document.getElementById('availableCount').textContent = `(${available.length})`;
