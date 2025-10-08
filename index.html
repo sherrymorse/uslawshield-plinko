@@ -220,12 +220,6 @@
       margin-right: 10px;
     }
 
-    .disc-item.used {
-      opacity: 0.6;
-      border-left-color: #6c757d;
-      cursor: not-allowed;
-    }
-
     .instructions {
       font-size: 0.85em;
       color: #e7d386;
@@ -407,10 +401,6 @@
         <h4>Available Discs <span class="disc-count" id="availableCount"></span></h4>
         <div class="disc-list" id="availableDiscList"></div>
         <button class="earn-more" onclick="openEarnDiscModal()">Earn More Discs</button>
-      </div>
-      <div class="disc-section">
-        <h4>Used Discs <span class="disc-count" id="usedCount"></span></h4>
-        <div class="disc-list" id="usedDiscList"></div>
       </div>
     </div>
   </div>
@@ -604,13 +594,13 @@
       // Wall collisions with improved bounce
       if (currentDisc.x - DISC_RADIUS < 0) {
         currentDisc.x = DISC_RADIUS;
-        currentDisc.vx *= -0.9;
+        currentDisc.vx *= -0.95;
         currentDisc.vy *= 0.95; // Slight vertical damping
         bounceSound.currentTime = 0;
         bounceSound.play();
       } else if (currentDisc.x + DISC_RADIUS > BOARD_WIDTH) {
         currentDisc.x = BOARD_WIDTH - DISC_RADIUS;
-        currentDisc.vx *= -0.9;
+        currentDisc.vx *= -0.95;
         currentDisc.vy *= 0.95;
         bounceSound.currentTime = 0;
         bounceSound.play();
@@ -642,12 +632,12 @@
           currentDisc.vy -= 2 * dot * ny;
 
           // Increased bounce factor
-          currentDisc.vx *= 0.85;
-          currentDisc.vy *= 0.85;
+          currentDisc.vx *= 0.9;
+          currentDisc.vy *= 0.9;
 
           // Increased random perturbation
-          currentDisc.vx += (Math.random() - 0.5) * 0.5;
-          currentDisc.vy += (Math.random() - 0.5) * 0.5;
+          currentDisc.vx += (Math.random() - 0.5) * 0.7;
+          currentDisc.vy += (Math.random() - 0.5) * 0.7;
 
           // Ensure disc doesn't get trapped
           currentDisc.vy = Math.max(currentDisc.vy, 0.5);
@@ -767,12 +757,11 @@
 
     function updateDiscList() {
       const availableList = document.getElementById('availableDiscList');
-      const usedList = document.getElementById('usedDiscList');
       availableList.innerHTML = '';
-      usedList.innerHTML = '';
       gameState.discs.forEach((disc, index) => {
+        if (disc.used) return;
         const item = document.createElement('div');
-        item.className = `disc-item ${disc.used ? 'used' : ''}`;
+        item.className = 'disc-item';
         item.dataset.index = index;
         item.innerHTML = `
           <svg width="20" height="20" viewBox="0 0 20 20">
@@ -784,14 +773,9 @@
           Activity: ${disc.activity}<br>
           Member ID: ${disc.memberId}
         `;
-        if (disc.used) {
-          usedList.appendChild(item);
-        } else {
-          availableList.appendChild(item);
-        }
+        availableList.appendChild(item);
       });
       document.getElementById('availableCount').textContent = `(${gameState.discs.filter(d => !d.used).length})`;
-      document.getElementById('usedCount').textContent = `(${gameState.discs.filter(d => d.used).length})`;
     }
 
     window.openEarnDiscModal = function() {
