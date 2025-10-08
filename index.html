@@ -193,6 +193,12 @@
       border-left: 4px solid #d51e47;
       font-size: 0.9em;
       color: #333;
+      display: flex;
+      align-items: center;
+    }
+
+    .disc-item svg {
+      margin-right: 10px;
     }
 
     .disc-item.used {
@@ -331,8 +337,8 @@
       <canvas id="plinkoCanvas" width="600" height="800"></canvas>
       <div class="drop-controls">
         <label for="dropPosition">Drop Position:</label>
-        <input type="range" id="dropPosition" min="0" max="8" value="4" step="1">
-        <button class="btn-primary" onclick="dropDisc()" disabled id="dropButton">DROP DISC</button>
+        <input type="range" id="dropPosition" min="0" max="8" value="4" step="1" oninput="updatePreview()">
+        <button class="btn-primary" onclick="dropDisc()" disabled id="dropButton">Pull Lever to Drop</button>
       </div>
       <div class="total-score" id="totalScore">Total Winnings: $0</div>
     </div>
@@ -432,6 +438,11 @@
     let pegs = [];
     let currentDisc = null;
     let animationFrameId = null;
+    let previewX = BOARD_WIDTH / 2;
+    const bounceSound = new Audio('https://freesound.org/data/previews/51/51702_344017-lq.mp3');
+    const dropSound = new Audio('https://freesound.org/data/previews/750/750240_13765367-lq.mp3');
+    const winSound = new Audio('https://freesound.org/data/previews/507/507976_10722050-lq.mp3');
+    const loseSound = new Audio('https://freesound.org/data/previews/535/535236_11529372-lq.mp3');
 
     function initPlinkoBoard() {
       canvas = document.getElementById('plinkoCanvas');
@@ -477,7 +488,16 @@
         ctx.textAlign = 'center';
         ctx.fillText(`$${SLOT_VALUES[i]}`, i * slotWidth + slotWidth / 2, BOARD_HEIGHT - slotHeight / 2 + 5);
       }
-      // Draw disc if animating
+      // Draw preview disc if not animating
+      if (!currentDisc) {
+        ctx.beginPath();
+        ctx.arc(previewX, DISC_RADIUS, DISC_RADIUS, 0, Math.PI * 2);
+        ctx.fillStyle = '#d51e47';
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.stroke();
+      }
+      // Draw animating disc
       if (currentDisc) {
         ctx.beginPath();
         ctx.arc(currentDisc.x, currentDisc.y, DISC_RADIUS, 0, Math.PI * 2);
@@ -490,12 +510,17 @@
 
     function animateDisc() {
       if (!currentDisc) return;
+      currentDisc.x += currentDisc.vx;
       currentDisc.y += currentDisc.vy;
-      currentDisc.vy += 0.5; // Gravity
+      currentDisc.vy += 0.1; // Reduced gravity for slower fall
 
       // Wall collisions
-      if (currentDisc.x - DISC_RADIUS < 0 || currentDisc.x + DISC_RADIUS > BOARD_WIDTH) {
-        currentDisc.vx *= -1;
+      if (currentDisc.x - DISC_RADIUS < 0) {
+        currentDisc.x = DISC_RADIUS;
+        currentDisc.vx *= -0.8;
+      } else if (currentDisc.x + DISC_RADIUS > BOARD_WIDTH) {
+        currentDisc.x = BOARD_WIDTH - DISC_RADIUS;
+        currentDisc.vx *= -0.8;
       }
 
       // Peg collisions
@@ -503,12 +528,27 @@
         const dx = currentDisc.x - peg.x;
         const dy = currentDisc.y - peg.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < DISC_RADIUS + PEG_RADIUS) {
-          // Bounce
-          const angle = Math.atan2(dy, dx);
-          const speed = Math.sqrt(currentDisc.vx * currentDisc.vx + currentDisc.vy * currentDisc.vy);
-          currentDisc.vx = -Math.cos(angle) * speed * 0.8 + (Math.random() - 0.5) * 2;
-          currentDisc.vy = -Math.sin(angle) * speed * 0.8;
+        const minDist = DISC_RADIUS + PEG_RADIUS;
+        if (dist < minDist) {
+          // Play bounce sound
+          bounceSound.currentTime = 0;
+          bounceSound.play();
+
+          // Position correction
+          const nx = dx / dist;
+          const ny = dy / dist;
+          const overlap = minDist - dist;
+          currentDisc.x += nx * (overlap + 0.1);
+          currentDisc.y += ny * (overlap + 0.1);
+
+          // Velocity reflection
+          const dot = currentDisc.vx * nx + currentDisc.vy * ny;
+          currentDisc.vx -= 2 * dot * nx;
+          currentDisc.vy -= 2 * dot * ny;
+
+          // Add randomness
+          currentDisc.vx += (Math.random() - 0.5) * 0.5;
+          currentDisc.vy += (Math.random() - 0.5) * 0.5;
         }
       });
 
@@ -518,9 +558,17 @@
         const winnings = SLOT_VALUES[slotIndex] || 0;
         gameState.totalScore += winnings;
         document.getElementById('totalScore').textContent = `Total Winnings: $${gameState.totalScore}`;
+        if (winnings > 0) {
+          winSound.currentTime = 0;
+          winSound.play();
+        } else {
+          loseSound.currentTime = 0;
+          loseSound.play();
+        }
         currentDisc = null;
         saveGameState();
         updateDropButton();
+        drawBoard(); // Redraw to show preview again
         cancelAnimationFrame(animationFrameId);
         return;
       }
@@ -529,19 +577,25 @@
       animationFrameId = requestAnimationFrame(animateDisc);
     }
 
-    window.dropDisc = function() {
+    window.updatePreview = function() {
       const position = parseInt(document.getElementById('dropPosition').value);
-      const dropX = (position + 0.5) * (BOARD_WIDTH / 9);
+      previewX = (position + 0.5) * (BOARD_WIDTH / 9);
+      drawBoard();
+    };
+
+    window.dropDisc = function() {
       const availableDiscIndex = gameState.discs.findIndex(d => !d.used);
       if (availableDiscIndex === -1) return;
 
       gameState.discs[availableDiscIndex].used = true;
       currentDisc = {
-        x: dropX,
+        x: previewX,
         y: DISC_RADIUS,
-        vx: (Math.random() - 0.5) * 2,
+        vx: (Math.random() - 0.5) * 1,
         vy: 0
       };
+      dropSound.currentTime = 0;
+      dropSound.play();
       animateDisc();
       updateDiscList();
       updateDropButton();
@@ -589,6 +643,7 @@
         const item = document.createElement('div');
         item.className = `disc-item ${disc.used ? 'used' : ''}`;
         item.innerHTML = `
+          <svg width="20" height="20"><circle cx="10" cy="10" r="9" fill="#d51e47" stroke="white" stroke-width="1"/></svg>
           Disc #${index + 1}<br>
           Activity: ${disc.activity}<br>
           Member ID: ${disc.memberId}
@@ -665,6 +720,7 @@
     window.onload = async function() {
       await loadGameState();
       initPlinkoBoard();
+      updatePreview();
       updateDiscList();
       updateDropButton();
       showPlayerInfo();
