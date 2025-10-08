@@ -104,6 +104,7 @@
       width: 300px;
       max-height: 600px;
       overflow-y: auto;
+      color: #333;
     }
     .disc-sidebar h4 {
       color: #d51e47;
@@ -118,9 +119,17 @@
       margin-bottom: 10px;
       transition: all 0.2s;
       color: #333;
+      user-select: none;
     }
-    .disc-item:hover { transform: scale(1.03); }
-    .disc-item.selected { opacity: 0.5; transform: scale(1.05); }
+    .disc-item:hover { 
+      transform: scale(1.03); 
+      background: #e9ecef;
+    }
+    .disc-item.selected { 
+      opacity: 0.5; 
+      transform: scale(1.05);
+      background: #dee2e6;
+    }
     .instructions {
       font-size: 0.85em;
       color: #e7d386;
