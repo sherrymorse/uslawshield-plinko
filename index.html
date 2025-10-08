@@ -269,8 +269,8 @@
         <div class="error-message" id="errorMessage"></div>
       </div>
       <div class="modal-footer">
-        <button class="btn-primary" onclick="submitEarnDisc()">Submit</button>
-        <button class="btn-secondary" onclick="closeEarnModal()">Cancel</button>
+        <button type="button" class="btn-primary" id="submitDiscBtn">Submit</button>
+        <button type="button" class="btn-secondary" id="cancelDiscBtn">Cancel</button>
       </div>
     </div>
   </div>
@@ -630,6 +630,10 @@
         showPlayerInfo();
       }
 
+      // Submit and cancel button event listeners
+      document.getElementById('submitDiscBtn').addEventListener('click', submitEarnDisc);
+      document.getElementById('cancelDiscBtn').addEventListener('click', closeEarnModal);
+
       document.getElementById('nameInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') submitName();
       });
@@ -642,7 +646,7 @@
       document.getElementById('memberIdInput').addEventListener('input', (e) => {
         e.target.value = e.target.value.toUpperCase();
       });
-      document.getElementById('totalScore').textContent = `Total Winnings: $${gameState.totalScore}`;
+      document.getElementById('totalScore').textContent = `Total Winnings: ${gameState.totalScore}`;
     };
   </script>
 </body>
