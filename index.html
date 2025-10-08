@@ -236,6 +236,31 @@
       border-radius: 5px;
     }
 
+    .disc-count {
+      font-size: 1em;
+      color: #d51e47;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .earn-more {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px;
+      background: linear-gradient(135deg, #d51e47 0%, #b01838 100%);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .earn-more:hover {
+      opacity: 0.9;
+    }
+
     .total-score {
       text-align: center;
       font-size: 1.5em;
@@ -379,11 +404,12 @@
     <div class="disc-sidebar">
       <div class="instructions">Drag an available disc to the top of the board and release to drop!</div>
       <div class="disc-section">
-        <h4>Available Discs</h4>
+        <h4>Available Discs <span class="disc-count" id="availableCount"></span></h4>
         <div class="disc-list" id="availableDiscList"></div>
+        <button class="earn-more" onclick="openEarnDiscModal()">Earn More Discs</button>
       </div>
       <div class="disc-section">
-        <h4>Used Discs</h4>
+        <h4>Used Discs <span class="disc-count" id="usedCount"></span></h4>
         <div class="disc-list" id="usedDiscList"></div>
       </div>
     </div>
@@ -575,15 +601,17 @@
       currentDisc.vx *= 0.98;
       currentDisc.vy *= 0.98;
 
-      // Wall collisions
+      // Wall collisions with improved bounce
       if (currentDisc.x - DISC_RADIUS < 0) {
         currentDisc.x = DISC_RADIUS;
-        currentDisc.vx *= -0.75;
+        currentDisc.vx *= -0.9;
+        currentDisc.vy *= 0.95; // Slight vertical damping
         bounceSound.currentTime = 0;
         bounceSound.play();
       } else if (currentDisc.x + DISC_RADIUS > BOARD_WIDTH) {
         currentDisc.x = BOARD_WIDTH - DISC_RADIUS;
-        currentDisc.vx *= -0.75;
+        currentDisc.vx *= -0.9;
+        currentDisc.vy *= 0.95;
         bounceSound.currentTime = 0;
         bounceSound.play();
       }
@@ -605,21 +633,21 @@
 
           // Position correction to prevent sticking
           const overlap = minDist - dist;
-          currentDisc.x += nx * overlap * 0.5;
-          currentDisc.y += ny * overlap * 0.5;
+          currentDisc.x += nx * overlap * 0.6;
+          currentDisc.y += ny * overlap * 0.6;
 
           // Reflect velocity
           const dot = currentDisc.vx * nx + currentDisc.vy * ny;
           currentDisc.vx -= 2 * dot * nx;
           currentDisc.vy -= 2 * dot * ny;
 
-          // Dampen bounce to lose energy
-          currentDisc.vx *= 0.75;
-          currentDisc.vy *= 0.75;
+          // Increased bounce factor
+          currentDisc.vx *= 0.85;
+          currentDisc.vy *= 0.85;
 
-          // Add small random perturbation to prevent sticking
-          currentDisc.vx += (Math.random() - 0.5) * 0.3;
-          currentDisc.vy += (Math.random() - 0.5) * 0.3;
+          // Increased random perturbation
+          currentDisc.vx += (Math.random() - 0.5) * 0.5;
+          currentDisc.vy += (Math.random() - 0.5) * 0.5;
 
           // Ensure disc doesn't get trapped
           currentDisc.vy = Math.max(currentDisc.vy, 0.5);
@@ -762,6 +790,8 @@
           availableList.appendChild(item);
         }
       });
+      document.getElementById('availableCount').textContent = `(${gameState.discs.filter(d => !d.used).length})`;
+      document.getElementById('usedCount').textContent = `(${gameState.discs.filter(d => d.used).length})`;
     }
 
     window.openEarnDiscModal = function() {
