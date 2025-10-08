@@ -205,8 +205,8 @@
   <div class="player-info" id="playerInfo" style="display: none;"></div>
   
   <div class="controls">
-    <button class="btn-primary" onclick="openEarnDiscModal()">Earn Plinko Disc</button>
-    <button class="btn-secondary" onclick="clearProgress()">Clear Progress</button>
+    <button class="btn-primary" id="earnDiscBtn">Earn Plinko Disc</button>
+    <button class="btn-secondary" id="clearProgressBtn">Clear Progress</button>
   </div>
   
   <div class="game-container">
@@ -219,7 +219,7 @@
       <div class="instructions">Click a disc, then click on the ramp to drop!</div>
       <h4>Available Discs <span id="availableCount"></span></h4>
       <div id="availableDiscList"></div>
-      <button class="btn-primary" onclick="openEarnDiscModal()" style="width: 100%; margin-top: 10px;">Earn More Discs</button>
+      <button class="btn-primary" id="earnMoreBtn" style="width: 100%; margin-top: 10px;">Earn More Discs</button>
     </div>
   </div>
 
@@ -233,7 +233,7 @@
         <div class="error-message" id="nameError">Please enter your name</div>
       </div>
       <div class="modal-footer">
-        <button class="btn-primary" onclick="submitName()">Start Playing</button>
+        <button class="btn-primary" id="submitNameBtn">Start Playing</button>
       </div>
     </div>
   </div>
@@ -338,7 +338,6 @@
     function drawBoard() {
       ctx.clearRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
       
-      // Enhanced ramp with gradient
       const rampGradient = ctx.createLinearGradient(0, 0, 0, RAMP_HEIGHT);
       rampGradient.addColorStop(0, '#6b7280');
       rampGradient.addColorStop(0.5, '#4b5563');
@@ -346,12 +345,10 @@
       ctx.fillStyle = rampGradient;
       ctx.fillRect(0, 0, BOARD_WIDTH, RAMP_HEIGHT);
       
-      // Ramp border
       ctx.strokeStyle = '#e7d386';
       ctx.lineWidth = 4;
       ctx.strokeRect(2, 2, BOARD_WIDTH - 4, RAMP_HEIGHT - 4);
       
-      // Texture lines
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
       ctx.lineWidth = 1;
       for (let i = 20; i < RAMP_HEIGHT; i += 20) {
@@ -361,7 +358,6 @@
         ctx.stroke();
       }
       
-      // Draw pegs with glow
       pegs.forEach(peg => {
         ctx.shadowBlur = 8;
         ctx.shadowColor = '#e7d386';
@@ -375,7 +371,6 @@
         ctx.stroke();
       });
       
-      // Draw slots
       const slotHeight = 50;
       const slotWidth = BOARD_WIDTH / NUM_SLOTS;
       for (let i = 0; i < NUM_SLOTS; i++) {
@@ -552,26 +547,35 @@
       });
       
       document.getElementById('availableCount').textContent = `(${available.length})`;
-      showPlayerInfo();
+      if (gameState.playerName) {
+        showPlayerInfo();
+      }
     }
 
-    window.openEarnDiscModal = function() {
+    function openEarnDiscModal() {
       document.getElementById('earnDiscModal').style.display = 'block';
       document.getElementById('activitySelect').value = '';
       document.getElementById('memberIdInput').value = '';
       document.getElementById('errorMessage').style.display = 'none';
-    };
+    }
 
-    window.closeEarnModal = function() {
+    function closeEarnModal() {
       document.getElementById('earnDiscModal').style.display = 'none';
-    };
+      document.getElementById('errorMessage').style.display = 'none';
+    }
 
-    window.submitEarnDisc = async function() {
+    function validateMemberId(memberId) {
+      const regex = /^[A-Z]{2,3}\d+$/;
+      return memberId.length >= 5 && memberId.length <= 10 && regex.test(memberId);
+    }
+
+    async function submitEarnDisc() {
+      console.log('submitEarnDisc called');
       const activity = document.getElementById('activitySelect').value;
       const memberId = document.getElementById('memberIdInput').value.trim().toUpperCase();
       const errorMsg = document.getElementById('errorMessage');
 
-      console.log('Submit clicked:', { activity, memberId });
+      console.log('Activity:', activity, 'Member ID:', memberId);
 
       if (!activity) {
         errorMsg.textContent = 'Please select an activity';
@@ -586,30 +590,27 @@
       }
 
       gameState.discs.push({ activity, memberId, used: false });
+      console.log('Disc added to gameState:', gameState.discs);
       closeEarnModal();
       updateDiscList();
       await saveGameState();
-      console.log('Disc added successfully');
-    };
-
-    function validateMemberId(memberId) {
-      const regex = /^[A-Z]{2,3}\d+$/;
-      return memberId.length >= 5 && memberId.length <= 10 && regex.test(memberId);
+      console.log('Game state saved');
     }
 
-    window.submitName = function() {
+    function submitName() {
       const name = document.getElementById('nameInput').value.trim();
+      const errorElement = document.getElementById('nameError');
       if (!name) {
-        document.getElementById('nameError').style.display = 'block';
+        errorElement.style.display = 'block';
         return;
       }
       gameState.playerName = name;
       document.getElementById('nameModal').style.display = 'none';
       showPlayerInfo();
       saveGameState();
-    };
+    }
 
-    window.clearProgress = function() {
+    function clearProgress() {
       if (confirm('Clear all discs and score? This cannot be undone.')) {
         gameState.discs = [];
         gameState.totalScore = 0;
@@ -617,9 +618,10 @@
         document.getElementById('totalScore').textContent = 'Total Winnings: $0';
         saveGameState();
       }
-    };
+    }
 
     window.onload = async function() {
+      console.log('Page loaded, initializing...');
       await loadGameState();
       initPlinkoBoard();
       updateDiscList();
@@ -630,23 +632,38 @@
         showPlayerInfo();
       }
 
-      // Submit and cancel button event listeners
-      document.getElementById('submitDiscBtn').addEventListener('click', submitEarnDisc);
+      // All event listeners
+      document.getElementById('earnDiscBtn').addEventListener('click', openEarnDiscModal);
+      document.getElementById('earnMoreBtn').addEventListener('click', openEarnDiscModal);
+      document.getElementById('clearProgressBtn').addEventListener('click', clearProgress);
+      document.getElementById('submitDiscBtn').addEventListener('click', function(e) {
+        console.log('Submit button clicked');
+        e.preventDefault();
+        submitEarnDisc();
+      });
       document.getElementById('cancelDiscBtn').addEventListener('click', closeEarnModal);
+      document.getElementById('submitNameBtn').addEventListener('click', submitName);
 
       document.getElementById('nameInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') submitName();
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitName();
+        }
       });
-      document.getElementById('activitySelect').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') submitEarnDisc();
-      });
+      
       document.getElementById('memberIdInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') submitEarnDisc();
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitEarnDisc();
+        }
       });
+      
       document.getElementById('memberIdInput').addEventListener('input', (e) => {
         e.target.value = e.target.value.toUpperCase();
       });
-      document.getElementById('totalScore').textContent = `Total Winnings: ${gameState.totalScore}`;
+      
+      document.getElementById('totalScore').textContent = `Total Winnings: $${gameState.totalScore}`;
+      console.log('All event listeners attached');
     };
   </script>
 </body>
