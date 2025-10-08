@@ -155,6 +155,7 @@
       margin: 0 auto;
       background: #ffffff;
       border-radius: 10px;
+      cursor: grab;
     }
 
     .drop-controls {
@@ -162,25 +163,6 @@
       margin-top: 15px;
       position: relative;
       height: 60px;
-    }
-
-    #dropPosition {
-      width: 300px;
-      margin-right: 10px;
-    }
-
-    .lever {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 40px;
-      height: 60px;
-      cursor: pointer;
-    }
-
-    .lever.released {
-      transform: translateX(-50%) rotate(45deg);
     }
 
     .disc-sidebar {
@@ -217,6 +199,11 @@
       color: #333;
       display: flex;
       align-items: center;
+      cursor: grab;
+    }
+
+    .disc-item:active {
+      cursor: grabbing;
     }
 
     .disc-item svg {
@@ -226,6 +213,7 @@
     .disc-item.used {
       opacity: 0.6;
       border-left-color: #6c757d;
+      cursor: not-allowed;
     }
 
     .total-score {
@@ -366,14 +354,6 @@
   <div class="game-container">
     <div class="plinko-board">
       <canvas id="plinkoCanvas" width="600" height="800"></canvas>
-      <div class="drop-controls">
-        <label for="dropPosition">Drop Position:</label>
-        <input type="range" id="dropPosition" min="0" max="8" value="4" step="1" oninput="updatePreview()">
-        <svg id="lever" class="lever" viewBox="0 0 40 60" onclick="toggleLever()">
-          <rect x="10" y="10" width="20" height="50" fill="#d51e47" stroke="white" stroke-width="2"/>
-          <circle cx="20" cy="15" r="8" fill="#e7d386"/>
-        </svg>
-      </div>
       <div class="total-score" id="totalScore">Total Winnings: $0</div>
     </div>
     <div class="disc-sidebar">
@@ -472,8 +452,11 @@
     let pegs = [];
     let currentDisc = null;
     let animationFrameId = null;
-    let previewX = BOARD_WIDTH / 2;
-    let leverReleased = false;
+    let dragging = false;
+    let draggingIndex = -1;
+    let dragX = 0;
+    let dragY = 0;
+    const DROP_ZONE_Y_MAX = 100; // Top 100px of canvas for dropping
     const bounceSound = new Audio('https://freesound.org/data/previews/51/51702_344017-lq.mp3');
     const dropSound = new Audio('https://freesound.org/data/previews/750/750240_13765367-lq.mp3');
     const winSound = new Audio('https://freesound.org/data/previews/507/507976_10722050-lq.mp3');
@@ -523,9 +506,9 @@
         ctx.textAlign = 'center';
         ctx.fillText(`$${SLOT_VALUES[i]}`, i * slotWidth + slotWidth / 2, BOARD_HEIGHT - slotHeight / 2 + 5);
       }
-      // Draw preview disc if not animating and lever not released
-      if (!currentDisc && !leverReleased) {
-        drawDisc(previewX, DISC_RADIUS);
+      // Draw dragging disc if dragging
+      if (dragging) {
+        drawDisc(dragX, dragY);
       }
       // Draw animating disc
       if (currentDisc) {
@@ -559,7 +542,11 @@
       // Update position
       currentDisc.x += currentDisc.vx;
       currentDisc.y += currentDisc.vy;
-      currentDisc.vy += 0.1; // Gravity
+      currentDisc.vy += 0.4; // Slightly reduced gravity from 0.5
+
+      // Add damping (air resistance)
+      currentDisc.vx *= 0.99;
+      currentDisc.vy *= 0.99;
 
       // Wall collisions
       if (currentDisc.x - DISC_RADIUS < 0) {
@@ -599,12 +586,16 @@
           currentDisc.vx -= 2 * dot * nx;
           currentDisc.vy -= 2 * dot * ny;
 
+          // Dampen bounce to lose energy
+          currentDisc.vx *= 0.8;
+          currentDisc.vy *= 0.8;
+
           // Add small random perturbation to prevent sticking
           currentDisc.vx += (Math.random() - 0.5) * 0.3;
           currentDisc.vy += (Math.random() - 0.5) * 0.3;
 
           // Ensure disc doesn't get trapped
-          currentDisc.vy = Math.max(currentDisc.vy, 0.1);
+          currentDisc.vy = Math.max(currentDisc.vy, 0.5);
         }
       });
 
@@ -622,9 +613,6 @@
           loseSound.play();
         }
         currentDisc = null;
-        leverReleased = false;
-        document.getElementById('lever').classList.remove('released');
-        updateDropButton();
         saveGameState();
         drawBoard();
         cancelAnimationFrame(animationFrameId);
@@ -635,43 +623,62 @@
       animationFrameId = requestAnimationFrame(animateDisc);
     }
 
-    window.updatePreview = function() {
-      if (!currentDisc && !leverReleased) {
-        const position = parseInt(document.getElementById('dropPosition').value);
-        previewX = (position + 0.5) * (BOARD_WIDTH / 9);
+    function getCanvasRelativePosition(event) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+      };
+    }
+
+    function handleMouseDown(event) {
+      if (dragging || currentDisc) return;
+      const target = event.target.closest('.disc-item');
+      if (target && !target.classList.contains('used')) {
+        draggingIndex = Array.from(document.querySelectorAll('.disc-item')).indexOf(target);
+        if (draggingIndex !== -1) {
+          dragging = true;
+          target.style.opacity = '0.5';
+          const pos = getCanvasRelativePosition(event);
+          dragX = pos.x;
+          dragY = pos.y;
+          drawBoard();
+        }
+      }
+    }
+
+    function handleMouseMove(event) {
+      if (dragging) {
+        const pos = getCanvasRelativePosition(event);
+        dragX = Math.max(DISC_RADIUS, Math.min(BOARD_WIDTH - DISC_RADIUS, pos.x));
+        dragY = pos.y;
         drawBoard();
       }
-    };
+    }
 
-    window.toggleLever = function() {
-      if (currentDisc || !gameState.discs.some(d => !d.used)) return;
-      leverReleased = !leverReleased;
-      const lever = document.getElementById('lever');
-      lever.classList.toggle('released', leverReleased);
-      if (leverReleased) {
-        dropSound.currentTime = 0;
-        dropSound.play();
-        const availableDiscIndex = gameState.discs.findIndex(d => !d.used);
-        if (availableDiscIndex !== -1) {
-          gameState.discs[availableDiscIndex].used = true;
+    function handleMouseUp(event) {
+      if (dragging) {
+        const pos = getCanvasRelativePosition(event);
+        const items = document.querySelectorAll('.disc-item');
+        items[draggingIndex].style.opacity = '1';
+        if (pos.y < DROP_ZONE_Y_MAX && pos.x >= DISC_RADIUS && pos.x <= BOARD_WIDTH - DISC_RADIUS) {
+          gameState.discs[draggingIndex].used = true;
           currentDisc = {
-            x: previewX,
+            x: pos.x,
             y: DISC_RADIUS,
             vx: (Math.random() - 0.5) * 1,
             vy: 0
           };
+          dropSound.currentTime = 0;
+          dropSound.play();
           animateDisc();
           updateDiscList();
-          updateDropButton();
           saveGameState();
         }
+        dragging = false;
+        draggingIndex = -1;
+        drawBoard();
       }
-    };
-
-    function updateDropButton() {
-      const hasAvailable = gameState.discs.some(d => !d.used);
-      document.getElementById('lever').style.opacity = hasAvailable ? '1' : '0.5';
-      document.getElementById('lever').style.cursor = hasAvailable ? 'pointer' : 'not-allowed';
     }
 
     function getOrCreatePlayerId() {
@@ -709,6 +716,7 @@
       gameState.discs.forEach((disc, index) => {
         const item = document.createElement('div');
         item.className = `disc-item ${disc.used ? 'used' : ''}`;
+        item.dataset.index = index;
         item.innerHTML = `
           <svg width="20" height="20" viewBox="0 0 20 20">
             <circle cx="10" cy="10" r="9" fill="#d51e47" stroke="white" stroke-width="1"/>
@@ -755,7 +763,6 @@
       gameState.discs.push({ activity, memberId, used: false });
       closeEarnModal();
       updateDiscList();
-      updateDropButton();
       showPlayerInfo();
       saveGameState();
     };
@@ -785,7 +792,6 @@
         gameState.discs = [];
         gameState.totalScore = 0;
         updateDiscList();
-        updateDropButton();
         document.getElementById('totalScore').textContent = 'Total Winnings: $0';
         saveGameState();
       }
@@ -794,15 +800,18 @@
     window.onload = async function() {
       await loadGameState();
       initPlinkoBoard();
-      updatePreview();
       updateDiscList();
-      updateDropButton();
       showPlayerInfo();
 
       if (!gameState.playerName) {
         document.getElementById('nameModal').style.display = 'block';
         document.getElementById('nameInput').focus();
       }
+
+      // Add event listeners for dragging
+      document.addEventListener('mousedown', handleMouseDown);
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
 
       // Add enter key support for modals
       document.getElementById('nameInput').addEventListener('keypress', function(e) {
