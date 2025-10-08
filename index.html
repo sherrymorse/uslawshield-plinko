@@ -585,25 +585,25 @@
       // Update position
       currentDisc.x += currentDisc.vx;
       currentDisc.y += currentDisc.vy;
-      currentDisc.vy += 0.12; // Reduced gravity by ~65% (from 0.35 to 0.12) for lighter feel
+      currentDisc.vy += 0.12; // Gravity maintained for lightweight feel
 
       // Add damping (air resistance)
-      currentDisc.vx *= 0.98; // Moderate damping for sustained bounces
+      currentDisc.vx *= 0.98;
       currentDisc.vy *= 0.98;
 
       // Wall collisions with improved bounce
       if (currentDisc.x - DISC_RADIUS < 0) {
-        currentDisc.x = DISC_RADIUS + 2; // Increased offset to prevent sticking
-        currentDisc.vx *= -0.97; // Higher elasticity for realistic bounce
-        currentDisc.vy *= 0.95; // Slight vertical damping
-        currentDisc.vx += (Math.random() - 0.5) * 0.6; // Increased randomness
+        currentDisc.x = DISC_RADIUS + 2;
+        currentDisc.vx *= -0.98; // Increased elasticity for stronger bounce
+        currentDisc.vy *= 0.95;
+        currentDisc.vx += (Math.random() - 0.5) * 0.8; // Increased randomness
         bounceSound.currentTime = 0;
         bounceSound.play();
       } else if (currentDisc.x + DISC_RADIUS > BOARD_WIDTH) {
         currentDisc.x = BOARD_WIDTH - DISC_RADIUS - 2;
-        currentDisc.vx *= -0.97;
+        currentDisc.vx *= -0.98;
         currentDisc.vy *= 0.95;
-        currentDisc.vx += (Math.random() - 0.5) * 0.6;
+        currentDisc.vx += (Math.random() - 0.5) * 0.8;
         bounceSound.currentTime = 0;
         bounceSound.play();
       }
@@ -625,7 +625,7 @@
 
           // Position correction to prevent sticking
           const overlap = minDist - dist;
-          currentDisc.x += nx * overlap * 0.8; // Increased correction
+          currentDisc.x += nx * overlap * 0.8;
           currentDisc.y += ny * overlap * 0.8;
 
           // Reflect velocity
@@ -634,12 +634,12 @@
           currentDisc.vy -= 2 * dot * ny;
 
           // Increased bounce factor for livelier reaction
-          currentDisc.vx *= 0.97; // Higher elasticity
-          currentDisc.vy *= 0.97;
+          currentDisc.vx *= 0.99; // Near-perfect elasticity
+          currentDisc.vy *= 0.99;
 
           // Increased random perturbation for more unpredictable bounces
-          currentDisc.vx += (Math.random() - 0.5) * 1.2; // More randomness
-          currentDisc.vy += (Math.random() - 0.5) * 1.2;
+          currentDisc.vx += (Math.random() - 0.5) * 1.5; // Stronger randomness
+          currentDisc.vy += (Math.random() - 0.5) * 1.5;
 
           // Ensure disc doesn't get trapped
           currentDisc.vy = Math.max(currentDisc.vy, 0.5);
@@ -716,7 +716,7 @@
             currentDisc = {
               x: pos.x,
               y: DISC_RADIUS,
-              vx: (Math.random() - 0.5) * 1.5, // Increased initial randomness
+              vx: (Math.random() - 0.5) * 1.5,
               vy: 0
             };
             dropSound.currentTime = 0;
