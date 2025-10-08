@@ -225,7 +225,7 @@
     </div>
     
     <div class="disc-sidebar">
-      <div class="instructions">Click a disc, then click on the ramp to drop!</div>
+      <div class="instructions">Click a disc to select it (it will dim), then click anywhere on the gray ramp area at the top of the board to drop it!</div>
       <h4>Available Discs <span id="availableCount"></span></h4>
       <div id="availableDiscList"></div>
       <button class="btn-primary" id="earnMoreBtn" style="width: 100%; margin-top: 10px;">Earn More Discs</button>
@@ -315,7 +315,10 @@
     let pegs = [];
     let currentDisc = null;
     let animationFrameId = null;
-    let selectedDiscIndex = -1;
+    let dragging = false;
+    let draggingIndex = -1;
+    let dragX = 0;
+    let dragY = 0;
     const DROP_ZONE_Y_MAX = 220;
     const RAMP_HEIGHT = 200;
     const RAMP_SLOPE = -Math.PI / 6;
@@ -326,7 +329,11 @@
       createPegs();
       drawBoard();
       
-      canvas.addEventListener('click', handleCanvasClick);
+      canvas.addEventListener('mousedown', handleCanvasMouseDown);
+      canvas.addEventListener('mousemove', handleCanvasMouseMove);
+      canvas.addEventListener('mouseup', handleCanvasMouseUp);
+      document.addEventListener('mousemove', handleDocumentMouseMove);
+      document.addEventListener('mouseup', handleDocumentMouseUp);
     }
 
     function createPegs() {
@@ -388,7 +395,11 @@
         ctx.fillStyle = 'white';
         ctx.font = 'bold 20px Oswald';
         ctx.textAlign = 'center';
-        ctx.fillText(`$${SLOT_VALUES[i]}`, i * slotWidth + slotWidth / 2, BOARD_HEIGHT - slotHeight / 2 + 7);
+        ctx.fillText(`${SLOT_VALUES[i]}`, i * slotWidth + slotWidth / 2, BOARD_HEIGHT - slotHeight / 2 + 7);
+      }
+      
+      if (dragging && dragX && dragY) {
+        drawDisc(dragX, dragY);
       }
       
       if (currentDisc) {
