@@ -396,7 +396,7 @@
       <div class="total-score" id="totalScore">Total Winnings: $0</div>
     </div>
     <div class="disc-sidebar">
-      <div class="instructions">Drag an available disc to the top of the board and release to drop!</div>
+      <div class="instructions">Drag a disc to the top of the board and release to drop!</div>
       <div class="disc-section">
         <h4>Available Discs <span class="disc-count" id="availableCount"></span></h4>
         <div class="disc-list" id="availableDiscList"></div>
@@ -632,12 +632,12 @@
           currentDisc.vy -= 2 * dot * ny;
 
           // Increased bounce factor
-          currentDisc.vx *= 0.9;
-          currentDisc.vy *= 0.9;
+          currentDisc.vx *= 0.95;
+          currentDisc.vy *= 0.95;
 
           // Increased random perturbation
-          currentDisc.vx += (Math.random() - 0.5) * 0.7;
-          currentDisc.vy += (Math.random() - 0.5) * 0.7;
+          currentDisc.vx += (Math.random() - 0.5) * 0.8;
+          currentDisc.vy += (Math.random() - 0.5) * 0.8;
 
           // Ensure disc doesn't get trapped
           currentDisc.vy = Math.max(currentDisc.vy, 0.5);
@@ -769,9 +769,7 @@
             <circle cx="7" cy="7" r="4" fill="rgba(255, 255, 255, 0.3)"/>
             <circle cx="10" cy="10" r="2" fill="#e7d386"/>
           </svg>
-          Disc #${index + 1}<br>
-          Activity: ${disc.activity}<br>
-          Member ID: ${disc.memberId}
+          Disc #${index + 1}
         `;
         availableList.appendChild(item);
       });
