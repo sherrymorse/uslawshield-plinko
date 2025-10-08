@@ -392,7 +392,7 @@
   </div>
   <div class="game-container">
     <div class="plinko-board">
-      <canvas id="plinkoCanvas" width="600" height="950"></canvas>
+      <canvas id="plinkoCanvas" width="600" height="1000"></canvas>
       <div class="total-score" id="totalScore">Total Winnings: $0</div>
     </div>
     <div class="disc-sidebar">
@@ -485,7 +485,7 @@
     let gameState = { discs: [], totalScore: 0 };
     let canvas, ctx;
     const BOARD_WIDTH = 600;
-    const BOARD_HEIGHT = 950; // Increased height for larger ramp
+    const BOARD_HEIGHT = 1000; // Increased height for larger ramp
     const DISC_RADIUS = 20;
     const PEG_RADIUS = 5;
     const NUM_ROWS = 12;
@@ -499,8 +499,8 @@
     let draggingIndex = -1;
     let dragX = 0;
     let dragY = 0;
-    const DROP_ZONE_Y_MAX = 200; // Extended drop zone for larger ramp
-    const RAMP_HEIGHT = 150; // Increased ramp height to 150px
+    const DROP_ZONE_Y_MAX = 250; // Extended drop zone for larger ramp
+    const RAMP_HEIGHT = 200; // Increased ramp height to 200px
     const RAMP_SLOPE = -Math.PI / 6; // 30-degree downward slope (radians)
     const RAMP_FRICTION = 0.95; // Friction on ramp
     const BOARD_FRICTION = 0.93; // Friction-heavy board
@@ -695,7 +695,7 @@
     }
 
     function getCanvasRelativePosition(event) {
-      const rect = canvas.getBoundingRect();
+      const rect = canvas.getBoundingClientRect();
       return {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top
@@ -835,6 +835,7 @@
         return;
       }
 
+      // Add new disc and update state
       gameState.discs.push({ activity, memberId, used: false });
       closeEarnModal();
       updateDiscList();
@@ -887,6 +888,12 @@
       document.addEventListener('mousedown', handleMouseDown);
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
+
+      // Ensure submit button works
+      const submitButton = document.querySelector('#earnDiscModal .modal-footer .btn-primary');
+      if (submitButton) {
+        submitButton.addEventListener('click', submitEarnDisc);
+      }
 
       // Add enter key support for modals
       document.getElementById('nameInput').addEventListener('keypress', function(e) {
