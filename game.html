@@ -15,7 +15,6 @@
     --seahawks-action-green: #A5D52A;
     --accent-gold: #FFD700;
     --accent-orange: #FF8C00;
-    --accent-red: #FF6B6B;
   }
   
   body {
@@ -29,7 +28,6 @@
     overflow-x: hidden;
   }
 
-  /* Animated background effect */
   body::before {
     content: '';
     position: fixed;
@@ -37,9 +35,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
-      radial-gradient(circle at 20% 50%, rgba(105, 190, 40, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(36, 89, 152, 0.15) 0%, transparent 50%);
+    background: radial-gradient(circle at 20% 50%, rgba(105, 190, 40, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(36, 89, 152, 0.15) 0%, transparent 50%);
     animation: pulse 8s ease-in-out infinite;
     pointer-events: none;
     z-index: 0;
@@ -64,8 +61,7 @@
     border-bottom: 6px solid var(--seahawks-green);
     border-radius: 25px;
     margin-bottom: 25px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 
-                0 0 80px rgba(105, 190, 40, 0.3) inset;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 80px rgba(105, 190, 40, 0.3) inset;
     position: relative;
     overflow: hidden;
   }
@@ -90,20 +86,11 @@
     font-family: 'Bebas Neue', sans-serif;
     font-size: 4.5em;
     letter-spacing: 8px;
-    text-shadow: 
-      0 0 40px var(--seahawks-green), 
-      3px 3px 0 #000,
-      0 0 20px rgba(105, 190, 40, 0.8);
+    text-shadow: 0 0 40px var(--seahawks-green), 3px 3px 0 #000, 0 0 20px rgba(105, 190, 40, 0.8);
     color: white;
     margin-bottom: 10px;
     position: relative;
     z-index: 1;
-    animation: titleGlow 2s ease-in-out infinite alternate;
-  }
-
-  @keyframes titleGlow {
-    from { text-shadow: 0 0 40px var(--seahawks-green), 3px 3px 0 #000, 0 0 20px rgba(105, 190, 40, 0.8); }
-    to { text-shadow: 0 0 60px var(--seahawks-green), 3px 3px 0 #000, 0 0 40px rgba(105, 190, 40, 1); }
   }
 
   .subtitle {
@@ -127,12 +114,6 @@
     font-weight: 800;
     letter-spacing: 2px;
     box-shadow: 0 6px 20px rgba(105, 190, 40, 0.6);
-    animation: namePulse 2s ease-in-out infinite;
-  }
-
-  @keyframes namePulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
   }
 
   .game-area {
@@ -147,9 +128,7 @@
     border-radius: 30px;
     padding: 35px;
     border: 4px solid var(--seahawks-green);
-    box-shadow: 
-      0 20px 60px rgba(0,0,0,0.7),
-      0 0 40px rgba(105, 190, 40, 0.2) inset;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(105, 190, 40, 0.2) inset;
   }
 
   .board-title {
@@ -194,12 +173,6 @@
     border-radius: 50%;
     margin: 0 20px;
     box-shadow: 0 0 15px rgba(105, 190, 40, 0.8), 0 4px 8px rgba(0,0,0,0.5);
-    animation: pegGlow 3s ease-in-out infinite;
-  }
-
-  @keyframes pegGlow {
-    0%, 100% { box-shadow: 0 0 15px rgba(105, 190, 40, 0.8), 0 4px 8px rgba(0,0,0,0.5); }
-    50% { box-shadow: 0 0 25px rgba(105, 190, 40, 1), 0 4px 12px rgba(0,0,0,0.7); }
   }
 
   .drop-zone {
@@ -224,26 +197,6 @@
     border: 3px solid var(--seahawks-navy);
     transition: all 0.3s ease;
     box-shadow: 0 10px 30px rgba(105, 190, 40, 0.5);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .drop-button::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.6s ease, height 0.6s ease;
-  }
-
-  .drop-button:hover::before {
-    width: 300px;
-    height: 300px;
   }
 
   .drop-button:hover:not(:disabled) {
@@ -263,13 +216,7 @@
     border-radius: 50%;
     position: absolute;
     box-shadow: 0 0 20px var(--accent-gold), 0 4px 10px rgba(0,0,0,0.6);
-    animation: puckSpin 1s linear infinite;
     z-index: 10;
-  }
-
-  @keyframes puckSpin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
   }
 
   .prize-slots {
@@ -297,12 +244,6 @@
     transition: all 0.3s ease;
   }
 
-  .prize-slot:hover {
-    transform: translateY(-3px);
-    border-color: var(--seahawks-action-green);
-    box-shadow: 0 8px 25px rgba(105, 190, 40, 0.4);
-  }
-
   .prize-slot.active {
     background: linear-gradient(135deg, var(--seahawks-green), var(--seahawks-action-green));
     color: var(--seahawks-navy);
@@ -327,17 +268,8 @@
     border-radius: 20px;
     padding: 25px;
     border: 4px solid var(--seahawks-green);
-    box-shadow: 
-      0 15px 40px rgba(0,0,0,0.6),
-      0 0 30px rgba(105, 190, 40, 0.2) inset;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6), 0 0 30px rgba(105, 190, 40, 0.2) inset;
     transition: all 0.3s ease;
-  }
-
-  .stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 
-      0 20px 50px rgba(0,0,0,0.7),
-      0 0 40px rgba(105, 190, 40, 0.3) inset;
   }
 
   .stat-label {
@@ -452,39 +384,20 @@
   }
 
   @media (max-width: 1024px) {
-    .game-area {
-      grid-template-columns: 1fr;
-    }
-    
-    .title {
-      font-size: 3em;
-    }
-    
-    .subtitle {
-      font-size: 1.2em;
-    }
+    .game-area { grid-template-columns: 1fr; }
+    .title { font-size: 3em; }
+    .subtitle { font-size: 1.2em; }
   }
 
   @media (max-width: 768px) {
-    .title {
-      font-size: 2.5em;
-    }
-    
-    .peg {
-      width: 12px;
-      height: 12px;
-      margin: 0 12px;
-    }
-    
-    .peg-row {
-      margin: 10px 0;
-    }
+    .title { font-size: 2.5em; }
+    .peg { width: 12px; height: 12px; margin: 0 12px; }
+    .peg-row { margin: 10px 0; }
   }
 </style>
 </head>
 <body>
 <div class="container">
-  <!-- Error message shown if invalid session -->
   <div id="errorScreen" style="display:none;">
     <div class="header">
       <h1 class="title">U.S. LAWSHIELD PLINKO</h1>
@@ -496,7 +409,6 @@
     </div>
   </div>
 
-  <!-- Main game interface (hidden until validated) -->
   <div id="gameScreen" style="display:none;">
     <div class="header">
       <h1 class="title">U.S. LAWSHIELD PLINKO</h1>
@@ -515,19 +427,12 @@
         <h2 class="board-title" id="boardTitle">BOARD A</h2>
         
         <div class="drop-zone">
-          <button class="drop-button" id="dropButton">
-            🎯 DROP PUCK
-          </button>
+          <button class="drop-button" id="dropButton">🎯 DROP PUCK</button>
         </div>
 
         <div class="plinko-board" id="plinkoBoard">
-          <div class="peg-grid" id="pegGrid">
-            <!-- Pegs will be generated dynamically -->
-          </div>
-          
-          <div class="prize-slots" id="prizeSlots">
-            <!-- Prize slots will be generated dynamically -->
-          </div>
+          <div class="peg-grid" id="pegGrid"></div>
+          <div class="prize-slots" id="prizeSlots"></div>
         </div>
       </div>
 
@@ -554,11 +459,9 @@
 </div>
 
 <script>
-// Player Game JavaScript - NO ADMIN ACCESS
 (function() {
   'use strict';
 
-  // Configuration
   const CONFIG = {
     STORAGE_KEY: 'plinko_game_state',
     BOARD_A_PRIZES: [100, 500, 1000, 500, 100],
@@ -566,12 +469,10 @@
     PEG_ROWS: 8
   };
 
-  // Game state
   let gameState = null;
   let sessionId = null;
   let isDropping = false;
 
-  // DOM Elements
   const elements = {
     errorScreen: document.getElementById('errorScreen'),
     gameScreen: document.getElementById('gameScreen'),
@@ -587,95 +488,59 @@
     gameCompleteMessage: document.getElementById('gameCompleteMessage')
   };
 
-  // Initialize
   function init() {
-    // Get session ID from URL
     const urlParams = new URLSearchParams(window.location.search);
     sessionId = urlParams.get('session');
 
-    if (!sessionId) {
+    if (!sessionId || !loadGameState() || gameState.sessionId !== sessionId) {
       showError();
       return;
     }
 
-    // Load game state
-    if (!loadGameState()) {
-      showError();
-      return;
-    }
-
-    // Validate session
-    if (gameState.sessionId !== sessionId) {
-      showError();
-      return;
-    }
-
-    // Show game screen
     elements.errorScreen.style.display = 'none';
     elements.gameScreen.style.display = 'block';
 
-    // Setup game
     setupGame();
     setupEventListeners();
   }
 
-  // Load game state from localStorage
   function loadGameState() {
     try {
       const savedState = localStorage.getItem(CONFIG.STORAGE_KEY);
       if (!savedState) return false;
       
       gameState = JSON.parse(savedState);
-      
-      if (!gameState.gameActive) return false;
-      
-      return true;
+      return gameState.gameActive;
     } catch (e) {
-      console.error('Failed to load game state:', e);
       return false;
     }
   }
 
-  // Save game state to localStorage
   function saveGameState() {
     try {
       localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(gameState));
     } catch (e) {
-      console.error('Failed to save game state:', e);
+      console.error('Save failed:', e);
     }
   }
 
-  // Setup game
   function setupGame() {
-    // Display player name
     elements.playerName.textContent = `🎮 ${gameState.playerName}`;
-    
-    // Setup board
     setupBoard();
-    
-    // Update UI
     updateUI();
   }
 
-  // Setup event listeners
   function setupEventListeners() {
     elements.dropButton.addEventListener('click', dropPuck);
   }
 
-  // Setup board (pegs and prize slots)
   function setupBoard() {
-    const currentBoard = gameState.currentBoard;
-    elements.boardTitle.textContent = `BOARD ${currentBoard}`;
-    
-    // Generate pegs
+    elements.boardTitle.textContent = `BOARD ${gameState.currentBoard}`;
     generatePegs();
-    
-    // Generate prize slots
-    const prizes = currentBoard === 'A' ? CONFIG.BOARD_A_PRIZES : CONFIG.BOARD_B_PRIZES;
+    const prizes = gameState.currentBoard === 'A' ? CONFIG.BOARD_A_PRIZES : CONFIG.BOARD_B_PRIZES;
     generatePrizeSlots(prizes);
   }
 
-  // Generate pegs
   function generatePegs() {
     elements.pegGrid.innerHTML = '';
     
@@ -694,7 +559,6 @@
     }
   }
 
-  // Generate prize slots
   function generatePrizeSlots(prizes) {
     elements.prizeSlots.innerHTML = '';
     
@@ -707,43 +571,27 @@
     });
   }
 
-  // Drop puck
   async function dropPuck() {
     if (isDropping || gameState.pucksRemaining <= 0) return;
     
     isDropping = true;
     elements.dropButton.disabled = true;
     
-    // Create puck element
     const puck = document.createElement('div');
     puck.className = 'puck';
     elements.plinkoBoard.appendChild(puck);
     
-    // Animate puck falling
     const slotIndex = await animatePuckFall(puck);
     
-    // Remove puck
     elements.plinkoBoard.removeChild(puck);
-    
-    // Highlight winning slot
     highlightSlot(slotIndex);
-    
-    // Record result
     recordResult(slotIndex);
     
-    // Update game state
     gameState.pucksRemaining--;
-    
-    // Check if need to switch boards
     checkBoardSwitch();
-    
-    // Save state
     saveGameState();
-    
-    // Update UI
     updateUI();
     
-    // Check game completion
     if (gameState.pucksRemaining === 0) {
       completeGame();
     }
@@ -752,35 +600,29 @@
     elements.dropButton.disabled = false;
   }
 
-  // Animate puck falling (simplified simulation)
   function animatePuckFall(puck) {
     return new Promise((resolve) => {
       const boardRect = elements.plinkoBoard.getBoundingClientRect();
       
-      // Start position (top center)
       let x = boardRect.width / 2;
       let y = 20;
       
       puck.style.left = x + 'px';
       puck.style.top = y + 'px';
       
-      // Simulate falling through pegs
       let currentRow = 0;
-      const totalRows = CONFIG.PEG_ROWS;
-      const rowHeight = (boardRect.height - 200) / totalRows;
+      const rowHeight = (boardRect.height - 200) / CONFIG.PEG_ROWS;
       
       const interval = setInterval(() => {
-        if (currentRow >= totalRows) {
+        if (currentRow >= CONFIG.PEG_ROWS) {
           clearInterval(interval);
           
-          // Determine final slot
           const slots = gameState.currentBoard === 'A' ? 
             CONFIG.BOARD_A_PRIZES.length : 
             CONFIG.BOARD_B_PRIZES.length;
           
-          // Random slot based on normal distribution (center-weighted)
           const slotIndex = Math.min(Math.max(
-            Math.floor(Math.random() * slots + Math.random() * slots) / 2,
+            Math.floor((Math.random() + Math.random()) * slots / 2),
             0
           ), slots - 1);
           
@@ -788,13 +630,8 @@
           return;
         }
         
-        // Move down
         y += rowHeight;
-        
-        // Random left/right movement
         x += (Math.random() - 0.5) * 40;
-        
-        // Keep within bounds
         x = Math.max(50, Math.min(boardRect.width - 50, x));
         
         puck.style.left = x + 'px';
@@ -805,7 +642,6 @@
     });
   }
 
-  // Highlight winning slot
   function highlightSlot(slotIndex) {
     const slots = elements.prizeSlots.querySelectorAll('.prize-slot');
     slots[slotIndex].classList.add('active');
@@ -815,11 +651,8 @@
     }, 2000);
   }
 
-  // Record result
   function recordResult(slotIndex) {
-    const prizes = gameState.currentBoard === 'A' ? 
-      CONFIG.BOARD_A_PRIZES : 
-      CONFIG.BOARD_B_PRIZES;
+    const prizes = gameState.currentBoard === 'A' ? CONFIG.BOARD_A_PRIZES : CONFIG.BOARD_B_PRIZES;
     
     const result = {
       board: gameState.currentBoard,
@@ -828,19 +661,13 @@
       timestamp: new Date().toISOString()
     };
     
-    if (!gameState.results) {
-      gameState.results = [];
-    }
-    
+    if (!gameState.results) gameState.results = [];
     gameState.results.push(result);
     
-    // Add to results panel
     addResultToPanel(result);
   }
 
-  // Add result to panel
   function addResultToPanel(result) {
-    // Clear placeholder
     if (elements.resultsPanel.children.length === 1 && 
         elements.resultsPanel.firstChild.tagName === 'P') {
       elements.resultsPanel.innerHTML = '';
@@ -856,11 +683,9 @@
     elements.resultsPanel.insertBefore(resultItem, elements.resultsPanel.firstChild);
   }
 
-  // Check if need to switch boards
   function checkBoardSwitch() {
     if (gameState.boardConfig !== 'BOTH') return;
     
-    // If on board A and no more A pucks, switch to B
     if (gameState.currentBoard === 'A') {
       const aPucksUsed = gameState.results.filter(r => r.board === 'A').length;
       if (aPucksUsed >= gameState.puckCountA) {
@@ -870,7 +695,6 @@
     }
   }
 
-  // Update UI
   function updateUI() {
     elements.pucksRemaining.textContent = gameState.pucksRemaining;
     elements.currentBoardDisplay.textContent = gameState.currentBoard;
@@ -881,20 +705,17 @@
     }
   }
 
-  // Complete game
   function completeGame() {
     elements.gameCompleteMessage.style.display = 'block';
     gameState.gameActive = false;
     saveGameState();
   }
 
-  // Show error screen
   function showError() {
     elements.errorScreen.style.display = 'block';
     elements.gameScreen.style.display = 'none';
   }
 
-  // Start the game
   init();
 })();
 </script>
