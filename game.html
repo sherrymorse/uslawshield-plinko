@@ -1,132 +1,182 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="UTF-8">
 <head>
 <meta charset="UTF-8">
-<title>U.S. LawShield PLINKO</title>
+<title>U.S. LawShield PLINKO – Neon Revival Edition</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   
   :root {
-    --plinko-red: #FF0000;
-    --plinko-blue: #0047AB;
-    --plinko-yellow: #FFD700;
-    --plinko-green: #228B22;
-    --plinko-dark-blue: #002244;
+    --neon-blue: #00aaff;
+    --neon-green: #39ff14;
+    --deep-navy: #001533;
     --plinko-gold: #FFD700;
+    --highlight-blue: #00e1ff;
+    --shadow-deep: rgba(0,0,0,0.8);
   }
   
   body {
     font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(135deg, #001933 0%, #003366 100%);
+    background: radial-gradient(circle at 50% 15%, #002244 0%, #000814 100%);
     min-height: 100vh;
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 0;
     overflow: hidden;
   }
 
   .game-container {
-    max-width: 800px;
-    width: 100%;
+    width: 90vw;
+    height: 95vh;
+    max-width: 1000px;
+    max-height: 1000px;
+    position: relative;
+    border-radius: 28px;
+    border: 10px solid var(--plinko-gold);
+    box-shadow: 0 0 80px rgba(0,255,150,0.6), inset 0 0 25px rgba(0,255,255,0.25);
+    background: radial-gradient(circle at 20% 0%, #00ffcc 0%, #002b5c 35%, #000814 100%);
+    overflow: hidden;
   }
 
   .header {
-    text-align: center;
-    padding: 20px;
-    margin-bottom: 20px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, var(--highlight-blue) 0%, #0072ce 70%, #001533 100%);
+    border-bottom: 5px solid var(--plinko-gold);
+    box-shadow: 0 0 40px var(--highlight-blue);
+    z-index: 10;
   }
 
   .title {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 3.5em;
-    letter-spacing: 6px;
-    text-shadow: 0 0 30px var(--plinko-gold), 3px 3px 0 #000;
-    color: white;
-    margin-bottom: 5px;
+    font-size: 3.4rem;
+    letter-spacing: 8px;
+    text-shadow: 0 0 25px var(--plinko-gold), 0 0 40px var(--neon-green), 2px 2px 0 #000;
+    color: #ffffff;
   }
 
   .subtitle {
-    font-size: 1.2em;
+    position: absolute;
+    top: 105px;
+    width: 100%;
+    text-align: center;
+    font-size: 0.9rem;
     letter-spacing: 3px;
     color: var(--plinko-gold);
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    font-weight: 800;
+    text-shadow: 0 0 10px #000;
+    z-index: 10;
   }
 
   .canvas-wrapper {
-    position: relative;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 0 60px rgba(255, 215, 0, 0.6);
-    border: 6px solid var(--plinko-gold);
-    background: linear-gradient(160deg, #000428 0%, #004e92 100%);
+    position: absolute;
+    top: 120px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 12px 18px 18px;
   }
 
   #plinkoCanvas {
     display: block;
     width: 100%;
-    background: linear-gradient(160deg, #000428 0%, #004e92 100%);
+    height: 100%;
     cursor: pointer;
+    border-radius: 22px;
+    box-shadow: inset 0 0 35px rgba(0,0,0,0.9), 0 0 40px rgba(0,255,200,0.4);
+    background: radial-gradient(circle at 50% 0%, #004e92 0%, #001533 40%, #000814 100%);
   }
 
   .game-info {
     position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
+    top: 130px;
+    left: 24px;
+    right: 24px;
     display: flex;
     justify-content: space-between;
-    z-index: 10;
+    z-index: 12;
     pointer-events: none;
   }
 
   .info-badge {
-    background: linear-gradient(135deg, #8B0000 0%, #FF0000 100%);
-    padding: 10px 20px;
-    border-radius: 20px;
+    background: linear-gradient(135deg, #0072ce 0%, #00ffcc 100%);
+    padding: 8px 18px;
+    border-radius: 18px;
     border: 3px solid var(--plinko-gold);
     color: white;
     font-weight: 800;
-    font-size: 16px;
+    font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 18px rgba(0,0,0,0.6);
   }
 
   .drop-zone {
     position: absolute;
-    top: 120px;
+    top: 160px;
     left: 50%;
     transform: translateX(-50%);
-    width: 150px;
-    height: 60px;
-    background: linear-gradient(135deg, #FF0000 0%, #8B0000 100%);
+    width: 180px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-green) 100%);
     border: 4px solid var(--plinko-gold);
-    border-radius: 15px;
+    border-radius: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: 800;
-    font-size: 16px;
+    font-size: 15px;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    box-shadow: 0 8px 25px rgba(255, 0, 0, 0.6);
-    z-index: 5;
+    letter-spacing: 3px;
+    box-shadow: 0 0 35px var(--highlight-blue);
+    z-index: 12;
   }
 
   .instruction {
+    position: absolute;
+    bottom: 8px;
+    left: 0; right: 0;
     text-align: center;
     color: var(--plinko-gold);
     font-weight: 700;
-    font-size: 16px;
-    margin-top: 15px;
+    font-size: 0.85rem;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px #000;
+    z-index: 10;
+  }
+
+  .release-warning {
+    position: absolute;
+    top: 220px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    padding: 10px 18px;
+    border-radius: 14px;
+    border: 3px solid var(--plinko-gold);
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+    text-align: center;
+    z-index: 100;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.9);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease-out;
+  }
+
+  .release-warning.show {
+    opacity: 1;
   }
 
   .error-screen {
@@ -157,36 +207,12 @@
     line-height: 1.6;
   }
 
-  .release-warning {
-    position: absolute;
-    top: 200px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(139, 0, 0, 0.95);
-    padding: 15px 25px;
-    border-radius: 15px;
-    border: 3px solid var(--plinko-gold);
-    color: white;
-    font-weight: 700;
-    font-size: 16px;
-    text-align: center;
-    z-index: 100;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-  }
-
-  .release-warning.show {
-    opacity: 1;
-  }
-
   .bigwin {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
-    font-size: 6em;
+    font-size: 5.5em;
     color: var(--plinko-gold);
     text-shadow: 0 0 50px var(--plinko-gold), 0 0 100px #FF0000;
     z-index: 9999;
@@ -198,7 +224,7 @@
 
   @keyframes win {
     0% { transform: translate(-50%, -50%) scale(0) rotate(-180deg); opacity: 0; }
-    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.25) rotate(8deg); opacity: 1; }
     100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   }
 
@@ -207,8 +233,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: linear-gradient(135deg, #8B0000 0%, #FF0000 100%);
-    padding: 30px;
+    background: linear-gradient(135deg, #00ff99 0%, #0072ce 90%);
+    padding: 30px 40px;
     border-radius: 20px;
     border: 4px solid var(--plinko-gold);
     color: white;
@@ -224,15 +250,40 @@
     margin-bottom: 15px;
     letter-spacing: 3px;
     color: var(--plinko-gold);
+    text-shadow: 0 0 20px #fff;
   }
+
+  .slot-values {
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    width: 100%;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3em;
+    color: #fff;
+    text-align: center;
+    letter-spacing: 3px;
+    display: flex;
+    justify-content: space-evenly;
+    text-shadow: 0 0 10px #000;
+    pointer-events: none;
+    z-index: 15;
+  }
+
+  .slot-values span.jackpot {
+    color: var(--plinko-gold);
+    text-shadow: 0 0 15px var(--plinko-gold), 0 0 25px var(--neon-green);
+    font-size: 1.5em;
+  }
+
 </style>
 </head>
 <body>
 <div class="game-container" id="gameContainer">
   <div class="header">
     <h1 class="title">U.S. LAWSHIELD PLINKO</h1>
-    <p class="subtitle">LEGAL DEFENSE FOR SELF DEFENSE®</p>
   </div>
+  <p class="subtitle">LEGAL DEFENSE FOR SELF DEFENSE®</p>
 
   <div class="canvas-wrapper">
     <div class="game-info">
@@ -241,20 +292,19 @@
     </div>
     <div class="drop-zone">DROP ZONE</div>
     <canvas id="plinkoCanvas" width="800" height="1000"></canvas>
-    <div class="release-warning" id="releaseWarning">
-      ⚠️ MOVE TO DROP ZONE TO RELEASE!
-    </div>
-    <div class="game-over" id="gameOverScreen" style="display: none;">
+    <div class="release-warning" id="releaseWarning">⚠️ MOVE TO DROP ZONE TO RELEASE!</div>
+    <div class="game-over" id="gameOverScreen">
       <h2>GAME COMPLETE!</h2>
       <p>All pucks have been used.</p>
       <p>Thank you for playing!</p>
     </div>
+    <div class="slot-values" id="slotVals"></div>
+    <div class="instruction">DRAG PUCK INTO DROP ZONE → RELEASE TO PLAY!</div>
   </div>
-
-  <div class="instruction">DRAG PUCK TO DROP ZONE → RELEASE TO PLAY!</div>
 </div>
 
 <script>
+// JSONBin config
 const JSONBIN_CONFIG = {
   BASE_URL: 'https://api.jsonbin.io/v3/b',
   HEADERS: {
@@ -264,7 +314,6 @@ const JSONBIN_CONFIG = {
   }
 };
 
-// Check for game parameter
 const urlParams = new URLSearchParams(window.location.search);
 const binId = urlParams.get('game');
 
@@ -287,28 +336,6 @@ function showError() {
   `;
 }
 
-async function initGame(binId) {
-  try {
-    const gameState = await readGameBin(binId);
-    
-    if (!gameState) {
-      throw new Error('Failed to load game');
-    }
-    
-    // Mark player as connected
-    gameState.playerConnected = true;
-    gameState.lastUpdated = new Date().toISOString();
-    await updateGameBin(binId, gameState);
-    
-    // Start game
-    startPlinko(binId, gameState);
-    
-  } catch (error) {
-    console.error('Error loading game:', error);
-    showError();
-  }
-}
-
 async function updateGameBin(binId, data) {
   try {
     const response = await fetch(`${JSONBIN_CONFIG.BASE_URL}/${binId}`, {
@@ -316,11 +343,7 @@ async function updateGameBin(binId, data) {
       headers: JSONBIN_CONFIG.HEADERS,
       body: JSON.stringify(data)
     });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
   } catch (error) {
     console.error('Error updating JSONBin:', error);
@@ -336,11 +359,7 @@ async function readGameBin(binId) {
         'X-Access-Key': JSONBIN_CONFIG.HEADERS['X-Access-Key']
       }
     });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const data = await response.json();
     return data.record;
   } catch (error) {
@@ -349,328 +368,309 @@ async function readGameBin(binId) {
   }
 }
 
+async function initGame(binId) {
+  try {
+    const gameState = await readGameBin(binId);
+    if (!gameState) throw new Error('Failed to load game');
+    gameState.playerConnected = true;
+    gameState.lastUpdated = new Date().toISOString();
+    await updateGameBin(binId, gameState);
+    startPlinko(binId, gameState);
+  } catch (error) {
+    console.error('Error loading game:', error);
+    showError();
+  }
+}
+
+// ---- PLINKO CORE ----
 function startPlinko(binId, gameState) {
   const canvas = document.getElementById('plinkoCanvas');
   const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  
-  // Correct drop zone position at TOP of board
-  const DROP_ZONE_Y = 120;
-  const DROP_ZONE_HEIGHT = 60;
-  const DROP_ZONE_WIDTH = 150;
+  const W = canvas.width;
+  const H = canvas.height;
+
+  // Layout constants: tuned for “TV board” look
+  const DROP_ZONE_Y = 160; // align with CSS
+  const DROP_ZONE_HEIGHT = 56;
+  const DROP_ZONE_WIDTH = 180;
   const DROP_ZONE_CENTER = W / 2;
-  
+
   const PUCK_RADIUS = 18;
   const PEG_RADIUS = 6;
-  const NUM_ROWS = 12; // Classic Plinko rows
+  const NUM_ROWS = 12;
   const NUM_SLOTS = 9;
 
   let pegs = [];
   let currentPuck = null;
   let isDragging = false;
-  let hoverPuck = { x: DROP_ZONE_CENTER, y: DROP_ZONE_Y + DROP_ZONE_HEIGHT/2 };
+  let hoverPuck = { x: DROP_ZONE_CENTER, y: DROP_ZONE_Y + DROP_ZONE_HEIGHT / 2 };
   let animationId = null;
   let particles = [];
   let lastTime = 0;
   let gameActive = true;
 
-  // Authentic Price is Right slot values
+  // Authentic slot tables
   const SLOT_VALUES = {
     A: [100, 500, 1000, 0, 10000, 0, 1000, 500, 100],
     B: [0, 300, 600, 1000, 5000, 1000, 600, 300, 0]
   };
 
-  // Initialize triangular peg layout (authentic Plinko)
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playPegSound() {
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "square";
+      osc.frequency.value = 600 + Math.random() * 200;
+      gain.gain.value = 0.05;
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.06);
+    } catch (e) {
+      // ignore if context not ready
+    }
+  }
+
+  // Initialize pegs in a triangular grid
   function initPegs() {
     pegs = [];
-    const startY = DROP_ZONE_Y + DROP_ZONE_HEIGHT + 60; // Start pegs below drop zone
-    const rowHeight = (H - startY - 200) / NUM_ROWS;
-    
+    const startY = DROP_ZONE_Y + DROP_ZONE_HEIGHT + 60;
+    const rowHeight = (H - startY - 180) / NUM_ROWS;
+
     for (let row = 0; row < NUM_ROWS; row++) {
-      const numPegs = 8 + (row % 2); // Alternating pattern for authentic look
-      const offset = row % 2 === 0 ? (W / 8) / 2 : 0;
-      const horizontalSpacing = W / 8;
-      
-      for (let col = 0; col < numPegs; col++) {
-        pegs.push({
-          x: offset + col * horizontalSpacing,
-          y: startY + row * rowHeight,
-          lastHit: 0
-        });
+      const numPegs = NUM_SLOTS + (row % 2 === 0 ? 0 : -1);
+      const offset = row % 2 === 0 ? 0.5 : 0.0;
+      const spacing = (W - 120) / NUM_SLOTS;
+      const rowY = startY + row * rowHeight;
+      for (let i = 0; i < numPegs; i++) {
+        const x = 60 + (i + offset) * spacing;
+        pegs.push({ x, y: rowY, lastHit: 0 });
       }
     }
   }
 
+  // Draw angled slots (vanishing point feel)
+  function drawSlots() {
+    const slotHeight = 110;
+    const slotY = H - slotHeight;
+    const slotWidth = W / NUM_SLOTS;
+    const vanishingCenter = W / 2;
+    const currentSlotValues = SLOT_VALUES[gameState.currentBoard] || SLOT_VALUES.A;
+
+    ctx.save();
+    for (let index = 0; index < NUM_SLOTS; index++) {
+      const x0 = index * slotWidth;
+      const x1 = x0 + slotWidth;
+      const slotCenter = (x0 + x1) / 2;
+      const offset = (slotCenter - vanishingCenter) / (W / 2); // -1..1
+      const skew = offset * 0.18; // tilt scaling
+
+      const value = currentSlotValues[index];
+      const gradient = ctx.createLinearGradient(x0, slotY, x1, slotY + slotHeight);
+      if (value === 10000 || value === 5000) {
+        gradient.addColorStop(0, "#ffd700");
+        gradient.addColorStop(1, "#ff8c00");
+      } else if (value === 0) {
+        gradient.addColorStop(0, "#555");
+        gradient.addColorStop(1, "#222");
+      } else {
+        gradient.addColorStop(0, "#ff004c");
+        gradient.addColorStop(1, "#8b0000");
+      }
+
+      ctx.save();
+      ctx.transform(1, 0, skew, 1, 0, 0);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(x0, slotY, slotWidth, slotHeight);
+      ctx.strokeStyle = "#FFD700";
+      ctx.lineWidth = value === 10000 || value === 5000 ? 5 : 3;
+      ctx.strokeRect(x0, slotY, slotWidth, slotHeight);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
   function drawBoard() {
-    // Clear with dark blue gradient background
-    const bgGradient = ctx.createLinearGradient(0, 0, 0, H);
-    bgGradient.addColorStop(0, '#000428');
-    bgGradient.addColorStop(1, '#004e92');
-    ctx.fillStyle = bgGradient;
+    // Background
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+    bgGrad.addColorStop(0, "#001933");
+    bgGrad.addColorStop(0.35, "#003d7a");
+    bgGrad.addColorStop(1, "#000814");
+    ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, W, H);
-    
-    // Draw board border
-    ctx.strokeStyle = '#FFD700';
-    ctx.lineWidth = 8;
-    ctx.strokeRect(20, 20, W - 40, H - 40);
-    
-    // Draw decorative header
-    const headerGradient = ctx.createLinearGradient(0, 0, 0, 80);
-    headerGradient.addColorStop(0, '#8B0000');
-    headerGradient.addColorStop(1, '#FF0000');
-    ctx.fillStyle = headerGradient;
-    ctx.fillRect(40, 40, W - 80, 80);
-    
-    ctx.strokeStyle = '#FFD700';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(40, 40, W - 80, 80);
-    
-    // Draw title in header
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 32px "Bebas Neue"';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('PLINKO', W/2, 80);
-    
-    // Draw pegs with authentic appearance
-    ctx.shadowColor = '#FFD700';
+
+    // Side panels
+    const leftPanelGrad = ctx.createLinearGradient(0, 0, 0, H);
+    leftPanelGrad.addColorStop(0, "#00ffcc");
+    leftPanelGrad.addColorStop(1, "#0072ce");
+    ctx.fillStyle = leftPanelGrad;
+    ctx.fillRect(0, 0, 30, H);
+
+    const rightPanelGrad = ctx.createLinearGradient(0, 0, 0, H);
+    rightPanelGrad.addColorStop(0, "#0072ce");
+    rightPanelGrad.addColorStop(1, "#00ff99");
+    ctx.fillStyle = rightPanelGrad;
+    ctx.fillRect(W - 30, 0, 30, H);
+
+    // Inner frame
+    ctx.strokeStyle = "#FFD700";
+    ctx.lineWidth = 6;
+    ctx.strokeRect(35, 20, W - 70, H - 60);
+
+    // Pegs
+    ctx.shadowColor = "#FFD700";
     ctx.shadowBlur = 8;
-    
     pegs.forEach(peg => {
-      const pegGradient = ctx.createRadialGradient(
-        peg.x - 2, peg.y - 2, 0, peg.x, peg.y, PEG_RADIUS
-      );
-      pegGradient.addColorStop(0, '#FFFFFF');
-      pegGradient.addColorStop(0.3, '#FFD700');
-      pegGradient.addColorStop(1, '#FF8C00');
-      
-      ctx.fillStyle = pegGradient;
+      const pegGrad = ctx.createRadialGradient(peg.x - 2, peg.y - 2, 0, peg.x, peg.y, PEG_RADIUS);
+      pegGrad.addColorStop(0, "#ffffff");
+      pegGrad.addColorStop(0.4, "#ffe066");
+      pegGrad.addColorStop(1, "#ff8c00");
+      ctx.fillStyle = pegGrad;
       ctx.beginPath();
       ctx.arc(peg.x, peg.y, PEG_RADIUS, 0, Math.PI * 2);
       ctx.fill();
-      
-      // Inner highlight
-      ctx.fillStyle = '#FFFFFF';
+      ctx.fillStyle = "rgba(255,255,255,0.7)";
       ctx.beginPath();
       ctx.arc(peg.x - 2, peg.y - 2, PEG_RADIUS * 0.3, 0, Math.PI * 2);
       ctx.fill();
     });
-    
     ctx.shadowBlur = 0;
-    
-    // Draw slots at BOTTOM (correct placement)
-    const slotHeight = 100;
-    const slotWidth = W / NUM_SLOTS;
-    const slotY = H - slotHeight;
-    
-    const currentSlotValues = SLOT_VALUES[gameState.currentBoard] || SLOT_VALUES.A;
-    
-    currentSlotValues.forEach((value, index) => {
-      // Slot background with gradient
-      const slotGradient = ctx.createLinearGradient(
-        index * slotWidth, slotY, index * slotWidth, H
-      );
-      
-      if (value === 10000 || value === 5000) {
-        // Jackpot slot - gold gradient
-        slotGradient.addColorStop(0, '#FFD700');
-        slotGradient.addColorStop(1, '#FF8C00');
-      } else if (value === 0) {
-        // Zero slot - gray
-        slotGradient.addColorStop(0, '#666666');
-        slotGradient.addColorStop(1, '#333333');
-      } else {
-        // Money slots - red gradient
-        slotGradient.addColorStop(0, '#FF0000');
-        slotGradient.addColorStop(1, '#8B0000');
-      }
-      
-      ctx.fillStyle = slotGradient;
-      ctx.fillRect(index * slotWidth, slotY, slotWidth, slotHeight);
-      
-      // Slot border
-      ctx.strokeStyle = '#FFD700';
-      ctx.lineWidth = value === 10000 || value === 5000 ? 6 : 3;
-      ctx.strokeRect(index * slotWidth, slotY, slotWidth, slotHeight);
-      
-      // Slot value
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = value === 10000 || value === 5000 ? 'bold 26px "Bebas Neue"' : 'bold 22px "Bebas Neue"';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      
-      if (value === 10000 || value === 5000) {
-        ctx.shadowColor = '#FF0000';
-        ctx.shadowBlur = 12;
-      }
-      
-      const displayValue = value === 0 ? '0' : `$${value.toLocaleString()}`;
-      ctx.fillText(displayValue, index * slotWidth + slotWidth/2, slotY + slotHeight/2);
-      
-      ctx.shadowBlur = 0;
-    });
-    
-    // Draw hover puck
-    if (gameState.pucksRemaining > 0 && !currentPuck && !isDragging) {
-      drawPuck(hoverPuck.x, hoverPuck.y, true);
-    }
-    
-    // Draw current puck
+
+    // Slots
+    drawSlots();
+
+    // Puck
     if (currentPuck) {
       drawPuck(currentPuck.x, currentPuck.y, false);
+    } else if (gameState.pucksRemaining > 0 && !isDragging) {
+      drawPuck(hoverPuck.x, hoverPuck.y, true);
     }
-    
-    // Draw particles
-    particles.forEach((particle, index) => {
-      particle.life--;
-      if (particle.life <= 0) {
-        particles.splice(index, 1);
-        return;
-      }
-      
-      particle.x += particle.vx;
-      particle.y += particle.vy;
-      particle.vy += 0.1; // Gentle gravity
-      
-      ctx.globalAlpha = particle.life / particle.maxLife;
-      ctx.fillStyle = particle.color;
+
+    // Particles
+    particles.forEach((p, idx) => {
+      p.life--;
+      if (p.life <= 0) return;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.12;
+      ctx.globalAlpha = p.life / p.maxLife;
+      ctx.fillStyle = p.color;
       ctx.beginPath();
-      ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
       ctx.fill();
+      ctx.globalAlpha = 1;
     });
-    ctx.globalAlpha = 1;
+    particles = particles.filter(p => p.life > 0);
   }
 
-  function drawPuck(x, y, isHover = false) {
+  function drawPuck(x, y, isHover) {
     ctx.save();
-    
-    // Puck shadow
-    ctx.shadowColor = isHover ? '#FF0000' : '#8B0000';
-    ctx.shadowBlur = isHover ? 20 : 12;
+    ctx.shadowColor = isHover ? "#00ffcc" : "#ff004c";
+    ctx.shadowBlur = isHover ? 18 : 12;
     ctx.shadowOffsetX = 2;
     ctx.shadowOffsetY = 2;
-    
-    // Puck body with realistic gradient
-    const puckGradient = ctx.createRadialGradient(
-      x - 5, y - 5, 0, x, y, PUCK_RADIUS
-    );
-    
+
+    const grad = ctx.createRadialGradient(x - 6, y - 6, 0, x, y, PUCK_RADIUS);
     if (isHover) {
-      puckGradient.addColorStop(0, '#FFFFFF');
-      puckGradient.addColorStop(0.3, '#FF6B6B');
-      puckGradient.addColorStop(0.7, '#FF0000');
-      puckGradient.addColorStop(1, '#8B0000');
+      grad.addColorStop(0, "#ffffff");
+      grad.addColorStop(0.3, "#00ffcc");
+      grad.addColorStop(0.7, "#00aaff");
+      grad.addColorStop(1, "#004e92");
     } else {
-      puckGradient.addColorStop(0, '#FFFFFF');
-      puckGradient.addColorStop(0.4, '#FF0000');
-      puckGradient.addColorStop(1, '#8B0000');
+      grad.addColorStop(0, "#ffffff");
+      grad.addColorStop(0.3, "#ff4b81");
+      grad.addColorStop(0.8, "#ff004c");
+      grad.addColorStop(1, "#8b0000");
     }
-    
-    ctx.fillStyle = puckGradient;
+
+    ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.arc(x, y, PUCK_RADIUS, 0, Math.PI * 2);
     ctx.fill();
-    
-    // Puck border
-    ctx.strokeStyle = '#FFD700';
+    ctx.strokeStyle = "#FFD700";
     ctx.lineWidth = 3;
     ctx.stroke();
-    
-    // Puck highlight
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+
+    ctx.fillStyle = "rgba(255,255,255,0.7)";
     ctx.beginPath();
-    ctx.arc(x - 4, y - 4, PUCK_RADIUS * 0.3, 0, Math.PI * 2);
+    ctx.arc(x - 5, y - 5, PUCK_RADIUS * 0.3, 0, Math.PI * 2);
     ctx.fill();
-    
-    // USL text
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 12px Montserrat';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('USL', x, y);
-    
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 12px Montserrat";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("USL", x, y);
     ctx.restore();
   }
 
   function updatePhysics(timestamp) {
     if (!currentPuck || !gameActive) return;
-    
-    const deltaTime = Math.min(16, timestamp - lastTime) / 16;
+    const deltaTime = Math.min(20, timestamp - lastTime) / 16;
     lastTime = timestamp;
-    
-    // Realistic physics with proper energy conservation
-    currentPuck.vy += 0.4 * deltaTime; // Gravity
+
+    // Gravity
+    currentPuck.vy += 0.45 * deltaTime;
     currentPuck.x += currentPuck.vx * deltaTime;
     currentPuck.y += currentPuck.vy * deltaTime;
-    
-    // Air resistance (very slight)
+
+    // Slight air resistance
     currentPuck.vx *= 0.999;
     currentPuck.vy *= 0.999;
-    
-    // Wall collisions with realistic bounce
-    if (currentPuck.x - PUCK_RADIUS < 40) {
-      currentPuck.x = 40 + PUCK_RADIUS;
-      currentPuck.vx = Math.abs(currentPuck.vx) * 0.8; // Energy loss on wall hit
-    } else if (currentPuck.x + PUCK_RADIUS > W - 40) {
-      currentPuck.x = W - 40 - PUCK_RADIUS;
-      currentPuck.vx = -Math.abs(currentPuck.vx) * 0.8;
+
+    // Walls
+    if (currentPuck.x - PUCK_RADIUS < 50) {
+      currentPuck.x = 50 + PUCK_RADIUS;
+      currentPuck.vx = Math.abs(currentPuck.vx) * 0.85;
+    } else if (currentPuck.x + PUCK_RADIUS > W - 50) {
+      currentPuck.x = W - 50 - PUCK_RADIUS;
+      currentPuck.vx = -Math.abs(currentPuck.vx) * 0.85;
     }
-    
-    // Realistic peg collisions
-    const currentTime = Date.now();
-    
+
+    const now = Date.now();
     pegs.forEach(peg => {
-      if (currentTime - peg.lastHit < 50) return; // Collision cooldown
-      
+      if (now - peg.lastHit < 40) return;
       const dx = currentPuck.x - peg.x;
       const dy = currentPuck.y - peg.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      const minDistance = PUCK_RADIUS + PEG_RADIUS;
-      
-      if (distance < minDistance) {
-        peg.lastHit = currentTime;
-        
-        // Normalize collision vector
-        const nx = dx / distance;
-        const ny = dy / distance;
-        
-        // Separate puck from peg
-        const overlap = minDistance - distance;
-        currentPuck.x += nx * overlap * 0.7;
-        currentPuck.y += ny * overlap * 0.7;
-        
-        // Calculate reflection (realistic bounce)
-        const dotProduct = currentPuck.vx * nx + currentPuck.vy * ny;
-        currentPuck.vx -= 1.8 * dotProduct * nx;
-        currentPuck.vy -= 1.8 * dotProduct * ny;
-        
-        // Add slight randomness for authentic Plinko behavior
-        currentPuck.vx += (Math.random() - 0.5) * 0.8;
-        currentPuck.vy += (Math.random() - 0.5) * 0.4;
-        
-        // Create collision effect
-        for (let i = 0; i < 3; i++) {
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const minDist = PUCK_RADIUS + PEG_RADIUS;
+      if (dist < minDist) {
+        peg.lastHit = now;
+        const nx = dx / (dist || 0.0001);
+        const ny = dy / (dist || 0.0001);
+        const overlap = (minDist - dist) || 0.5;
+        currentPuck.x += nx * overlap * 0.6;
+        currentPuck.y += ny * overlap * 0.6;
+
+        const dot = currentPuck.vx * nx + currentPuck.vy * ny;
+        currentPuck.vx -= 1.9 * dot * nx;
+        currentPuck.vy -= 1.9 * dot * ny;
+
+        currentPuck.vx += (Math.random() - 0.5) * 0.7;
+        currentPuck.vy += (Math.random() - 0.5) * 0.5;
+
+        for (let i = 0; i < 4; i++) {
           particles.push({
             x: currentPuck.x,
             y: currentPuck.y,
             vx: (Math.random() - 0.5) * 4,
             vy: (Math.random() - 0.5) * 4,
-            life: 15,
-            maxLife: 15,
-            size: Math.random() * 2 + 1,
-            color: '#FFD700'
+            life: 18,
+            maxLife: 18,
+            size: Math.random() * 2.2 + 1,
+            color: "#FFD700"
           });
         }
+        playPegSound();
       }
     });
-    
-    // Check if puck reached slots at BOTTOM
-    if (currentPuck.y + PUCK_RADIUS > H - 100) {
+
+    if (currentPuck.y + PUCK_RADIUS > H - 110) {
       handlePuckLanding();
       return;
     }
-    
-    // Continue animation
+
     drawBoard();
     animationId = requestAnimationFrame(updatePhysics);
   }
@@ -680,8 +680,7 @@ function startPlinko(binId, gameState) {
     const slotIndex = Math.min(NUM_SLOTS - 1, Math.max(0, Math.floor(currentPuck.x / slotWidth)));
     const currentSlotValues = SLOT_VALUES[gameState.currentBoard] || SLOT_VALUES.A;
     const slotValue = currentSlotValues[slotIndex];
-    
-    // Record result
+
     if (!gameState.results) gameState.results = [];
     gameState.results.push({
       board: gameState.currentBoard,
@@ -689,25 +688,22 @@ function startPlinko(binId, gameState) {
       value: slotValue,
       timestamp: Date.now()
     });
-    
-    // Celebration particles based on value
-    const particleCount = slotValue >= 1000 ? 80 : 40;
-    const particleColor = slotValue >= 5000 ? '#FFD700' : slotValue >= 1000 ? '#FF0000' : '#666666';
-    
+
+    const particleCount = slotValue >= 1000 ? 90 : 40;
+    const color = slotValue >= 5000 ? "#FFD700" : slotValue >= 1000 ? "#00ffcc" : "#888888";
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: currentPuck.x,
-        y: H - 50,
+        y: H - 70,
         vx: (Math.random() - 0.5) * 10,
         vy: -Math.random() * 12,
         life: 50,
         maxLife: 50,
-        size: Math.random() * 3 + 2,
-        color: particleColor
+        size: Math.random() * 3.5 + 2,
+        color
       });
     }
-    
-    // Big celebration for jackpot
+
     if (slotValue === 10000 || slotValue === 5000) {
       const winElement = document.createElement('div');
       winElement.className = 'bigwin';
@@ -715,49 +711,43 @@ function startPlinko(binId, gameState) {
       document.body.appendChild(winElement);
       setTimeout(() => winElement.remove(), 2500);
     }
-    
-    // Update game state
+
     gameState.pucksRemaining--;
     gameState.lastUpdated = new Date().toISOString();
-    
-    // Save state
+
     saveState();
-    
-    // Check for board switch (if using both boards)
-    if (gameState.boardConfig === 'BOTH' && gameState.currentBoard === 'A' && 
+
+    if (gameState.boardConfig === 'BOTH' &&
+        gameState.currentBoard === 'A' &&
         gameState.pucksRemaining <= gameState.puckCountB) {
       gameState.currentBoard = 'B';
       document.getElementById('currentBoard').textContent = 'BOARD B';
       initPegs();
+      updateSlotText();
     }
-    
-    // Check for game completion
+
     if (gameState.pucksRemaining <= 0) {
       gameActive = false;
       setTimeout(() => {
         document.getElementById('gameOverScreen').style.display = 'block';
       }, 2000);
     }
-    
+
     currentPuck = null;
     updateDisplay();
-    
     cancelAnimationFrame(animationId);
     drawBoard();
   }
 
   function animateHoverPuck() {
     if (!gameActive) return;
-    
     if (currentPuck || gameState.pucksRemaining === 0) {
       requestAnimationFrame(animateHoverPuck);
       return;
     }
-    
-    // Gentle hovering motion within drop zone area
-    const time = Date.now() * 0.001;
-    hoverPuck.x = DROP_ZONE_CENTER + Math.sin(time) * (DROP_ZONE_WIDTH/2 - PUCK_RADIUS - 10);
-    
+    const time = Date.now() * 0.002;
+    hoverPuck.x = DROP_ZONE_CENTER + Math.sin(time) * (DROP_ZONE_WIDTH / 2 - PUCK_RADIUS - 10);
+    hoverPuck.y = DROP_ZONE_Y + DROP_ZONE_HEIGHT / 2;
     drawBoard();
     requestAnimationFrame(animateHoverPuck);
   }
@@ -765,15 +755,13 @@ function startPlinko(binId, gameState) {
   function updateDisplay() {
     document.getElementById('puckCounter').textContent = gameState.pucksRemaining;
     document.getElementById('currentBoard').textContent = `BOARD ${gameState.currentBoard}`;
-    
-    // Visual feedback for low puck count
-    const puckCounter = document.getElementById('puckCounter');
+    const puckCounterEl = document.getElementById('puckCounter');
     if (gameState.pucksRemaining <= 2) {
-      puckCounter.style.color = '#FF6B6B';
+      puckCounterEl.style.color = '#ff6b6b';
     } else if (gameState.pucksRemaining <= 5) {
-      puckCounter.style.color = '#FFA726';
+      puckCounterEl.style.color = '#ffb347';
     } else {
-      puckCounter.style.color = '#FFFFFF';
+      puckCounterEl.style.color = '#ffffff';
     }
   }
 
@@ -785,57 +773,48 @@ function startPlinko(binId, gameState) {
     }
   }
 
-  // Check if position is within drop zone
   function isInDropZone(x, y) {
-    return x >= DROP_ZONE_CENTER - DROP_ZONE_WIDTH/2 && 
-           x <= DROP_ZONE_CENTER + DROP_ZONE_WIDTH/2 &&
-           y >= DROP_ZONE_Y && 
-           y <= DROP_ZONE_Y + DROP_ZONE_HEIGHT;
+    return (
+      x >= DROP_ZONE_CENTER - DROP_ZONE_WIDTH / 2 &&
+      x <= DROP_ZONE_CENTER + DROP_ZONE_WIDTH / 2 &&
+      y >= DROP_ZONE_Y &&
+      y <= DROP_ZONE_Y + DROP_ZONE_HEIGHT
+    );
   }
 
-  // Event handlers
   canvas.addEventListener('mousemove', (e) => {
     if (!gameActive) return;
-    
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
-    
+
     if (isDragging && currentPuck) {
-      // Allow dragging anywhere, but only release in drop zone
-      currentPuck.x = Math.max(PUCK_RADIUS + 40, Math.min(W - PUCK_RADIUS - 40, x));
-      currentPuck.y = Math.max(PUCK_RADIUS + 40, Math.min(H - PUCK_RADIUS - 100, y));
+      currentPuck.x = Math.max(PUCK_RADIUS + 50, Math.min(W - PUCK_RADIUS - 50, x));
+      currentPuck.y = Math.max(PUCK_RADIUS + 60, Math.min(H - PUCK_RADIUS - 140, y));
       drawBoard();
     } else if (gameState.pucksRemaining > 0 && !currentPuck) {
-      // Hover puck stays in drop zone
-      hoverPuck.x = Math.max(DROP_ZONE_CENTER - DROP_ZONE_WIDTH/2 + PUCK_RADIUS, 
-                           Math.min(DROP_ZONE_CENTER + DROP_ZONE_WIDTH/2 - PUCK_RADIUS, x));
-      hoverPuck.y = DROP_ZONE_Y + DROP_ZONE_HEIGHT/2;
+      hoverPuck.x = Math.max(
+        DROP_ZONE_CENTER - DROP_ZONE_WIDTH / 2 + PUCK_RADIUS,
+        Math.min(DROP_ZONE_CENTER + DROP_ZONE_WIDTH / 2 - PUCK_RADIUS, x)
+      );
+      hoverPuck.y = DROP_ZONE_Y + DROP_ZONE_HEIGHT / 2;
     }
   });
 
   canvas.addEventListener('mousedown', (e) => {
     if (!gameActive || currentPuck || gameState.pucksRemaining === 0) return;
-    
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
-    
-    // Check if clicking near hover puck in drop zone
+
     const distance = Math.sqrt(Math.pow(x - hoverPuck.x, 2) + Math.pow(y - hoverPuck.y, 2));
-    
-    if (distance < PUCK_RADIUS * 1.5 && isInDropZone(x, y)) {
+    if (distance < PUCK_RADIUS * 1.7 && isInDropZone(x, y)) {
       isDragging = true;
-      currentPuck = { 
-        x: x, 
-        y: y, 
-        vx: 0, 
-        vy: 0
-      };
+      currentPuck = { x, y, vx: 0, vy: 0 };
       gameState.lastUpdated = new Date().toISOString();
       saveState();
       drawBoard();
@@ -844,10 +823,7 @@ function startPlinko(binId, gameState) {
 
   canvas.addEventListener('mouseup', () => {
     if (!gameActive || !isDragging || !currentPuck) return;
-    
     isDragging = false;
-    
-    // CORRECT: Must be in drop zone to release
     if (!isInDropZone(currentPuck.x, currentPuck.y)) {
       const warning = document.getElementById('releaseWarning');
       warning.classList.add('show');
@@ -856,20 +832,29 @@ function startPlinko(binId, gameState) {
       drawBoard();
       return;
     }
-    
-    // Realistic initial velocity - slight randomness for authentic Plinko
-    const centerX = DROP_ZONE_CENTER;
-    currentPuck.vx = (currentPuck.x - centerX) * 0.5; // Horizontal velocity based on drop position
-    currentPuck.vy = 2 + Math.random() * 0.5; // Consistent downward velocity
-    
+
+    // FIX: ensure the puck starts falling straight down from where it is
+    currentPuck.vx = 0;  // <-- no sideways launch
+    currentPuck.vy = 2.5; // small consistent downward nudge
+
     lastTime = performance.now();
     animationId = requestAnimationFrame(updatePhysics);
     saveState();
   });
 
-  // Initialize game
+  function updateSlotText() {
+    const slotValsEl = document.getElementById('slotVals');
+    const currentSlotValues = SLOT_VALUES[gameState.currentBoard] || SLOT_VALUES.A;
+    slotValsEl.innerHTML = currentSlotValues.map(v => {
+      if (v === 0) return `<span>0</span>`;
+      if (v === 10000 || v === 5000) return `<span class="jackpot">$${v.toLocaleString()}</span>`;
+      return `<span>$${v}</span>`;
+    }).join('');
+  }
+
   initPegs();
   updateDisplay();
+  updateSlotText();
   drawBoard();
   animateHoverPuck();
 }
