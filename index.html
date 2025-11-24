@@ -2,59 +2,69 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>U.S. LawShield PLINKO – Final Authentic Version</title>
+<title>U.S. LawShield PLINKO – Final & Perfect</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@600;800&display=swap" rel="stylesheet">
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
   body{
     font-family:'Oswald',sans-serif;
-    background:linear-gradient(135deg,#0a1633,#1e3a8a,#1e40af);
+    background:linear-gradient(135deg,#0a1a4e,#1e3a8a,#1e40af);
     min-height:100vh;color:white;overflow:hidden;
-    background-image:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff08" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,138.7C672,128,768,160,864,186.7C960,213,1056,235,1152,224C1248,213,1344,171,1392,149.3L1440,128L1440,320L0,320Z"></path></svg>'),linear-gradient(135deg,#0a1633,#1e3a8a);
-    background-size:100% 300px,cover;background-repeat:no-repeat,repeat;
-    animation:bg 40s linear infinite;
+    background-image:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff08" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,138.7C672,128,768,160,864,186.7C960,213,1056,235,1152,224C1248,213,1344,171,1392,149.3L1440,128L1440,320Z"></path></svg>'),linear-gradient(135deg,#0a1a4e,#1e3a8a);
+    background-size:100% 300px,cover;
+    background-repeat:no-repeat,repeat;
+    animation:bg 30s linear infinite;
   }
   @keyframes bg{0%{background-position:0 0}100%{background-position:0 300px}}
-  .header{text-align:center;padding:30px;background:rgba(0,0,0,0.6);border-bottom:6px solid gold;}
-  .title{font-family:'Bebas Neue',sans-serif;font-size:5.8em;letter-spacing:10px;text-shadow:0 0 50px gold,6px 6px 0 #000;}
-  .subtitle{font-size:1.6em;letter-spacing:5px;color:gold;}
-  .game{max-width:900px;margin:20px auto;display:flex;flex-direction:column;align-items:center;gap:25px;}
+  .header{text-align:center;padding:40px 20px;background:rgba(0,0,0,0.5);border-bottom:6px solid gold;}
+  .title{font-family:'Bebas Neue',sans-serif;font-size:6em;letter-spacing:10px;text-shadow:0 0 50px gold,6px 6px 0 #000;}
+  .subtitle{font-size:1.8em;letter-spacing:5px;color:gold;}
+  .game{max-width:900px;margin:30px auto;display:flex;flex-direction:column;align-items:center;gap:25px;}
   canvas{
     background:#0f172a;
     border-radius:25px;
-    box-shadow:0 0 80px rgba(255,215,0,0.7),inset 0 0 50px #000;
+    box-shadow:0 0 70px rgba(255,215,0,0.7),inset 0 0 50px #000;
     border:8px solid gold;
   }
+  .dropzone{
+    background:linear-gradient(90deg,#22c55e,#15803d);
+    padding:25px 50px;
+    border-radius:25px;
+    font-size:32px;
+    font-weight:800;
+    box-shadow:0 20px 50px rgba(34,197,94,0.8);
+    animation:pulse 2s infinite;
+    position:relative;
+  }
+  @keyframes pulse{50%{transform:scale(1.05)}}
   .prompt{
-    position:absolute;top:140px;left:50%;transform:translateX(-50%);
-    background:rgba(0,0,0,0.8);padding:14px 30px;border-radius:50px;
-    font-size:24px;font-weight:800;border:3px solid gold;
-    box-shadow:0 0 30px gold;display:none;z-index:10;
+    position:absolute;top:-40px;left:50%;transform:translateX(-50%);
+    background:rgba(0,0,0,0.7);padding:10px 25px;border-radius:25px;
+    font-size:20px;white-space:nowrap;font-weight:600;
   }
   .btn{
     background:gold;color:#000;padding:20px 50px;border:none;border-radius:50px;
     font-size:26px;font-weight:800;cursor:pointer;
-    box-shadow:0 12px 40px rgba(255,215,0,0.8);transition:all .3s;
+    box-shadow:0 15px 40px rgba(255,215,0,0.8);transition:all .3s;
   }
-  .btn:hover{transform:translateY(-6px);box-shadow:0 18px 50px rgba(255,215,0,1);}
+  .btn:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(255,215,0,1);}
   .stats{
-    background:rgba(255,255,255,0.15);padding:30px;border-radius:25px;
-    text-align:center;font-size:28px;min-width:340px;
+    background:rgba(255,255,255,0.2);padding:30px;border-radius:25px;
+    text-align:center;font-size:28px;min-width:350px;
   }
   .bigwin{
     position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);
-    font-size:9em;color:gold;text-shadow:0 0 80px gold,0 0 160px orange;
+    font-size:9em;color:gold;text-shadow:0 0 70px gold,0 0 140px orange;
     z-index:9999;pointer-events:none;animation:win 2s forwards;
   }
-  @keyframes win{0%{transform:translate(-50%,-50%) scale(0) rotate(-200deg)}50%{transform:translate(-50%,-50%) scale(1.5)}100%{transform:translate(-50%,-50%) scale(1)}}
-  .status{position:fixed;top:10px;right:10px;background:rgba(0,0,0,0.7);padding:10px 20px;border-radius:20px;font-size:15px;}
+  @keyframes win{0%{transform:translate(-50%,-50%) scale(0) rotate(-180deg)}50%{transform:translate(-50%,-50%) scale(1.5)}100%{transform:translate(-50%,-50%) scale(1)}}
+  .status{position:fixed;top:15px;right:15px;background:rgba(0,0,0,0.7);padding:12px 25px;border-radius:25px;font-size:16px;}
 </style>
 </head>
 <body>
 
 <div class="status" id="status">Connecting to cloud…</div>
-<div class="prompt" id="prompt">Hold mouse button to grab – release to drop!</div>
 
 <div class="header">
   <h1 class="title">U.S. LAWSHIELD PLINKO</h1>
@@ -62,85 +72,92 @@
 </div>
 
 <div class="game">
-  <canvas id="c" width="720" height="1000"></canvas>
+  <canvas id="c" width="720" height="1080"></canvas>
+
+  <div class="dropzone">
+    DROP ZONE
+    <div class="prompt">Hold mouse down on the disc to grab & position – release to drop!</div>
+  </div>
 
   <button class="btn" onclick="earnDisc()">Earn New Disc</button>
 
   <div class="stats">
     <div><b>Total Winnings:</b> $<span id="total">0</span></div>
     <div><b>Best Drop:</b> $<span id="best">0</span></div>
-    <div><b>Discs Used:</b> <span id="played">0</span> / <span id="earned">0</span></div>
+    <div><b>Discs Played:</b> <span id="played">0</span></div>
+    <div><b>Discs Available:</b> <span id="avail">0</span></div>
   </div>
 </div>
 
 <script>
-// ==================== JSONBIN.IO ====================
+// ==================== JSONBIN.IO CLOUD ====================
 const MASTER_KEY = "$2a$10$NckuWO.y9g8.amyZZWkc8.lKIMS.AVSCyN1qT9/0d5EtRjuV9lmS2";
 const BIN_URL = "https://api.jsonbin.io/v3/b";
-let BIN_ID = localStorage.getItem("plinko_bin_id");
+let BIN_ID = localStorage.getItem("plinko_bin_id") || null;
 let cloud = {employees:{},activities:[]};
 
 async function loadCloud(){
   try{
-    if(!BIN_ID) throw 0;
+    if(!BIN_ID) throw "no bin";
     const r = await fetch(`${BIN_URL}/${BIN_ID}/latest`,{headers:{'X-Master-Key':MASTER_KEY}});
-    cloud = await r.json();
+    cloud = await r.json() || cloud;
     document.getElementById("status").textContent="Cloud Connected";
-  }catch{
+  }catch(e){
     const r = await fetch(BIN_URL,{method:"POST",headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY,'X-Bin-Name':'USLawShield-Plinko'},body:JSON.stringify(cloud)});
     const j = await r.json();
-    BIN_ID = j.metadata.id; localStorage.setItem("plinko_bin_id",BIN_ID);
+    BIN_ID = j.metadata.id;
+    localStorage.setItem("plinko_bin_id",BIN_ID);
     document.getElementById("status").textContent="Cloud Created";
   }
 }
-async function saveCloud(){ if(BIN_ID) await fetch(`${BIN_URL}/${BIN_ID}`,{method:"PUT",headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(cloud)}); }
+async function saveCloud(){
+  if(!BIN_ID) return;
+  await fetch(`${BIN_URL}/${BIN_ID}`,{method:"PUT",headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(cloud)});
+}
 
-// ==================== PLAYER ====================
-let id = localStorage.getItem("empId") || ("emp_"+Date.now()); localStorage.setItem("empId",id);
-let name = localStorage.getItem("empName") || (prompt("Welcome! Enter your name:")||"Player"); localStorage.setItem("empName",name);
-if(!cloud.employees[id]) cloud.employees[id] = {name,total:0,best:0,earned:0,used:0};
-let p = cloud.employees[id];
+// ==================== EMPLOYEE & STATE ====================
+let employeeId = localStorage.getItem("empId");
+let name = localStorage.getItem("empName");
+if(!name){ name = prompt("Welcome! Enter your name:") || "Player"; localStorage.setItem("empName",name); }
+if(!employeeId){ employeeId = "emp_"+Date.now(); localStorage.setItem("empId",employeeId); }
 
-// ==================== PLINKO – PRICE IS RIGHT EXACT ====================
+if(!cloud.employees[employeeId]) cloud.employees[employeeId] = {name,total:0,best:0,played:0,discs:0,used:0};
+let p = cloud.employees[employeeId];
+
+// ==================== PLINKO PHYSICS ====================
 const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
 const W = canvas.width, H = canvas.height;
-const DROP_H = 140, DISC_R = 32, PEG_R = 7;
+const DROP_H = 120, DISC_R = 30, PEG_R = 8;
 const ROWS = 16, SLOTS = 9;
 const VALUES = [100,500,1000,0,10000,0,1000,500,100];
-let pegs = [], disc = null, hoverDisc = {x:W/2,y:80,sway:0}, trail = [], particles = [];
+let pegs = [], disc = null, trail = [], particles = [], time = 0;
+let hovering = {x:W/2, y:DROP_H/2, speed:1.5, amp: W/2 - DISC_R - 50};
+let dragging = false;
 
 function initPegs(){
   const startY = DROP_H + 90;
-  const rowH = (H - 220 - startY) / ROWS;
+  const rowH = (H - 240 - startY) / ROWS;
   const colW = W / 10;
   for(let r=0;r<ROWS;r++){
     const cols = r%2===0?9:10;
     const offset = r%2===0?colW:colW/2;
-    for(let c=0;c<cols;c++) pegs.push({x:offset+c*colW,y:startY+r*rowH});
+    for(let c=0;c<cols;c++){
+      pegs.push({x:offset+c*colW,y:startY+r*rowH});
+    }
   }
 }
 initPegs();
 
 function draw(){
+  time += 0.016;
   ctx.fillStyle="#0f172a"; ctx.fillRect(0,0,W,H);
 
   // Drop zone
   const grad = ctx.createLinearGradient(0,0,0,DROP_H);
   grad.addColorStop(0,"#22c55e"); grad.addColorStop(1,"#15803d");
   ctx.fillStyle=grad; ctx.fillRect(0,0,W,DROP_H);
-  ctx.fillStyle="white"; ctx.font="bold 42px Oswald"; ctx.textAlign="center";
+  ctx.fillStyle="white"; ctx.font="bold 38px Oswald"; ctx.textAlign="center";
   ctx.fillText("DROP ZONE",W/2,DROP_H/2+15);
-
-  // Hover disc (always visible)
-  hoverDisc.sway += 0.015;
-  hoverDisc.x = W/2 + Math.sin(hoverDisc.sway)*180;
-  ctx.save(); ctx.translate(hoverDisc.x,hoverDisc.y); ctx.rotate(hoverDisc.sway*0.3);
-  const g = ctx.createRadialGradient(-10,-10,0,0,0,DISC_R);
-  g.addColorStop(0,"#ff3333"); g.addColorStop(0.7,"#cc0000"); g.addColorStop(1,"#660000");
-  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,DISC_R,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle="rgba(255,255,255,0.4)"; ctx.beginPath(); ctx.arc(-10,-10,DISC_R*0.4,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle="white"; ctx.font="bold 18px Oswald"; ctx.textAlign="center"; ctx.fillText("USL",0,7);
-  ctx.restore();
 
   // Pegs
   pegs.forEach(p=>{
@@ -149,30 +166,31 @@ function draw(){
     ctx.fillStyle=g; ctx.beginPath(); ctx.arc(p.x,p.y,PEG_R,0,Math.PI*2); ctx.fill();
   });
 
-  // Slots
-  const sh=120, sw=W/SLOTS;
+  // Slots - FIXED CROPPING
+  const sh=130, sw=W/SLOTS;
   VALUES.forEach((v,i)=>{
     ctx.fillStyle = i===4?"#fbbf24":(v===0?"#7f1d1d":"#166534");
     ctx.fillRect(i*sw,H-sh,sw,sh);
     ctx.strokeStyle="gold"; ctx.lineWidth=5; ctx.strokeRect(i*sw,H-sh,sw,sh);
-    ctx.fillStyle="white"; ctx.font="bold 38px Oswald";
-    ctx.fillText(v===0?"0":"$"+v,i*sw+sw/2,H-sh/2+14);
+    ctx.fillStyle="white"; ctx.font="bold 26px Oswald";
+    ctx.fillText(v===0?"0":"$"+v,i*sw+sw/2,H-sh/2+8);
   });
 
+  // Hovering disc (only when available and not falling)
+  const avail = p.discs - p.used;
+  if(avail > 0 && !disc && !dragging){
+    hovering.x = W/2 + Math.sin(time * hovering.speed) * hovering.amp;
+    drawDisc(hovering.x, hovering.y, Math.sin(time*2)*0.15);
+  }
+
   // Trail
-  trail.forEach((t,i)=>{ctx.globalAlpha=i/trail.length*0.6;
-    ctx.fillStyle="#ff3333"; ctx.beginPath(); ctx.arc(t.x,t.y,DISC_R*0.8,0,Math.PI*2); ctx.fill();});
+  trail.forEach((t,i)=>{ctx.globalAlpha=i/trail.length*0.5;
+    ctx.fillStyle="#ef4444"; ctx.beginPath(); ctx.arc(t.x,t.y,DISC_R*0.8,0,Math.PI*2); ctx.fill();});
   ctx.globalAlpha=1;
 
-  // Falling disc
+  // Active disc (dragging or falling)
   if(disc){
-    ctx.save(); ctx.translate(disc.x,disc.y); ctx.rotate(disc.spin);
-    const g = ctx.createRadialGradient(-10,-10,0,0,0,DISC_R);
-    g.addColorStop(0,"#ff3333"); g.addColorStop(0.7,"#cc0000"); g.addColorStop(1,"#660000");
-    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,DISC_R,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle="rgba(255,255,255,0.4)"; ctx.beginPath(); ctx.arc(-10,-10,DISC_R*0.4,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle="white"; ctx.font="bold 18px Oswald"; ctx.textAlign="center"; ctx.fillText("USL",0,7);
-    ctx.restore();
+    drawDisc(disc.x, disc.y, disc.spin);
   }
 
   // Particles
@@ -185,53 +203,75 @@ function draw(){
   }); ctx.globalAlpha=1;
 }
 
-let holding = false;
-canvas.addEventListener("mousedown", e=>{
-  if(p.used >= p.earned || disc) return;
+function drawDisc(x,y,spin=0){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(spin);
+  const g = ctx.createRadialGradient(-9,-9,0,0,0,DISC_R);
+  g.addColorStop(0,"#ff3333"); g.addColorStop(0.7,"#cc0000"); g.addColorStop(1,"#660000");
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,DISC_R,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle="rgba(255,255,255,0.4)"; ctx.beginPath(); ctx.arc(-9,-9,DISC_R*0.4,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle="white"; ctx.font="bold 18px Oswald"; ctx.textAlign="center"; ctx.fillText("USL",0,6);
+  ctx.restore();
+}
+
+// Hover + drag logic
+canvas.addEventListener("mousemove",(e)=>{
   const r = canvas.getBoundingClientRect();
-  const x = e.clientX - r.left;
-  const y = e.clientY - r.top;
-  const dx = x - hoverDisc.x;
-  const dy = y - hoverDisc.y;
-  if(Math.hypot(dx,dy) < DISC_R + 20){
-    holding = true;
-    document.getElementById("prompt").style.display = "none";
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const avail = p.discs - p.used;
+  const hx = hovering.x, hy = hovering.y;
+  const nearHover = avail > 0 && !disc && !dragging && Math.hypot(mx-hx,my-hy) < DISC_R*1.3;
+
+  if(nearHover) canvas.style.cursor = "grab";
+  else if(dragging) canvas.style.cursor = "grabbing";
+  else canvas.style.cursor = "default";
+
+  if(dragging && disc){
+    disc.x = Math.max(DISC_R+30, Math.min(W-DISC_R-30, mx));
+    disc.y = Math.max(30, Math.min(DROP_H-30, my));
+    draw();
   }
 });
-canvas.addEventListener("mousemove", e=>{
-  if(!holding) return;
+
+canvas.addEventListener("mousedown",(e)=>{
   const r = canvas.getBoundingClientRect();
-  disc = {
-    x: e.clientX - r.left,
-    y: Math.min(e.clientY - r.top, DROP_H - 10),
-    vx: 0, vy: 0, spin: 0, spinV: 0
-  };
-  draw();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const avail = p.discs - p.used;
+  if(avail > 0 && !disc && Math.hypot(mx-hovering.x,my-hovering.y) < DISC_R*1.3){
+    dragging = true;
+    canvas.style.cursor = "grabbing";
+    disc = {x:mx, y:my, vx:0, vy:0, spin:0, spinV:0};
+    draw();
+  }
 });
-canvas.addEventListener("mouseup", e=>{
-  if(!holding) return;
-  holding = false;
-  if(disc && disc.y <= DROP_H - 10){
-    p.used++;
-    disc.vx = (Math.random()-0.5)*70;
+
+canvas.addEventListener("mouseup",(e)=>{
+  if(!dragging) return;
+  dragging = false;
+  canvas.style.cursor = "default";
+
+  if(disc && disc.y <= DROP_H){
+    disc.vx = (Math.random()-0.5)*80;
     disc.vy = 0;
     disc.spinV = (Math.random()-0.5)*0.8;
     trail = [];
-    updateStats();
+    p.used++;
+    document.getElementById("avail").textContent = p.discs - p.used;
     saveCloud();
     requestAnimationFrame(physics);
+  }else{
+    disc = null;
   }
-  disc = null;
   draw();
 });
-canvas.addEventListener("mouseenter",()=>{ if(p.used < p.earned) document.getElementById("prompt").style.display = "block"; });
-canvas.addEventListener("mouseleave",()=>{ document.getElementById("prompt").style.display = "none"; });
 
-// Physics – identical to The Price is Right
+canvas.addEventListener("mouseleave",()=>{if(dragging){dragging=false; disc=null; draw();}});
+
+// Physics loop
 function physics(){
   if(!disc) return;
-  disc.vy += 540;
-  disc.vx *= 0.992; disc.vy *= 0.992;
+
+  disc.vy += 520;
+  disc.vx *= 0.993; disc.vy *= 0.993;
   disc.x += disc.vx * 0.016;
   disc.y += disc.vy * 0.016;
   disc.spin += disc.spinV; disc.spinV *= 0.99;
@@ -242,58 +282,62 @@ function physics(){
     if(d < DISC_R+PEG_R){
       const nx=dx/d, ny=dy/d;
       const dot = disc.vx*nx + disc.vy*ny;
-      disc.vx -= 2.2*dot*nx*0.78;
-      disc.vy -= 2.2*dot*ny*0.78;
-      disc.spinV += (Math.random()-0.5)*0.8;
-      disc.vx += (Math.random()-0.5)*50;
+      disc.vx -= 2.1*dot*nx*0.78;
+      disc.vy -= 2.1*dot*ny*0.78;
+      disc.spinV += (Math.random()-0.5)*0.7;
+      disc.vx += (Math.random()-0.5)*45;
       const overlap = DISC_R+PEG_R-d;
-      disc.x += nx*overlap*1.3; disc.y += ny*overlap*1.3;
+      disc.x += nx*overlap*1.2; disc.y += ny*overlap*1.2;
     }
   });
 
   if(disc.x < DISC_R+30){ disc.x = DISC_R+30; disc.vx = Math.abs(disc.vx)*0.8; }
   if(disc.x > W-DISC_R-30){ disc.x = W-DISC_R-30; disc.vx = -Math.abs(disc.vx)*0.8; }
 
-  if(disc.y > H-140){
+  if(disc.y > H-150){
     const slot = Math.floor(disc.x / (W/SLOTS));
     const win = VALUES[Math.min(Math.max(slot,0),8)];
-    p.total += win; p.best = Math.max(p.best,win);
-    updateStats(); saveCloud();
+    p.total += win; p.best = Math.max(p.best,win); p.played++;
+    document.getElementById("total").textContent = p.total;
+    document.getElementById("best").textContent = p.best;
+    document.getElementById("played").textContent = p.played;
+
     if(win >= 1000){
       const el = document.createElement("div"); el.className="bigwin"; el.textContent = "$"+win+"!";
       document.body.appendChild(el); setTimeout(()=>el.remove(),3000);
-      for(let i=0;i<100;i++) particles.push({x:disc.x,y:H-100,vy:Math.random()*14+8,life:70,color:"#fbbf24"});
+      for(let i=0;i<100;i++) particles.push({x:disc.x,y:H-120,vy:Math.random()*14+8,life:60,color:"#fbbf24"});
     }
+    saveCloud();
     disc = null; trail = [];
   }
+
   draw();
   if(disc) requestAnimationFrame(physics);
 }
 
-function updateStats(){
-  document.getElementById("total").textContent = p.total;
-  document.getElementById("best").textContent = p.best;
-  document.getElementById("played").textContent = p.used;
-  document.getElementById("earned").textContent = p.earned;
-}
-
+// Earn disc
 function earnDisc(){
   const acts = ["Single PR","Dual PR","Monthly LOC","Annual LOC","Save","Winback","Add E-Shield","Conversion"];
-  const act = prompt("Activity:\n\n"+acts.map((a,i)=>`${i+1}. ${a}`).join("\n"));
+  const act = prompt("Activity completed:\n\n"+acts.map((a,i)=>`${i+1}. ${a}`).join("\n")+"\n\nEnter number or name:");
   const mid = prompt("Member ID (e.g. TX123456):")?.toUpperCase();
   if(act && mid && /^[A-Z]{2,3}\d+$/.test(mid)){
-    p.earned++;
-    cloud.activities.push({id,name,act,mid,time:Date.now()});
-    updateStats(); saveCloud();
-    alert(`Disc earned! Total ready: ${p.earned - p.used}`);
-  }else alert("Invalid input");
+    p.discs++;
+    cloud.activities.push({employeeId,name,activity:act,memberId:mid,time:Date.now()});
+    document.getElementById("avail").textContent = p.discs - p.used;
+    saveCloud();
+    alert("Disc earned! Hover over the red disc to grab it.");
+    draw();
+  }else alert("Invalid – try again");
 }
 
+// Init
 loadCloud().then(()=>{
-  p.earned = p.earned||0; p.used = p.used||0;
-  updateStats();
-  draw();
-  setInterval(draw,50); // keeps hover disc swaying
+  p.discs = p.discs||0; p.used = p.used||0;
+  document.getElementById("total").textContent = p.total;
+  document.getElementById("best").textContent = p.best;
+  document.getElementById("played").textContent = p.played;
+  document.getElementById("avail").textContent = p.discs - p.used;
+  requestAnimationFrame(()=>{draw(); requestAnimationFrame(()=>{draw();});});
 });
 </script>
 </body>
