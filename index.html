@@ -732,7 +732,7 @@ const JSONBIN_CONFIG = {
       currentGameState = { ...gameState, binId: binId };
       saveAdminState();
 
-      // Generate player URL
+      // Generate player URL - FIXED: using ?game= parameter
       const playerUrl = generatePlayerUrl(binId);
       elements.gameLink.value = playerUrl;
       elements.gameLinkSection.style.display = 'block';
@@ -767,6 +767,7 @@ const JSONBIN_CONFIG = {
 
   function generatePlayerUrl(binId) {
     const baseUrl = window.location.origin + window.location.pathname;
+    // FIXED: Generate URL with ?game= parameter instead of ?session=
     return baseUrl.replace('index.html', CONFIG.GAME_PAGE) + '?game=' + binId;
   }
 
