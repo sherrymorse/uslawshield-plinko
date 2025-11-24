@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>U.S. LawShield PLINKO – Premium Edition</title>
+<title>U.S. LawShield PLINKO – Professional Edition</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@600;800&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   
@@ -14,36 +14,30 @@
     min-height: 100vh;
     color: white;
     overflow-x: hidden;
-    position: relative;
   }
 
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-      radial-gradient(circle at 20% 80%, rgba(105, 190, 40, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(105, 190, 40, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(0, 86, 184, 0.1) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: -1;
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 30px;
   }
 
   .header {
+    grid-column: 1 / -1;
     text-align: center;
-    padding: 25px 20px;
+    padding: 20px;
     background: linear-gradient(180deg, rgba(0, 34, 68, 0.95) 0%, rgba(0, 34, 68, 0.8) 100%);
     border-bottom: 4px solid #69BE28;
-    position: relative;
-    overflow: hidden;
+    border-radius: 15px;
+    margin-bottom: 20px;
   }
 
   .title {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 4.5em;
+    font-size: 4em;
     letter-spacing: 6px;
     text-shadow: 0 0 30px #69BE28, 3px 3px 0 #000;
     color: white;
@@ -58,205 +52,257 @@
     font-weight: 600;
   }
 
-  .cta-banner {
-    background: linear-gradient(90deg, #69BE28, #4A8A1F, #69BE28);
-    background-size: 200% 100%;
-    animation: shimmer 3s infinite;
-    padding: 15px;
-    text-align: center;
-    margin: 15px 0;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(105, 190, 40, 0.4);
-  }
-
-  @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-  }
-
-  .cta-text {
-    font-size: 1.3em;
-    font-weight: 800;
-    color: #002244;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-  }
-
-  .game-container {
-    max-width: 1200px;
-    margin: 20px auto;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 25px;
-    padding: 0 20px;
-  }
-
-  .plinko-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
+  .game-section {
+    background: rgba(0, 25, 51, 0.8);
+    border-radius: 20px;
+    padding: 20px;
+    border: 3px solid #69BE28;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
   }
 
   .canvas-wrapper {
     position: relative;
-    border-radius: 20px;
+    border-radius: 15px;
     overflow: hidden;
-    box-shadow: 
-      0 0 60px rgba(105, 190, 40, 0.5),
-      inset 0 0 40px rgba(0, 0, 0, 0.7);
-    border: 8px solid #002244;
+    box-shadow: 0 0 60px rgba(105, 190, 40, 0.4);
+    border: 6px solid #002244;
     background: #001933;
+    margin-bottom: 20px;
   }
 
-  #c {
+  #plinkoCanvas {
     display: block;
     background: #001933;
+    width: 100%;
   }
 
   .drop-zone {
     background: linear-gradient(135deg, #69BE28 0%, #4A8A1F 100%);
-    padding: 15px 30px;
-    border-radius: 15px;
-    font-size: 22px;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 20px;
     font-weight: 800;
-    box-shadow: 0 10px 30px rgba(105, 190, 40, 0.6);
+    box-shadow: 0 8px 25px rgba(105, 190, 40, 0.6);
     border: 3px solid #002244;
     color: #002244;
     text-align: center;
-    min-width: 280px;
     position: relative;
-    animation: pulse-glow 2s infinite;
-  }
-
-  @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 10px 30px rgba(105, 190, 40, 0.6); }
-    50% { box-shadow: 0 15px 40px rgba(105, 190, 40, 0.9); }
   }
 
   .prompt {
     position: absolute;
-    top: -30px;
+    top: -25px;
     left: 50%;
     transform: translateX(-50%);
     background: #002244;
-    padding: 6px 15px;
-    border-radius: 15px;
-    font-size: 14px;
+    padding: 5px 15px;
+    border-radius: 12px;
+    font-size: 12px;
     white-space: nowrap;
     font-weight: 600;
     border: 2px solid #69BE28;
     color: #69BE28;
   }
 
-  .controls-section {
+  .control-section {
+    background: rgba(0, 25, 51, 0.8);
+    border-radius: 20px;
+    padding: 25px;
+    border: 3px solid #69BE28;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     display: flex;
     flex-direction: column;
     gap: 20px;
-    min-width: 320px;
+  }
+
+  .setup-panel {
+    background: rgba(0, 34, 68, 0.9);
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid #69BE28;
+  }
+
+  .panel-title {
+    color: #69BE28;
+    font-size: 24px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 2px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  label {
+    display: block;
+    color: #A5ACAF;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  input[type="text"], select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #69BE28;
+    border-radius: 8px;
+    background: #001933;
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+  }
+
+  .board-selection {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .board-option {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    background: #001933;
+    border: 2px solid #69BE28;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: #A5ACAF;
+    font-weight: 600;
+  }
+
+  .board-option.selected {
+    background: #69BE28;
+    color: #002244;
+    border-color: #002244;
   }
 
   .btn {
     background: linear-gradient(135deg, #69BE28 0%, #4A8A1F 100%);
     color: #002244;
-    padding: 16px 35px;
+    padding: 15px 25px;
     border: none;
     border-radius: 50px;
-    font-size: 20px;
+    font-size: 16px;
     font-weight: 800;
     cursor: pointer;
-    box-shadow: 0 8px 25px rgba(105, 190, 40, 0.5);
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
     border: 3px solid #002244;
     font-family: 'Montserrat', sans-serif;
+    width: 100%;
   }
 
   .btn:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 35px rgba(105, 190, 40, 0.8);
-    background: linear-gradient(135deg, #7ACF32 0%, #5A9A2F 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(105, 190, 40, 0.8);
   }
 
   .btn-cta {
     background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    color: #002244;
-    font-size: 22px;
-    padding: 18px 40px;
-    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.6);
-    border: 3px solid #002244;
+    font-size: 18px;
+    padding: 18px;
   }
 
-  .btn-cta:hover {
-    box-shadow: 0 15px 40px rgba(255, 215, 0, 0.9);
-    background: linear-gradient(135deg, #FFE55C 0%, #FFB347 100%);
-  }
-
-  .stats-panel {
-    background: linear-gradient(135deg, rgba(0, 34, 68, 0.9) 0%, rgba(0, 51, 102, 0.9) 100%);
-    padding: 25px;
-    border-radius: 20px;
-    text-align: center;
-    border: 3px solid #69BE28;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-  }
-
-  .stats-panel h3 {
-    color: #69BE28;
-    font-size: 24px;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 3px;
-  }
-
-  .stat-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-  }
-
-  .stat-item {
-    background: rgba(0, 25, 51, 0.7);
-    padding: 12px;
-    border-radius: 12px;
+  .game-info {
+    background: rgba(0, 34, 68, 0.9);
+    padding: 20px;
+    border-radius: 15px;
     border: 2px solid #69BE28;
   }
 
-  .stat-value {
-    font-size: 28px;
-    font-weight: 800;
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(105, 190, 40, 0.3);
+  }
+
+  .info-label {
+    color: #A5ACAF;
+    font-weight: 600;
+  }
+
+  .info-value {
     color: #69BE28;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    font-weight: 800;
+  }
+
+  .prize-legend {
+    background: rgba(0, 34, 68, 0.9);
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid #69BE28;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .legend-title {
+    color: #69BE28;
+    font-size: 20px;
+    margin-bottom: 15px;
+    text-align: center;
     font-family: 'Bebas Neue', sans-serif;
     letter-spacing: 2px;
   }
 
-  .stat-label {
-    font-size: 14px;
-    color: #A5ACAF;
-    margin-top: 4px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 600;
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px;
+    background: rgba(0, 25, 51, 0.7);
+    border-radius: 8px;
   }
 
-  .status {
-    position: fixed;
+  .legend-symbol {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    margin-right: 12px;
+    flex-shrink: 0;
+    border: 2px solid white;
+  }
+
+  .legend-text {
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .current-board {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(0, 34, 68, 0.9);
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: 2px solid #69BE28;
+    color: #69BE28;
+    font-weight: 800;
+    z-index: 10;
+  }
+
+  .puck-counter {
+    position: absolute;
     top: 15px;
     right: 15px;
     background: rgba(0, 34, 68, 0.9);
     padding: 10px 20px;
     border-radius: 20px;
-    font-size: 14px;
     border: 2px solid #69BE28;
     color: #69BE28;
-    z-index: 1000;
-    font-weight: 600;
+    font-weight: 800;
+    z-index: 10;
   }
 
   .bigwin {
@@ -264,7 +310,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
-    font-size: 7em;
+    font-size: 6em;
     color: #FFD700;
     text-shadow: 0 0 40px #FFD700, 0 0 80px #FFA500;
     z-index: 9999;
@@ -272,6 +318,7 @@
     animation: win 2s forwards;
     font-family: 'Bebas Neue', sans-serif;
     letter-spacing: 6px;
+    text-align: center;
   }
 
   @keyframes win {
@@ -280,598 +327,734 @@
     100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   }
 
-  .disc-counter {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background: rgba(0, 34, 68, 0.9);
-    padding: 10px 20px;
-    border-radius: 20px;
-    border: 2px solid #69BE28;
-    color: #69BE28;
-    font-weight: 800;
-    font-size: 18px;
-    z-index: 10;
+  .admin-panel {
+    grid-column: 1 / -1;
+    background: rgba(0, 25, 51, 0.9);
+    border-radius: 15px;
+    padding: 25px;
+    border: 3px solid #69BE28;
+    margin-top: 20px;
   }
 
-  @media (max-width: 768px) {
-    .game-container {
-      flex-direction: column;
-      align-items: center;
-    }
-    
-    .controls-section {
-      width: 100%;
-    }
-    
-    .title {
-      font-size: 3em;
-    }
-    
-    .subtitle {
-      font-size: 1.1em;
-    }
-    
-    .cta-text {
-      font-size: 1.1em;
-    }
+  .admin-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .admin-btn {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .admin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+  }
+
+  .prize-display {
+    background: rgba(0, 34, 68, 0.9);
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid #69BE28;
+    margin-top: 20px;
+  }
+
+  .prize-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+  }
+
+  .prize-item {
+    background: rgba(0, 25, 51, 0.7);
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid #69BE28;
+    text-align: center;
+  }
+
+  .prize-symbol {
+    font-size: 2em;
+    margin-bottom: 8px;
+  }
+
+  .prize-name {
+    color: #69BE28;
+    font-weight: 800;
+    font-size: 14px;
+    line-height: 1.3;
+  }
+
+  .board-b {
+    background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+    border-color: #FFD700;
+  }
+
+  .board-b .legend-symbol {
+    border-color: #FFD700;
   }
 </style>
 </head>
 <body>
-
-<div class="status" id="status">Connecting to cloud…</div>
-<div class="header">
-  <h1 class="title">U.S. LAWSHIELD PLINKO</h1>
-  <p class="subtitle">LEGAL DEFENSE FOR SELF DEFENSE®</p>
-  
-  <div class="cta-banner">
-    <div class="cta-text">🎯 EARN DISCS • WIN BIG • CLIMB THE LEADERBOARD 🎯</div>
+<div class="container">
+  <div class="header">
+    <h1 class="title">U.S. LAWSHIELD PLINKO</h1>
+    <p class="subtitle">LEGAL DEFENSE FOR SELF DEFENSE®</p>
   </div>
-</div>
 
-<div class="game-container">
-  <div class="plinko-section">
+  <div class="game-section">
     <div class="canvas-wrapper">
-      <div class="disc-counter">Discs: <span id="discCounter">0</span></div>
-      <canvas id="c" width="720" height="1080"></canvas>
+      <div class="current-board" id="currentBoard">BOARD A</div>
+      <div class="puck-counter">PUCKS: <span id="puckCounter">0</span></div>
+      <canvas id="plinkoCanvas" width="800" height="1000"></canvas>
     </div>
     <div class="drop-zone">
       DROP ZONE
-      <div class="prompt">Grab disc → Position → Release to win!</div>
+      <div class="prompt">Hover puck → Click & hold → Position → Release to drop!</div>
     </div>
   </div>
-  
-  <div class="controls-section">
-    <button class="btn btn-cta" onclick="earnDisc()">🎁 EARN FREE DISC</button>
-    <button class="btn" onclick="showLeaderboard()">🏆 VIEW LEADERBOARD</button>
-    
-    <div class="stats-panel">
-      <h3>Your Performance</h3>
-      <div class="stat-grid">
-        <div class="stat-item">
-          <div class="stat-value" id="total">0</div>
-          <div class="stat-label">Total Winnings</div>
+
+  <div class="control-section">
+    <div class="setup-panel">
+      <h3 class="panel-title">PLAYER SETUP</h3>
+      <div class="form-group">
+        <label for="playerName">Player Name:</label>
+        <input type="text" id="playerName" placeholder="Enter player name">
+      </div>
+      <div class="form-group">
+        <label>Select Board(s):</label>
+        <div class="board-selection">
+          <div class="board-option" data-board="A">Board A</div>
+          <div class="board-option" data-board="B">Board B</div>
+          <div class="board-option" data-board="BOTH">Both</div>
         </div>
-        <div class="stat-item">
-          <div class="stat-value" id="best">0</div>
-          <div class="stat-label">Best Drop</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="played">0</div>
-          <div class="stat-label">Discs Played</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="avail">0</div>
-          <div class="stat-label">Available Now</div>
-        </div>
+      </div>
+      <div class="form-group">
+        <label for="puckCount">Number of Pucks:</label>
+        <select id="puckCount">
+          <option value="1">1 Puck</option>
+          <option value="2">2 Pucks</option>
+          <option value="3">3 Pucks</option>
+          <option value="5">5 Pucks</option>
+        </select>
+      </div>
+      <button class="btn btn-cta" id="startGame">START GAME</button>
+    </div>
+
+    <div class="game-info">
+      <h3 class="panel-title">GAME INFO</h3>
+      <div class="info-item">
+        <span class="info-label">Game ID:</span>
+        <span class="info-value" id="gameId">-</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Player:</span>
+        <span class="info-value" id="playerDisplay">-</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Pucks Remaining:</span>
+        <span class="info-value" id="pucksRemaining">0</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Total Won:</span>
+        <span class="info-value" id="totalWon">0 prizes</span>
       </div>
     </div>
 
-    <div class="cta-banner" style="margin: 0;">
-      <div class="cta-text" style="font-size: 1.1em;">🚀 EARN MORE → PLAY MORE → WIN MORE! 🚀</div>
+    <div class="prize-legend" id="legendA">
+      <h3 class="legend-title">BOARD A PRIZES</h3>
+      <!-- Legend items will be populated by JavaScript -->
+    </div>
+
+    <div class="prize-legend board-b" id="legendB" style="display: none;">
+      <h3 class="legend-title">BOARD B PRIZES</h3>
+      <!-- Legend items will be populated by JavaScript -->
+    </div>
+  </div>
+
+  <div class="admin-panel">
+    <h3 class="panel-title">ADMIN CONTROLS</h3>
+    <div class="admin-controls">
+      <button class="admin-btn" id="resetGame">Reset Game</button>
+      <button class="admin-btn" id="addPuck">Add Puck</button>
+      <button class="admin-btn" id="manualPrize">Add Manual Prize</button>
+      <button class="admin-btn" id="switchBoard">Switch Board</button>
+      <button class="admin-btn" id="copyGameLink">Copy Game Link</button>
+    </div>
+    
+    <div class="prize-display">
+      <h3 class="panel-title">PRIZES WON</h3>
+      <div class="prize-list" id="wonPrizes">
+        <!-- Won prizes will appear here -->
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-// ==================== JSONBIN.IO CLOUD ====================
-const MASTER_KEY = "$2a$10$NckuWO.y9g8.amyZZWkc8.lKIMS.AVSCyN1qT9/0d5EtRjuV9lmS2";
-const BIN_URL = "https://api.jsonbin.io/v3/b";
-let BIN_ID = localStorage.getItem("plinko_bin_id") || null;
-let cloud = {employees:{},activities:[],leaderboard:[]};
-
-async function loadCloud(){
-  try{
-    if(!BIN_ID) throw "no bin";
-    const r = await fetch(`${BIN_URL}/${BIN_ID}/latest`,{headers:{'X-Master-Key':MASTER_KEY}});
-    const data = await r.json();
-    cloud = data.record || cloud;
-    document.getElementById("status").textContent="Cloud Connected";
-  }catch(e){
-    const r = await fetch(BIN_URL,{method:"POST",headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY,'X-Bin-Name':'USLawShield-Plinko'},body:JSON.stringify(cloud)});
-    const j = await r.json();
-    BIN_ID = j.metadata.id;
-    localStorage.setItem("plinko_bin_id",BIN_ID);
-    document.getElementById("status").textContent="Cloud Created";
+// ==================== GAME STATE ====================
+const gameState = {
+  gameId: null,
+  playerName: '',
+  boardType: 'A',
+  pucksTotal: 1,
+  pucksUsed: 0,
+  pucksRemaining: 0,
+  currentBoard: 'A',
+  prizesWon: [],
+  isActive: false,
+  currentPuck: null,
+  boards: {
+    A: {
+      name: "Board A",
+      color: '#69BE28',
+      prizes: [
+        { symbol: '🎁', name: '$25 Gift Card', color: '#667eea' },
+        { symbol: '⏰', name: '1 Hour Campaign of Your Choice', color: '#f093fb' },
+        { symbol: '👥', name: 'Shadow an Agent for 1 Hour', color: '#4facfe' },
+        { symbol: '🚪', name: 'Leave 15min Early / Come in 15min Late', color: '#ff6b6b' },
+        { symbol: '☕', name: 'Extra 15 Minute Break', color: '#f6d365' },
+        { symbol: '📊', name: 'Replace QA Score with Call of Your Choice', color: '#4facfe' },
+        { symbol: '💼', name: 'Coffee with Leadership', color: '#f093fb' },
+        { symbol: '⏰', name: '1 Hour Campaign of Your Choice', color: '#f093fb' },
+        { symbol: '🎁', name: '$25 Gift Card', color: '#667eea' }
+      ]
+    },
+    B: {
+      name: "Board B",
+      color: '#FFD700',
+      prizes: [
+        { symbol: '🕑', name: '2 Hours Campaign of Your Choice', color: '#9b59b6' },
+        { symbol: '💰', name: '$50 Gift Card', color: '#e74c3c' },
+        { symbol: '⏱️', name: 'Leave 30 Minutes Early', color: '#3498db' },
+        { symbol: '💯', name: 'Replace Lowest QA Score with 100', color: '#2ecc71' },
+        { symbol: '🕓', name: '4 Hours Campaign of Your Choice', color: '#f1c40f' },
+        { symbol: '🍽️', name: 'Lunch on Leadership', color: '#e67e22' },
+        { symbol: '🎴', name: 'Wild Card', color: '#1abc9c' },
+        { symbol: '💰', name: '$50 Gift Card', color: '#e74c3c' },
+        { symbol: '🕑', name: '2 Hours Campaign of Your Choice', color: '#9b59b6' }
+      ]
+    }
   }
-}
-
-async function saveCloud(){
-  if(!BIN_ID) return;
-  await fetch(`${BIN_URL}/${BIN_ID}`,{method:"PUT",headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},body:JSON.stringify(cloud)});
-}
-
-// ==================== EMPLOYEE & STATE ====================
-let employeeId = localStorage.getItem("empId");
-let name = localStorage.getItem("empName");
-if(!name){ 
-  name = prompt("🎮 Welcome to U.S. LawShield Plinko!\n\nEnter your name to get started:") || "Player"; 
-  localStorage.setItem("empName",name); 
-}
-if(!employeeId){ employeeId = "emp_"+Date.now(); localStorage.setItem("empId",employeeId); }
-if(!cloud.employees[employeeId]) cloud.employees[employeeId] = {name,total:0,best:0,played:0,discs:0,used:0};
-let p = cloud.employees[employeeId];
+};
 
 // ==================== PLINKO PHYSICS ====================
-const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
+const canvas = document.getElementById('plinkoCanvas');
+const ctx = canvas.getContext('2d');
 const W = canvas.width, H = canvas.height;
-const DROP_H = 120, DISC_R = 30, PEG_R = 8;
-const ROWS = 16, SLOTS = 9;
-const VALUES = [100,500,1000,0,10000,0,1000,500,100];
+const DROP_ZONE_HEIGHT = 120;
+const PUCK_RADIUS = 18;
+const PEG_RADIUS = 6;
+const NUM_ROWS = 16;
+const NUM_SLOTS = 9;
 
-// Modern, vibrant slot colors
-const SLOT_COLORS = [
-  'linear-gradient(45deg, #667eea 0%, #764ba2 100%)',   // Purple gradient
-  'linear-gradient(45deg, #f093fb 0%, #f5576c 100%)',   // Pink gradient  
-  'linear-gradient(45deg, #4facfe 0%, #00f2fe 100%)',   // Blue gradient
-  'linear-gradient(45deg, #ff6b6b 0%, #ee5a52 100%)',   // Red gradient
-  'linear-gradient(45deg, #f6d365 0%, #fda085 100%)',   // Gold gradient - JACKPOT
-  'linear-gradient(45deg, #ff6b6b 0%, #ee5a52 100%)',   // Red gradient
-  'linear-gradient(45deg, #4facfe 0%, #00f2fe 100%)',   // Blue gradient
-  'linear-gradient(45deg, #f093fb 0%, #f5576c 100%)',   // Pink gradient
-  'linear-gradient(45deg, #667eea 0%, #764ba2 100%)'    // Purple gradient
-];
-
-let pegs = [], disc = null, trail = [], particles = [], time = 0;
-let hovering = {x:W/2, y:DROP_H/2, speed:1.5, amp: W/2 - DISC_R - 50};
+let pegs = [];
+let currentPuck = null;
 let dragging = false;
+let hoverPuck = { x: W/2, y: DROP_ZONE_HEIGHT/2 };
+let animationId = null;
+let particles = [];
 
-function initPegs(){
-  const startY = DROP_H + 90;
-  const rowH = (H - 240 - startY) / ROWS;
-  const colW = W / 10;
-  for(let r=0;r<ROWS;r++){
-    const cols = r%2===0?9:10;
-    const offset = r%2===0?colW:colW/2;
-    for(let c=0;c<cols;c++){
-      pegs.push({x:offset+c*colW,y:startY+r*rowH});
+// Initialize pegs
+function initPegs() {
+  pegs = [];
+  const startY = DROP_ZONE_HEIGHT + 80;
+  const rowHeight = (H - 200 - startY) / NUM_ROWS;
+  const colSpacing = W / 8;
+  
+  for (let row = 0; row < NUM_ROWS; row++) {
+    const numCols = row % 2 === 0 ? 9 : 8;
+    const offset = row % 2 === 0 ? 0 : colSpacing / 2;
+    
+    for (let col = 0; col < numCols; col++) {
+      pegs.push({
+        x: offset + col * colSpacing,
+        y: startY + row * rowHeight
+      });
     }
   }
 }
-initPegs();
 
-function draw(){
-  time += 0.016;
+// Draw the board
+function drawBoard() {
+  // Clear canvas
+  ctx.fillStyle = '#001933';
+  ctx.fillRect(0, 0, W, H);
   
-  // Board background
-  ctx.fillStyle="#001933";
-  ctx.fillRect(0,0,W,H);
+  // Draw drop zone
+  const dropGradient = ctx.createLinearGradient(0, 0, 0, DROP_ZONE_HEIGHT);
+  dropGradient.addColorStop(0, '#69BE28');
+  dropGradient.addColorStop(1, '#4A8A1F');
+  ctx.fillStyle = dropGradient;
+  ctx.fillRect(0, 0, W, DROP_ZONE_HEIGHT);
   
-  // Drop zone
-  const grad = ctx.createLinearGradient(0,0,0,DROP_H);
-  grad.addColorStop(0,"#69BE28");
-  grad.addColorStop(1,"#4A8A1F");
-  ctx.fillStyle=grad;
-  ctx.fillRect(0,0,W,DROP_H);
+  ctx.strokeStyle = '#002244';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(0, 0, W, DROP_ZONE_HEIGHT);
   
-  ctx.strokeStyle="#002244";
-  ctx.lineWidth=6;
-  ctx.strokeRect(0,0,W,DROP_H);
+  ctx.fillStyle = '#002244';
+  ctx.font = 'bold 24px Montserrat';
+  ctx.textAlign = 'center';
+  ctx.fillText('DROP ZONE', W/2, DROP_ZONE_HEIGHT/2 + 8);
   
-  ctx.fillStyle="#002244";
-  ctx.font="bold 32px Montserrat";
-  ctx.textAlign="center";
-  ctx.fillText("DROP ZONE",W/2,DROP_H/2+12);
-  
-  // Pegs
-  pegs.forEach(p=>{
-    const g = ctx.createRadialGradient(p.x-4,p.y-4,0,p.x,p.y,PEG_R);
-    g.addColorStop(0,"#69BE28");
-    g.addColorStop(1,"#4A8A1F");
-    ctx.fillStyle=g;
+  // Draw pegs
+  pegs.forEach(peg => {
+    const pegGradient = ctx.createRadialGradient(
+      peg.x - 3, peg.y - 3, 0, peg.x, peg.y, PEG_RADIUS
+    );
+    pegGradient.addColorStop(0, '#69BE28');
+    pegGradient.addColorStop(1, '#4A8A1F');
+    
+    ctx.fillStyle = pegGradient;
     ctx.beginPath();
-    ctx.arc(p.x,p.y,PEG_R,0,Math.PI*2);
+    ctx.arc(peg.x, peg.y, PEG_RADIUS, 0, Math.PI * 2);
     ctx.fill();
     
-    ctx.shadowColor = "#69BE28";
+    ctx.shadowColor = '#69BE28';
     ctx.shadowBlur = 8;
     ctx.fill();
     ctx.shadowBlur = 0;
   });
   
-  // Modern slots with rotated text
-  const sh=130, sw=W/SLOTS;
-  VALUES.forEach((v,i)=>{
-    // Create gradient fill for slot
-    const slotGradient = ctx.createLinearGradient(i*sw, H-sh, i*sw, H);
-    if(i === 4) { // Jackpot slot
-      slotGradient.addColorStop(0, "#f6d365");
-      slotGradient.addColorStop(1, "#fda085");
-    } else if(v === 0) { // Zero slots
-      slotGradient.addColorStop(0, "#ff6b6b");
-      slotGradient.addColorStop(1, "#ee5a52");
-    } else { // Value slots
-      const colors = [
-        ['#667eea', '#764ba2'],
-        ['#f093fb', '#f5576c'],
-        ['#4facfe', '#00f2fe']
-      ];
-      const colorIndex = [0,1,2,0,0,0,2,1,0][i];
-      slotGradient.addColorStop(0, colors[colorIndex][0]);
-      slotGradient.addColorStop(1, colors[colorIndex][1]);
-    }
+  // Draw slots
+  const currentBoard = gameState.boards[gameState.currentBoard];
+  const slotHeight = 80;
+  const slotWidth = W / NUM_SLOTS;
+  
+  currentBoard.prizes.forEach((prize, index) => {
+    // Slot background
+    ctx.fillStyle = prize.color;
+    ctx.fillRect(index * slotWidth, H - slotHeight, slotWidth, slotHeight);
     
-    ctx.fillStyle = slotGradient;
-    ctx.fillRect(i*sw, H-sh, sw, sh);
+    // Slot border
+    ctx.strokeStyle = currentBoard.color;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(index * slotWidth, H - slotHeight, slotWidth, slotHeight);
     
-    // Slot borders
-    ctx.strokeStyle="#69BE28";
-    ctx.lineWidth=4;
-    ctx.strokeRect(i*sw, H-sh, sw, sh);
-    
-    // Rotated text (vertical)
+    // Prize symbol (rotated)
     ctx.save();
-    ctx.translate(i*sw + sw/2, H - sh/2);
-    ctx.rotate(-Math.PI/2); // Rotate 90 degrees counter-clockwise
+    ctx.translate(index * slotWidth + slotWidth/2, H - slotHeight/2);
+    ctx.rotate(-Math.PI/2);
     
-    ctx.fillStyle="white";
-    ctx.font="bold 20px Montserrat";
-    ctx.textAlign="center";
-    ctx.textBaseline="middle";
-    
-    // Add dollar sign and format numbers
-    const displayText = v === 0 ? "0" : "$" + v.toLocaleString();
-    ctx.fillText(displayText, 0, 0);
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 20px Montserrat';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(prize.symbol, 0, 0);
     
     ctx.restore();
   });
   
-  // Hovering disc
-  const avail = p.discs - p.used;
-  if(avail > 0 && !disc && !dragging){
-    hovering.x = W/2 + Math.sin(time * hovering.speed) * hovering.amp;
-    drawDisc(hovering.x, hovering.y, Math.sin(time*2)*0.15);
+  // Draw hover puck (if available and not dragging)
+  if (gameState.pucksRemaining > 0 && !currentPuck && !dragging) {
+    drawPuck(hoverPuck.x, hoverPuck.y);
   }
   
-  // Trail
-  trail.forEach((t,i)=>{
-    ctx.globalAlpha=i/trail.length*0.5;
-    ctx.fillStyle="#69BE28";
-    ctx.beginPath();
-    ctx.arc(t.x,t.y,DISC_R*0.8,0,Math.PI*2);
-    ctx.fill();
-  });
-  ctx.globalAlpha=1;
-  
-  // Active disc
-  if(disc){
-    drawDisc(disc.x, disc.y, disc.spin);
+  // Draw current puck
+  if (currentPuck) {
+    drawPuck(currentPuck.x, currentPuck.y, currentPuck.rotation);
   }
   
-  // Particles
-  particles = particles.filter(pa=>{
-    pa.y -= pa.vy;
-    pa.life--;
-    ctx.globalAlpha = pa.life/50;
-    ctx.fillStyle=pa.color;
+  // Draw particles
+  particles.forEach((particle, index) => {
+    particle.life--;
+    if (particle.life <= 0) {
+      particles.splice(index, 1);
+      return;
+    }
+    
+    ctx.globalAlpha = particle.life / 60;
+    ctx.fillStyle = particle.color;
     ctx.beginPath();
-    ctx.arc(pa.x+Math.sin(pa.life)*25,pa.y,10,0,Math.PI*2);
+    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
     ctx.fill();
-    return pa.life>0;
   });
-  ctx.globalAlpha=1;
+  ctx.globalAlpha = 1;
 }
 
-function drawDisc(x,y,spin=0){
+function drawPuck(x, y, rotation = 0) {
   ctx.save();
-  ctx.translate(x,y);
-  ctx.rotate(spin);
+  ctx.translate(x, y);
+  ctx.rotate(rotation);
   
-  const g = ctx.createRadialGradient(-9,-9,0,0,0,DISC_R);
-  g.addColorStop(0,"#69BE28");
-  g.addColorStop(0.7,"#4A8A1F");
-  g.addColorStop(1,"#002244");
-  ctx.fillStyle=g;
+  const puckGradient = ctx.createRadialGradient(-6, -6, 0, 0, 0, PUCK_RADIUS);
+  puckGradient.addColorStop(0, '#69BE28');
+  puckGradient.addColorStop(0.7, '#4A8A1F');
+  puckGradient.addColorStop(1, '#002244');
+  
+  ctx.fillStyle = puckGradient;
   ctx.beginPath();
-  ctx.arc(0,0,DISC_R,0,Math.PI*2);
+  ctx.arc(0, 0, PUCK_RADIUS, 0, Math.PI * 2);
   ctx.fill();
   
-  ctx.strokeStyle="#002244";
-  ctx.lineWidth=3;
+  ctx.strokeStyle = '#002244';
+  ctx.lineWidth = 2;
   ctx.stroke();
   
-  ctx.fillStyle="#002244";
+  ctx.fillStyle = '#002244';
   ctx.beginPath();
-  ctx.arc(-9,-9,DISC_R*0.4,0,Math.PI*2);
+  ctx.arc(-6, -6, PUCK_RADIUS * 0.3, 0, Math.PI * 2);
   ctx.fill();
   
-  ctx.fillStyle="white";
-  ctx.font="bold 16px Montserrat";
-  ctx.textAlign="center";
-  ctx.fillText("USL",0,5);
+  ctx.fillStyle = 'white';
+  ctx.font = 'bold 14px Montserrat';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('USL', 0, 0);
   
   ctx.restore();
 }
 
-// Update disc counter
-function updateDiscCounter() {
-  document.getElementById("discCounter").textContent = p.discs - p.used;
-  document.getElementById("avail").textContent = p.discs - p.used;
-}
-
-// Hover + drag logic
-canvas.addEventListener("mousemove",(e)=>{
-  const r = canvas.getBoundingClientRect();
-  const mx = e.clientX - r.left, my = e.clientY - r.top;
-  const avail = p.discs - p.used;
-  const hx = hovering.x, hy = hovering.y;
-  const nearHover = avail > 0 && !disc && !dragging && Math.hypot(mx-hx,my-hy) < DISC_R*1.3;
+// Physics simulation
+function updatePhysics() {
+  if (!currentPuck) return;
   
-  if(nearHover) canvas.style.cursor = "grab";
-  else if(dragging) canvas.style.cursor = "grabbing";
-  else canvas.style.cursor = "default";
+  // Apply gravity
+  currentPuck.vy += 0.5;
   
-  if(dragging && disc){
-    disc.x = Math.max(DISC_R+30, Math.min(W-DISC_R-30, mx));
-    disc.y = Math.max(30, Math.min(DROP_H-30, my));
-    draw();
+  // Update position
+  currentPuck.x += currentPuck.vx;
+  currentPuck.y += currentPuck.vy;
+  
+  // Update rotation based on velocity
+  currentPuck.rotation += currentPuck.vx * 0.02;
+  
+  // Wall collisions
+  if (currentPuck.x - PUCK_RADIUS < 0) {
+    currentPuck.x = PUCK_RADIUS;
+    currentPuck.vx = Math.abs(currentPuck.vx) * 0.8;
+  } else if (currentPuck.x + PUCK_RADIUS > W) {
+    currentPuck.x = W - PUCK_RADIUS;
+    currentPuck.vx = -Math.abs(currentPuck.vx) * 0.8;
   }
-});
-
-canvas.addEventListener("mousedown",(e)=>{
-  const r = canvas.getBoundingClientRect();
-  const mx = e.clientX - r.left, my = e.clientY - r.top;
-  const avail = p.discs - p.used;
   
-  if(avail > 0 && !disc && Math.hypot(mx-hovering.x,my-hovering.y) < DISC_R*1.3){
-    dragging = true;
-    canvas.style.cursor = "grabbing";
-    disc = {x:mx, y:my, vx:0, vy:0, spin:0, spinV:0};
-    draw();
-  }
-});
-
-canvas.addEventListener("mouseup",(e)=>{
-  if(!dragging) return;
-  dragging = false;
-  canvas.style.cursor = "default";
-  
-  if(disc && disc.y <= DROP_H){
-    disc.vx = (Math.random()-0.5)*80;
-    disc.vy = 0;
-    disc.spinV = (Math.random()-0.5)*0.8;
-    trail = [];
-    p.used++;
-    updateDiscCounter();
-    saveCloud();
-    requestAnimationFrame(physics);
-  }else{
-    disc = null;
-  }
-  draw();
-});
-
-canvas.addEventListener("mouseleave",()=>{
-  if(dragging){
-    dragging=false;
-    disc=null;
-    draw();
-  }
-});
-
-// Physics loop
-function physics(){
-  if(!disc) return;
-  
-  disc.vy += 520;
-  disc.vx *= 0.993;
-  disc.vy *= 0.993;
-  disc.x += disc.vx * 0.016;
-  disc.y += disc.vy * 0.016;
-  disc.spin += disc.spinV;
-  disc.spinV *= 0.99;
-  
-  trail.push({x:disc.x,y:disc.y});
-  if(trail.length>40) trail.shift();
-  
-  pegs.forEach(p=>{
-    const dx=disc.x-p.x, dy=disc.y-p.y, d=Math.hypot(dx,dy);
-    if(d < DISC_R+PEG_R){
-      const nx=dx/d, ny=dy/d;
-      const dot = disc.vx*nx + disc.vy*ny;
-      disc.vx -= 2.1*dot*nx*0.78;
-      disc.vy -= 2.1*dot*ny*0.78;
-      disc.spinV += (Math.random()-0.5)*0.7;
-      disc.vx += (Math.random()-0.5)*45;
+  // Peg collisions
+  pegs.forEach(peg => {
+    const dx = currentPuck.x - peg.x;
+    const dy = currentPuck.y - peg.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const minDistance = PUCK_RADIUS + PEG_RADIUS;
+    
+    if (distance < minDistance) {
+      // Collision response
+      const angle = Math.atan2(dy, dx);
+      const targetX = peg.x + Math.cos(angle) * minDistance;
+      const targetY = peg.y + Math.sin(angle) * minDistance;
       
-      const overlap = DISC_R+PEG_R-d;
-      disc.x += nx*overlap*1.2;
-      disc.y += ny*overlap*1.2;
+      currentPuck.x = targetX;
+      currentPuck.y = targetY;
+      
+      // Reflect velocity with energy loss
+      const dot = currentPuck.vx * dx + currentPuck.vy * dy;
+      currentPuck.vx -= 1.8 * dot * dx / (distance * distance);
+      currentPuck.vy -= 1.8 * dot * dy / (distance * distance);
+      
+      // Add some randomness for authentic Plinko behavior
+      currentPuck.vx += (Math.random() - 0.5) * 2;
+      currentPuck.vy += (Math.random() - 0.5) * 2;
     }
   });
   
-  if(disc.x < DISC_R+30){
-    disc.x = DISC_R+30;
-    disc.vx = Math.abs(disc.vx)*0.8;
-  }
-  if(disc.x > W-DISC_R-30){
-    disc.x = W-DISC-R-30;
-    disc.vx = -Math.abs(disc.vx)*0.8;
-  }
-  
-  if(disc.y > H-150){
-    const slot = Math.floor(disc.x / (W/SLOTS));
-    const win = VALUES[Math.min(Math.max(slot,0),8)];
-    p.total += win;
-    p.best = Math.max(p.best,win);
-    p.played++;
+  // Check if puck reached bottom slots
+  if (currentPuck.y + PUCK_RADIUS > H - 80) {
+    const slotIndex = Math.floor(currentPuck.x / (W / NUM_SLOTS));
+    const currentBoard = gameState.boards[gameState.currentBoard];
+    const prize = currentBoard.prizes[slotIndex];
     
-    document.getElementById("total").textContent = p.total.toLocaleString();
-    document.getElementById("best").textContent = p.best.toLocaleString();
-    document.getElementById("played").textContent = p.played;
+    // Award prize
+    gameState.prizesWon.push({
+      board: gameState.currentBoard,
+      prize: prize.name,
+      symbol: prize.symbol
+    });
     
-    // Update leaderboard
-    updateLeaderboard();
-    
-    if(win >= 1000){
-      const el = document.createElement("div");
-      el.className="bigwin";
-      el.textContent = "$"+win.toLocaleString()+"!";
-      document.body.appendChild(el);
-      setTimeout(()=>el.remove(),3000);
-      
-      for(let i=0;i<100;i++) particles.push({
-        x:disc.x,
-        y:H-120,
-        vy:Math.random()*14+8,
-        life:60,
-        color: win === 10000 ? "#FFD700" : "#69BE28"
+    // Create celebration particles
+    for (let i = 0; i < 30; i++) {
+      particles.push({
+        x: currentPuck.x,
+        y: H - 40,
+        vx: (Math.random() - 0.5) * 10,
+        vy: -Math.random() * 15,
+        life: 60,
+        size: Math.random() * 4 + 2,
+        color: prize.color
       });
     }
-    saveCloud();
-    disc = null;
-    trail = [];
+    
+    // Show win animation for special prizes
+    if (slotIndex === 4) { // Middle slot - biggest prize
+      const winElement = document.createElement('div');
+      winElement.className = 'bigwin';
+      winElement.textContent = 'BIG PRIZE!';
+      document.body.appendChild(winElement);
+      setTimeout(() => winElement.remove(), 2000);
+    }
+    
+    // Update game state
+    gameState.pucksUsed++;
+    gameState.pucksRemaining--;
+    updateGameDisplay();
+    
+    // Check if should switch boards
+    if (gameState.boardType === 'BOTH' && gameState.currentBoard === 'A') {
+      gameState.currentBoard = 'B';
+      document.getElementById('currentBoard').textContent = 'BOARD B';
+      document.getElementById('legendA').style.display = 'none';
+      document.getElementById('legendB').style.display = 'block';
+      initPegs();
+    } else if (gameState.pucksRemaining === 0) {
+      // Game over
+      gameState.isActive = false;
+    }
+    
+    currentPuck = null;
+    cancelAnimationFrame(animationId);
+    drawBoard();
+    return;
   }
   
-  draw();
-  if(disc) requestAnimationFrame(physics);
+  drawBoard();
+  animationId = requestAnimationFrame(updatePhysics);
 }
 
-// Update leaderboard
-function updateLeaderboard() {
-  if(!cloud.leaderboard) cloud.leaderboard = [];
+// ==================== GAME CONTROLS ====================
+function startGame() {
+  const playerName = document.getElementById('playerName').value.trim();
+  const puckCount = parseInt(document.getElementById('puckCount').value);
+  const selectedBoard = document.querySelector('.board-option.selected').dataset.board;
   
-  // Find if employee already in leaderboard
-  const existingIndex = cloud.leaderboard.findIndex(entry => entry.id === employeeId);
-  
-  if(existingIndex !== -1) {
-    cloud.leaderboard[existingIndex].total = p.total;
-  } else {
-    cloud.leaderboard.push({
-      id: employeeId,
-      name: name,
-      total: p.total
-    });
+  if (!playerName) {
+    alert('Please enter a player name');
+    return;
   }
   
-  // Sort by total winnings
-  cloud.leaderboard.sort((a, b) => b.total - a.total);
+  gameState.playerName = playerName;
+  gameState.boardType = selectedBoard;
+  gameState.pucksTotal = puckCount;
+  gameState.pucksRemaining = puckCount;
+  gameState.pucksUsed = 0;
+  gameState.currentBoard = selectedBoard === 'B' ? 'B' : 'A';
+  gameState.prizesWon = [];
+  gameState.isActive = true;
+  gameState.gameId = 'G' + Date.now().toString().slice(-6);
   
-  // Keep only top 10
-  cloud.leaderboard = cloud.leaderboard.slice(0, 10);
+  // Update displays
+  updateGameDisplay();
+  document.getElementById('currentBoard').textContent = `BOARD ${gameState.currentBoard}`;
+  
+  // Show appropriate legend
+  document.getElementById('legendA').style.display = 
+    gameState.currentBoard === 'A' || gameState.boardType === 'BOTH' ? 'block' : 'none';
+  document.getElementById('legendB').style.display = 
+    gameState.currentBoard === 'B' ? 'block' : 'none';
+  
+  // Initialize board
+  initPegs();
+  drawBoard();
+  
+  // Animate hover puck
+  animateHoverPuck();
 }
 
-// Show leaderboard
-function showLeaderboard() {
-  const leaderboard = cloud.leaderboard || [];
-  let leaderboardHTML = `
-    <div style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); 
-                background:linear-gradient(135deg, #002244, #003366); 
-                padding:30px; border-radius:20px; border:4px solid #69BE28;
-                color:white; z-index:10000; max-width:500px; width:90%;
-                box-shadow:0 0 50px rgba(0,0,0,0.8); font-family:Montserrat;">
-      <h2 style="text-align:center; color:#69BE28; margin-bottom:20px; font-family:'Bebas Neue';">🏆 LEADERBOARD</h2>
-      <div style="max-height:400px; overflow-y:auto;">
-  `;
+function animateHoverPuck() {
+  if (!gameState.isActive || currentPuck || gameState.pucksRemaining === 0) return;
   
-  if(leaderboard.length === 0) {
-    leaderboardHTML += `<p style="text-align:center; color:#A5ACAF;">No scores yet! Be the first to play!</p>`;
-  } else {
-    leaderboard.forEach((player, index) => {
-      const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index+1}.`;
-      leaderboardHTML += `
-        <div style="display:flex; justify-content:space-between; padding:12px; 
-                    background:${index % 2 === 0 ? 'rgba(0,25,51,0.7)' : 'transparent'}; 
-                    border-radius:8px; margin:5px 0;">
-          <span>${medal} ${player.name}</span>
-          <span style="color:#69BE28; font-weight:bold;">$${player.total.toLocaleString()}</span>
-        </div>
-      `;
-    });
+  hoverPuck.x = W/2 + Math.sin(Date.now() * 0.002) * (W/2 - PUCK_RADIUS - 50);
+  drawBoard();
+  requestAnimationFrame(animateHoverPuck);
+}
+
+function updateGameDisplay() {
+  document.getElementById('gameId').textContent = gameState.gameId;
+  document.getElementById('playerDisplay').textContent = gameState.playerName;
+  document.getElementById('puckCounter').textContent = gameState.pucksRemaining;
+  document.getElementById('pucksRemaining').textContent = gameState.pucksRemaining;
+  document.getElementById('totalWon').textContent = `${gameState.prizesWon.length} prizes`;
+  
+  // Update won prizes display
+  const wonPrizesElement = document.getElementById('wonPrizes');
+  wonPrizesElement.innerHTML = '';
+  
+  gameState.prizesWon.forEach(prize => {
+    const prizeElement = document.createElement('div');
+    prizeElement.className = 'prize-item';
+    prizeElement.innerHTML = `
+      <div class="prize-symbol">${prize.symbol}</div>
+      <div class="prize-name">${prize.prize}</div>
+      <div style="font-size: 10px; color: #A5ACAF;">Board ${prize.board}</div>
+    `;
+    wonPrizesElement.appendChild(prizeElement);
+  });
+}
+
+// ==================== EVENT HANDLERS ====================
+canvas.addEventListener('mousemove', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  
+  if (dragging && currentPuck) {
+    currentPuck.x = Math.max(PUCK_RADIUS, Math.min(W - PUCK_RADIUS, x));
+    currentPuck.y = Math.max(PUCK_RADIUS, Math.min(DROP_ZONE_HEIGHT - PUCK_RADIUS, y));
+    drawBoard();
+  } else if (gameState.pucksRemaining > 0 && !currentPuck) {
+    hoverPuck.x = x;
+    hoverPuck.y = y;
   }
-  
-  leaderboardHTML += `
-      </div>
-      <button onclick="this.parentElement.remove()" 
-              style="margin-top:20px; padding:12px 30px; width:100%; 
-                     background:#69BE28; color:#002244; border:none; 
-                     border-radius:10px; font-weight:bold; cursor:pointer;">
-        CLOSE
-      </button>
-    </div>
-  `;
-  
-  const modal = document.createElement('div');
-  modal.innerHTML = leaderboardHTML;
-  document.body.appendChild(modal);
-}
+});
 
-// Earn disc with better CTA
-function earnDisc(){
-  const activities = [
-    "Single PR", "Dual PR", "Monthly LOC", "Annual LOC", 
-    "Save", "Winback", "Add E-Shield", "Conversion"
-  ];
+canvas.addEventListener('mousedown', (e) => {
+  if (!gameState.isActive || currentPuck || gameState.pucksRemaining === 0) return;
   
-  const activity = prompt(
-    "🎯 EARN A FREE PLINKO DISC!\n\n" +
-    "Select an activity you completed:\n\n" +
-    activities.map((a, i) => `${i+1}. ${a}`).join("\n") +
-    "\n\nEnter the number or name of the activity:"
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  
+  // Check if clicking near hover puck
+  const distance = Math.sqrt(
+    Math.pow(x - hoverPuck.x, 2) + Math.pow(y - hoverPuck.y, 2)
   );
   
-  if(!activity) return;
-  
-  const mid = prompt("Enter Member ID (e.g. TX123456):")?.toUpperCase();
-  
-  if(mid && /^[A-Z]{2,3}\d+$/.test(mid)){
-    p.discs++;
-    cloud.activities.push({
-      employeeId,
-      name,
-      activity: activity,
-      memberId: mid,
-      time: Date.now()
-    });
-    
-    updateDiscCounter();
-    saveCloud();
-    
-    // Success message with encouragement
-    alert("🎉 SUCCESS! Disc earned!\n\nHover over the green disc, grab it, and drop it in the DROP ZONE to win!\n\nGood luck! 🍀");
-    draw();
-  } else {
-    alert("❌ Please enter a valid Member ID (2-3 letters followed by numbers)");
+  if (distance < PUCK_RADIUS * 1.5) {
+    dragging = true;
+    currentPuck = {
+      x: x,
+      y: y,
+      vx: 0,
+      vy: 0,
+      rotation: 0
+    };
+    drawBoard();
   }
+});
+
+canvas.addEventListener('mouseup', () => {
+  if (dragging && currentPuck) {
+    dragging = false;
+    
+    // Add initial velocity based on drop position for more realistic physics
+    const centerX = W / 2;
+    currentPuck.vx = (currentPuck.x - centerX) * 0.5;
+    currentPuck.vy = 2;
+    
+    animationId = requestAnimationFrame(updatePhysics);
+  }
+});
+
+// Board selection
+document.querySelectorAll('.board-option').forEach(option => {
+  option.addEventListener('click', () => {
+    document.querySelectorAll('.board-option').forEach(opt => opt.classList.remove('selected'));
+    option.classList.add('selected');
+  });
+});
+
+// Start game button
+document.getElementById('startGame').addEventListener('click', startGame);
+
+// Admin controls
+document.getElementById('resetGame').addEventListener('click', () => {
+  if (confirm('Reset the game? This will clear all progress.')) {
+    gameState.isActive = false;
+    currentPuck = null;
+    gameState.prizesWon = [];
+    updateGameDisplay();
+    drawBoard();
+  }
+});
+
+document.getElementById('addPuck').addEventListener('click', () => {
+  gameState.pucksRemaining++;
+  gameState.pucksTotal++;
+  updateGameDisplay();
+});
+
+document.getElementById('manualPrize').addEventListener('click', () => {
+  const prizeName = prompt('Enter prize name:');
+  if (prizeName) {
+    gameState.prizesWon.push({
+      board: gameState.currentBoard,
+      prize: prizeName,
+      symbol: '🎁'
+    });
+    updateGameDisplay();
+  }
+});
+
+document.getElementById('switchBoard').addEventListener('click', () => {
+  gameState.currentBoard = gameState.currentBoard === 'A' ? 'B' : 'A';
+  document.getElementById('currentBoard').textContent = `BOARD ${gameState.currentBoard}`;
+  document.getElementById('legendA').style.display = gameState.currentBoard === 'A' ? 'block' : 'none';
+  document.getElementById('legendB').style.display = gameState.currentBoard === 'B' ? 'block' : 'none';
+  initPegs();
+  drawBoard();
+});
+
+document.getElementById('copyGameLink').addEventListener('click', () => {
+  const gameLink = `${window.location.origin}${window.location.pathname}?game=${gameState.gameId}`;
+  navigator.clipboard.writeText(gameLink).then(() => {
+    alert('Game link copied to clipboard!');
+  });
+});
+
+// ==================== INITIALIZE LEGENDS ====================
+function initializeLegends() {
+  // Board A legend
+  const legendA = document.getElementById('legendA');
+  const uniquePrizesA = [];
+  
+  gameState.boards.A.prizes.forEach(prize => {
+    if (!uniquePrizesA.find(p => p.symbol === prize.symbol)) {
+      uniquePrizesA.push(prize);
+    }
+  });
+  
+  uniquePrizesA.forEach(prize => {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = `
+      <div class="legend-symbol" style="background: ${prize.color}">${prize.symbol}</div>
+      <div class="legend-text">${prize.name}</div>
+    `;
+    legendA.appendChild(item);
+  });
+  
+  // Board B legend
+  const legendB = document.getElementById('legendB');
+  const uniquePrizesB = [];
+  
+  gameState.boards.B.prizes.forEach(prize => {
+    if (!uniquePrizesB.find(p => p.symbol === prize.symbol)) {
+      uniquePrizesB.push(prize);
+    }
+  });
+  
+  uniquePrizesB.forEach(prize => {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = `
+      <div class="legend-symbol" style="background: ${prize.color}">${prize.symbol}</div>
+      <div class="legend-text">${prize.name}</div>
+    `;
+    legendB.appendChild(item);
+  });
 }
 
 // Initialize the game
-loadCloud().then(()=>{
-  p.discs = p.discs||0;
-  p.used = p.used||0;
-  document.getElementById("total").textContent = p.total.toLocaleString();
-  document.getElementById("best").textContent = p.best.toLocaleString();
-  document.getElementById("played").textContent = p.played;
-  updateDiscCounter();
-  
-  requestAnimationFrame(()=>{
-    draw();
-    requestAnimationFrame(()=>{
-      draw();
-    });
-  });
-});
+initializeLegends();
+initPegs();
+drawBoard();
+
+// Set default board selection
+document.querySelector('.board-option[data-board="A"]').classList.add('selected');
 </script>
 </body>
 </html>
