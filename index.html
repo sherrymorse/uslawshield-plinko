@@ -2,15 +2,27 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>U.S. LawShield PLINKO – JSONBin.io Real-Time</title>
+<title>U.S. LawShield PLINKO – Premium Edition</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;800&family=Oswald:wght@700&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   
+  :root {
+    --seahawks-navy: #002244;
+    --seahawks-green: #69BE28;
+    --seahawks-blue: #245998;
+    --seahawks-gray: #A5ACAF;
+    --accent-gold: #FFD700;
+    --accent-orange: #FF8C00;
+    --accent-red: #FF6B6B;
+    --accent-purple: #9B59B6;
+    --accent-teal: #1ABC9C;
+  }
+  
   body {
     font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(135deg, #002244 0%, #003366 50%, #002244 100%);
+    background: linear-gradient(135deg, var(--seahawks-navy) 0%, var(--seahawks-blue) 50%, var(--seahawks-navy) 100%);
     min-height: 100vh;
     color: white;
     overflow-x: hidden;
@@ -22,302 +34,403 @@
     padding: 20px;
     display: grid;
     grid-template-columns: 1fr 400px;
-    gap: 30px;
+    gap: 25px;
   }
 
   .header {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 20px;
-    background: linear-gradient(180deg, rgba(0, 34, 68, 0.95) 0%, rgba(0, 34, 68, 0.8) 100%);
-    border-bottom: 4px solid #69BE28;
-    border-radius: 15px;
+    padding: 25px;
+    background: linear-gradient(180deg, rgba(0, 34, 68, 0.95) 0%, rgba(41, 128, 185, 0.8) 100%);
+    border-bottom: 6px solid var(--accent-gold);
+    border-radius: 20px;
     margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(105, 190, 40, 0.2) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.2) 0%, transparent 50%);
+    pointer-events: none;
   }
 
   .title {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 4em;
-    letter-spacing: 6px;
-    text-shadow: 0 0 30px #69BE28, 3px 3px 0 #000;
+    font-size: 5em;
+    letter-spacing: 8px;
+    text-shadow: 0 0 40px var(--accent-gold), 4px 4px 0 #000;
     color: white;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    position: relative;
   }
 
   .subtitle {
-    font-size: 1.4em;
-    letter-spacing: 3px;
-    color: #69BE28;
+    font-size: 1.6em;
+    letter-spacing: 4px;
+    color: var(--accent-gold);
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    font-weight: 600;
+    font-weight: 800;
+    font-family: 'Oswald', sans-serif;
   }
 
   .game-section {
-    background: rgba(0, 25, 51, 0.8);
-    border-radius: 20px;
-    padding: 20px;
-    border: 3px solid #69BE28;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    background: linear-gradient(135deg, rgba(0, 34, 68, 0.9) 0%, rgba(36, 89, 152, 0.9) 100%);
+    border-radius: 25px;
+    padding: 25px;
+    border: 4px solid var(--accent-gold);
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+    position: relative;
   }
 
   .canvas-wrapper {
     position: relative;
-    border-radius: 15px;
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 0 60px rgba(105, 190, 40, 0.4);
-    border: 6px solid #002244;
-    background: #001933;
-    margin-bottom: 20px;
+    box-shadow: 
+      0 0 80px rgba(105, 190, 40, 0.6),
+      inset 0 0 60px rgba(0, 0, 0, 0.8);
+    border: 8px solid var(--seahawks-navy);
+    background: linear-gradient(135deg, #001933 0%, #003366 100%);
+    margin-bottom: 25px;
   }
 
   #plinkoCanvas {
     display: block;
-    background: #001933;
+    background: linear-gradient(135deg, #001933 0%, #003366 100%);
     width: 100%;
   }
 
   .drop-zone {
-    background: linear-gradient(135deg, #69BE28 0%, #4A8A1F 100%);
-    padding: 15px;
-    border-radius: 12px;
-    font-size: 20px;
+    background: linear-gradient(135deg, var(--seahawks-green) 0%, #4A8A1F 100%);
+    padding: 20px 40px;
+    border-radius: 20px;
+    font-size: 24px;
     font-weight: 800;
-    box-shadow: 0 8px 25px rgba(105, 190, 40, 0.6);
-    border: 3px solid #002244;
-    color: #002244;
+    box-shadow: 0 12px 35px rgba(105, 190, 40, 0.8);
+    border: 4px solid var(--accent-gold);
+    color: var(--seahawks-navy);
     text-align: center;
     position: relative;
+    animation: pulse-glow 2s infinite;
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { 
+      box-shadow: 0 12px 35px rgba(105, 190, 40, 0.8);
+      transform: scale(1);
+    }
+    50% { 
+      box-shadow: 0 18px 45px rgba(105, 190, 40, 1);
+      transform: scale(1.02);
+    }
   }
 
   .prompt {
     position: absolute;
-    top: -25px;
+    top: -35px;
     left: 50%;
     transform: translateX(-50%);
-    background: #002244;
-    padding: 5px 15px;
-    border-radius: 12px;
-    font-size: 12px;
+    background: var(--seahawks-navy);
+    padding: 10px 20px;
+    border-radius: 15px;
+    font-size: 14px;
     white-space: nowrap;
-    font-weight: 600;
-    border: 2px solid #69BE28;
-    color: #69BE28;
+    font-weight: 700;
+    border: 3px solid var(--accent-gold);
+    color: var(--accent-gold);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
   }
 
   .control-section {
-    background: rgba(0, 25, 51, 0.8);
-    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(0, 34, 68, 0.9) 0%, rgba(36, 89, 152, 0.9) 100%);
+    border-radius: 25px;
     padding: 25px;
-    border: 3px solid #69BE28;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    border: 4px solid var(--accent-gold);
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
     display: flex;
     flex-direction: column;
     gap: 20px;
   }
 
   .setup-panel {
-    background: rgba(0, 34, 68, 0.9);
-    padding: 20px;
-    border-radius: 15px;
-    border: 2px solid #69BE28;
+    background: linear-gradient(135deg, rgba(0, 34, 68, 0.95) 0%, rgba(41, 128, 185, 0.9) 100%);
+    padding: 25px;
+    border-radius: 20px;
+    border: 3px solid var(--accent-gold);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
   }
 
   .panel-title {
-    color: #69BE28;
-    font-size: 24px;
-    margin-bottom: 15px;
+    color: var(--accent-gold);
+    font-size: 28px;
+    margin-bottom: 20px;
     text-align: center;
     font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   }
 
   .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
   }
 
   label {
     display: block;
-    color: #A5ACAF;
-    margin-bottom: 8px;
-    font-weight: 600;
-    font-size: 14px;
+    color: var(--accent-gold);
+    margin-bottom: 10px;
+    font-weight: 700;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
   input[type="text"], select {
     width: 100%;
-    padding: 12px;
-    border: 2px solid #69BE28;
-    border-radius: 8px;
-    background: #001933;
+    padding: 15px;
+    border: 3px solid var(--accent-gold);
+    border-radius: 12px;
+    background: rgba(0, 25, 51, 0.8);
     color: white;
     font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s;
+  }
+
+  input[type="text"]:focus, select:focus {
+    outline: none;
+    border-color: var(--seahawks-green);
+    box-shadow: 0 0 20px rgba(105, 190, 40, 0.6);
+    background: rgba(0, 25, 51, 0.9);
   }
 
   .board-selection {
     display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
+    gap: 12px;
+    margin-bottom: 20px;
   }
 
   .board-option {
     flex: 1;
     text-align: center;
-    padding: 12px;
-    background: #001933;
-    border: 2px solid #69BE28;
-    border-radius: 8px;
+    padding: 15px;
+    background: rgba(0, 25, 51, 0.8);
+    border: 3px solid var(--accent-gold);
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s;
-    color: #A5ACAF;
-    font-weight: 600;
+    color: var(--accent-gold);
+    font-weight: 700;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .board-option:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
   }
 
   .board-option.selected {
-    background: #69BE28;
-    color: #002244;
-    border-color: #002244;
+    background: var(--accent-gold);
+    color: var(--seahawks-navy);
+    border-color: var(--seahawks-navy);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
   }
 
   .btn {
-    background: linear-gradient(135deg, #69BE28 0%, #4A8A1F 100%);
-    color: #002244;
-    padding: 15px 25px;
+    background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-orange) 100%);
+    color: var(--seahawks-navy);
+    padding: 18px 30px;
     border: none;
     border-radius: 50px;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 800;
     cursor: pointer;
     transition: all 0.3s ease;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    border: 3px solid #002244;
-    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 2px;
+    border: 3px solid var(--seahawks-navy);
+    font-family: 'Oswald', sans-serif;
     width: 100%;
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
   }
 
   .btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(105, 190, 40, 0.8);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(255, 215, 0, 0.8);
+    background: linear-gradient(135deg, #FFE55C 0%, #FFA500 100%);
   }
 
   .btn-cta {
-    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    font-size: 18px;
-    padding: 18px;
+    background: linear-gradient(135deg, var(--seahawks-green) 0%, #4A8A1F 100%);
+    font-size: 20px;
+    padding: 20px;
+    border: 3px solid var(--accent-gold);
+    box-shadow: 0 10px 30px rgba(105, 190, 40, 0.6);
+  }
+
+  .btn-cta:hover {
+    box-shadow: 0 15px 40px rgba(105, 190, 40, 0.9);
+    background: linear-gradient(135deg, #7ACF32 0%, #5A9A2F 100%);
   }
 
   .game-info {
-    background: rgba(0, 34, 68, 0.9);
-    padding: 20px;
-    border-radius: 15px;
-    border: 2px solid #69BE28;
+    background: linear-gradient(135deg, rgba(0, 34, 68, 0.95) 0%, rgba(41, 128, 185, 0.9) 100%);
+    padding: 25px;
+    border-radius: 20px;
+    border: 3px solid var(--accent-gold);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
   }
 
   .info-item {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 12px;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(105, 190, 40, 0.3);
+    margin-bottom: 15px;
+    padding: 12px 0;
+    border-bottom: 2px solid rgba(255, 215, 0, 0.3);
   }
 
   .info-label {
-    color: #A5ACAF;
-    font-weight: 600;
+    color: var(--accent-gold);
+    font-weight: 700;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
   .info-value {
-    color: #69BE28;
+    color: white;
     font-weight: 800;
+    font-size: 18px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
   }
 
   .prize-legend {
-    background: rgba(0, 34, 68, 0.9);
-    padding: 20px;
-    border-radius: 15px;
-    border: 2px solid #69BE28;
-    max-height: 300px;
+    background: linear-gradient(135deg, rgba(0, 34, 68, 0.95) 0%, rgba(41, 128, 185, 0.9) 100%);
+    padding: 25px;
+    border-radius: 20px;
+    border: 3px solid var(--accent-gold);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    max-height: 350px;
     overflow-y: auto;
   }
 
   .legend-title {
-    color: #69BE28;
-    font-size: 20px;
-    margin-bottom: 15px;
+    color: var(--accent-gold);
+    font-size: 24px;
+    margin-bottom: 20px;
     text-align: center;
     font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   }
 
   .legend-item {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
-    padding: 8px;
+    margin-bottom: 12px;
+    padding: 12px;
     background: rgba(0, 25, 51, 0.7);
-    border-radius: 8px;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    transition: all 0.3s;
+  }
+
+  .legend-item:hover {
+    transform: translateX(5px);
+    border-color: var(--accent-gold);
+    background: rgba(0, 25, 51, 0.9);
   }
 
   .legend-symbol {
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 800;
-    margin-right: 12px;
+    margin-right: 15px;
     flex-shrink: 0;
-    border: 2px solid white;
+    border: 3px solid white;
+    font-size: 18px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   }
 
   .legend-text {
     color: white;
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.3;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
   }
 
   .current-board {
     position: absolute;
-    top: 15px;
-    left: 15px;
-    background: rgba(0, 34, 68, 0.9);
-    padding: 10px 20px;
-    border-radius: 20px;
-    border: 2px solid #69BE28;
-    color: #69BE28;
+    top: 20px;
+    left: 20px;
+    background: linear-gradient(135deg, var(--seahawks-navy) 0%, var(--seahawks-blue) 100%);
+    padding: 12px 25px;
+    border-radius: 25px;
+    border: 3px solid var(--accent-gold);
+    color: var(--accent-gold);
     font-weight: 800;
     z-index: 10;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    font-family: 'Oswald', sans-serif;
   }
 
   .puck-counter {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    background: rgba(0, 34, 68, 0.9);
-    padding: 10px 20px;
-    border-radius: 20px;
-    border: 2px solid #69BE28;
-    color: #69BE28;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, var(--seahawks-navy) 0%, var(--seahawks-blue) 100%);
+    padding: 12px 25px;
+    border-radius: 25px;
+    border: 3px solid var(--accent-gold);
+    color: var(--accent-gold);
     font-weight: 800;
     z-index: 10;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    font-family: 'Oswald', sans-serif;
   }
 
   .connection-status {
     position: absolute;
-    top: 15px;
+    top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 34, 68, 0.9);
-    padding: 8px 16px;
-    border-radius: 20px;
-    border: 2px solid #69BE28;
-    color: #69BE28;
-    font-weight: 600;
-    font-size: 12px;
+    background: linear-gradient(135deg, var(--seahawks-navy) 0%, var(--seahawks-blue) 100%);
+    padding: 10px 20px;
+    border-radius: 25px;
+    border: 3px solid var(--accent-gold);
+    color: var(--accent-gold);
+    font-weight: 700;
+    font-size: 14px;
     z-index: 10;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
   }
 
   .bigwin {
@@ -325,125 +438,268 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
-    font-size: 6em;
-    color: #FFD700;
-    text-shadow: 0 0 40px #FFD700, 0 0 80px #FFA500;
+    font-size: 8em;
+    color: var(--accent-gold);
+    text-shadow: 0 0 50px var(--accent-gold), 0 0 100px var(--accent-orange);
     z-index: 9999;
     pointer-events: none;
     animation: win 2s forwards;
     font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 6px;
+    letter-spacing: 8px;
     text-align: center;
   }
 
   @keyframes win {
     0% { transform: translate(-50%, -50%) scale(0) rotate(-180deg); opacity: 0; }
-    50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
     100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   }
 
   .admin-panel {
     grid-column: 1 / -1;
-    background: rgba(0, 25, 51, 0.9);
-    border-radius: 15px;
-    padding: 25px;
-    border: 3px solid #69BE28;
-    margin-top: 20px;
+    background: linear-gradient(135deg, rgba(0, 34, 68, 0.95) 0%, rgba(36, 89, 152, 0.9) 100%);
+    border-radius: 25px;
+    padding: 30px;
+    border: 4px solid var(--accent-gold);
+    margin-top: 25px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
   }
 
   .admin-controls {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
   }
 
   .admin-btn {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    background: linear-gradient(135deg, var(--accent-red) 0%, #ee5a52 100%);
     color: white;
-    padding: 12px 20px;
+    padding: 15px 25px;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     font-weight: 800;
     cursor: pointer;
     transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 16px;
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.3);
   }
 
   .admin-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
   }
 
   .prize-display {
-    background: rgba(0, 34, 68, 0.9);
-    padding: 20px;
-    border-radius: 15px;
-    border: 2px solid #69BE28;
-    margin-top: 20px;
+    background: linear-gradient(135deg, rgba(0, 34, 68, 0.95) 0%, rgba(41, 128, 185, 0.9) 100%);
+    padding: 25px;
+    border-radius: 20px;
+    border: 3px solid var(--accent-gold);
+    margin-top: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
   }
 
   .prize-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 15px;
   }
 
   .prize-item {
     background: rgba(0, 25, 51, 0.7);
-    padding: 15px;
-    border-radius: 10px;
-    border: 2px solid #69BE28;
+    padding: 20px;
+    border-radius: 15px;
+    border: 3px solid var(--accent-gold);
     text-align: center;
+    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+
+  .prize-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    border-color: var(--seahawks-green);
   }
 
   .prize-symbol {
-    font-size: 2em;
-    margin-bottom: 8px;
+    font-size: 2.5em;
+    margin-bottom: 12px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   }
 
   .prize-name {
-    color: #69BE28;
+    color: var(--accent-gold);
     font-weight: 800;
-    font-size: 14px;
-    line-height: 1.3;
+    font-size: 16px;
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
   .board-b {
     background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
-    border-color: #FFD700;
+    border-color: var(--accent-gold);
   }
 
   .board-b .legend-symbol {
-    border-color: #FFD700;
+    border-color: var(--accent-gold);
   }
 
   .mode-selector {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 15px;
+    margin-bottom: 25px;
+    grid-column: 1 / -1;
   }
 
   .mode-btn {
     flex: 1;
-    padding: 12px;
-    background: #001933;
-    border: 2px solid #69BE28;
-    border-radius: 8px;
-    color: #A5ACAF;
-    font-weight: 600;
+    padding: 18px;
+    background: rgba(0, 25, 51, 0.8);
+    border: 3px solid var(--accent-gold);
+    border-radius: 15px;
+    color: var(--accent-gold);
+    font-weight: 800;
     cursor: pointer;
     text-align: center;
     transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+
+  .mode-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
   }
 
   .mode-btn.active {
-    background: #69BE28;
-    color: #002244;
-    border-color: #002244;
+    background: var(--accent-gold);
+    color: var(--seahawks-navy);
+    border-color: var(--seahawks-navy);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+  }
+
+  .notification-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 350px;
+    background: linear-gradient(135deg, var(--seahawks-navy) 0%, var(--seahawks-blue) 100%);
+    border: 3px solid var(--accent-gold);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    z-index: 10000;
+    transform: translateX(400px);
+    transition: transform 0.5s ease;
+  }
+
+  .notification-panel.show {
+    transform: translateX(0);
+  }
+
+  .notification-title {
+    color: var(--accent-gold);
+    font-size: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .notification-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .notification-item {
+    background: rgba(0, 25, 51, 0.7);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--accent-gold);
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .notification-time {
+    color: var(--accent-gold);
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 5px;
+  }
+
+  .player-status {
+    background: linear-gradient(135deg, rgba(0, 34, 68, 0.95) 0%, rgba(41, 128, 185, 0.9) 100%);
+    padding: 20px;
+    border-radius: 20px;
+    border: 3px solid var(--accent-gold);
+    margin-top: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+  }
+
+  .status-title {
+    color: var(--accent-gold);
+    font-size: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .status-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+  }
+
+  .status-label {
+    color: var(--accent-gold);
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .status-value {
+    color: white;
+    font-weight: 800;
+    font-size: 14px;
+  }
+
+  .locked-field {
+    background: rgba(0, 25, 51, 0.5) !important;
+    color: var(--accent-gold) !important;
+    border-color: var(--accent-gold) !important;
+    cursor: not-allowed !important;
+  }
+
+  .locked-field::placeholder {
+    color: rgba(255, 215, 0, 0.6) !important;
   }
 </style>
 </head>
 <body>
+<div class="notification-panel" id="notificationPanel">
+  <h3 class="notification-title">🔔 ADMIN NOTIFICATIONS</h3>
+  <div class="notification-list" id="notificationList">
+    <div class="notification-item">
+      System initialized and ready
+      <div class="notification-time">Just now</div>
+    </div>
+  </div>
+</div>
+
 <div class="container">
   <div class="header">
     <h1 class="title">U.S. LAWSHIELD PLINKO</h1>
@@ -524,6 +780,22 @@
       </div>
     </div>
 
+    <div class="player-status" id="playerStatus" style="display: none;">
+      <h3 class="status-title">PLAYER STATUS</h3>
+      <div class="status-item">
+        <span class="status-label">Current Action:</span>
+        <span class="status-value" id="currentAction">Waiting to start</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Last Activity:</span>
+        <span class="status-value" id="lastActivity">-</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Connection:</span>
+        <span class="status-value" id="playerConnection">Not connected</span>
+      </div>
+    </div>
+
     <div class="prize-legend" id="legendA">
       <h3 class="legend-title">BOARD A PRIZES</h3>
       <!-- Legend items will be populated by JavaScript -->
@@ -543,6 +815,7 @@
       <button class="admin-btn" id="manualPrize">Add Manual Prize</button>
       <button class="admin-btn" id="switchBoard">Switch Board</button>
       <button class="admin-btn" id="copyGameLink">Copy Game Link</button>
+      <button class="admin-btn" id="showNotifications">Show Notifications</button>
     </div>
     
     <div class="prize-display">
@@ -582,6 +855,8 @@ const gameState = {
   connected: false,
   binId: null,
   lastUpdated: 0,
+  playerStatus: 'waiting',
+  lastActivity: null,
   boards: {
     A: {
       name: "Board A",
@@ -615,6 +890,57 @@ const gameState = {
     }
   }
 };
+
+// ==================== NOTIFICATION SYSTEM ====================
+const notifications = [];
+
+function addNotification(message) {
+  const timestamp = new Date().toLocaleTimeString();
+  notifications.unshift({
+    message,
+    timestamp,
+    id: Date.now()
+  });
+  
+  // Keep only last 20 notifications
+  if (notifications.length > 20) {
+    notifications.pop();
+  }
+  
+  updateNotificationDisplay();
+  
+  // Show notification panel if admin
+  if (gameState.isAdmin) {
+    document.getElementById('notificationPanel').classList.add('show');
+  }
+}
+
+function updateNotificationDisplay() {
+  const notificationList = document.getElementById('notificationList');
+  notificationList.innerHTML = '';
+  
+  notifications.forEach(notif => {
+    const item = document.createElement('div');
+    item.className = 'notification-item';
+    item.innerHTML = `
+      ${notif.message}
+      <div class="notification-time">${notif.timestamp}</div>
+    `;
+    notificationList.appendChild(item);
+  });
+}
+
+function updatePlayerStatus(status, activity) {
+  gameState.playerStatus = status;
+  gameState.lastActivity = activity || new Date().toLocaleTimeString();
+  
+  document.getElementById('currentAction').textContent = status;
+  document.getElementById('lastActivity').textContent = gameState.lastActivity;
+  
+  if (gameState.isAdmin) {
+    addNotification(`Player ${status.toLowerCase()}: ${activity || status}`);
+  }
+}
 
 // ==================== JSONBIN.IO REAL-TIME SYNC ====================
 let syncInterval = null;
@@ -707,6 +1033,12 @@ function startSyncInterval(binId) {
       // Update connection status
       isConnected = true;
       updateConnectionStatus();
+      
+      // Update player status for admin
+      if (gameState.isAdmin) {
+        document.getElementById('playerConnection').textContent = 'Connected';
+        document.getElementById('playerStatus').style.display = 'block';
+      }
     }
   }, 2000); // Sync every 2 seconds to stay within rate limits
 }
@@ -750,9 +1082,38 @@ async function loadGameStateFromCloud(binId) {
     updateBoardDisplay();
     drawBoard();
     startSyncInterval(binId);
+    
+    // Lock player fields if not admin
+    if (!gameState.isAdmin) {
+      lockPlayerFields();
+    }
+    
+    // Add notification for admin
+    if (gameState.isAdmin) {
+      addNotification(`Connected to game: ${gameState.gameId}`);
+      updatePlayerStatus('Connected', 'Player joined the game');
+    } else {
+      updatePlayerStatus('Ready to play', 'Game loaded successfully');
+    }
+    
     return true;
   }
   return false;
+}
+
+function lockPlayerFields() {
+  document.getElementById('playerName').classList.add('locked-field');
+  document.getElementById('playerName').readOnly = true;
+  document.getElementById('puckCount').classList.add('locked-field');
+  document.getElementById('puckCount').disabled = true;
+  
+  document.querySelectorAll('.board-option').forEach(option => {
+    option.classList.add('locked-field');
+    option.style.cursor = 'not-allowed';
+    option.onclick = null;
+  });
+  
+  document.getElementById('startGame').style.display = 'none';
 }
 
 // ==================== PLINKO PHYSICS ====================
@@ -762,7 +1123,7 @@ const W = canvas.width, H = canvas.height;
 const DROP_ZONE_HEIGHT = 120;
 const PUCK_RADIUS = 18;
 const PEG_RADIUS = 6;
-const NUM_ROWS = 16;
+const NUM_ROWS = 20; // Increased rows for better physics
 const NUM_SLOTS = 9;
 
 let pegs = [];
@@ -772,11 +1133,11 @@ let hoverPuck = { x: W/2, y: DROP_ZONE_HEIGHT/2 };
 let animationId = null;
 let particles = [];
 
-// Initialize pegs
+// Initialize pegs with better spacing
 function initPegs() {
   pegs = [];
-  const startY = DROP_ZONE_HEIGHT + 80;
-  const rowHeight = (H - 200 - startY) / NUM_ROWS;
+  const startY = DROP_ZONE_HEIGHT + 60; // Reduced initial gap
+  const rowHeight = (H - 160 - startY) / NUM_ROWS; // Adjusted for more rows
   const colSpacing = W / 8;
   
   for (let row = 0; row < NUM_ROWS; row++) {
@@ -792,72 +1153,95 @@ function initPegs() {
   }
 }
 
-// Draw the board
+// Draw the board with enhanced visuals
 function drawBoard() {
-  // Clear canvas
-  ctx.fillStyle = '#001933';
+  // Clear canvas with gradient
+  const bgGradient = ctx.createLinearGradient(0, 0, 0, H);
+  bgGradient.addColorStop(0, '#001933');
+  bgGradient.addColorStop(1, '#003366');
+  ctx.fillStyle = bgGradient;
   ctx.fillRect(0, 0, W, H);
   
-  // Draw drop zone
+  // Draw drop zone with enhanced gradient
   const dropGradient = ctx.createLinearGradient(0, 0, 0, DROP_ZONE_HEIGHT);
   dropGradient.addColorStop(0, '#69BE28');
-  dropGradient.addColorStop(1, '#4A8A1F');
+  dropGradient.addColorStop(0.5, '#4A8A1F');
+  dropGradient.addColorStop(1, '#2D5F1D');
   ctx.fillStyle = dropGradient;
   ctx.fillRect(0, 0, W, DROP_ZONE_HEIGHT);
   
   ctx.strokeStyle = '#002244';
-  ctx.lineWidth = 4;
+  ctx.lineWidth = 6;
   ctx.strokeRect(0, 0, W, DROP_ZONE_HEIGHT);
   
+  // Drop zone text with glow
+  ctx.shadowColor = '#69BE28';
+  ctx.shadowBlur = 10;
   ctx.fillStyle = '#002244';
-  ctx.font = 'bold 24px Montserrat';
+  ctx.font = 'bold 28px Oswald';
   ctx.textAlign = 'center';
-  ctx.fillText('DROP ZONE', W/2, DROP_ZONE_HEIGHT/2 + 8);
+  ctx.fillText('DROP ZONE', W/2, DROP_ZONE_HEIGHT/2 + 10);
+  ctx.shadowBlur = 0;
   
-  // Draw pegs
+  // Draw pegs with glow effect
   pegs.forEach(peg => {
     const pegGradient = ctx.createRadialGradient(
       peg.x - 3, peg.y - 3, 0, peg.x, peg.y, PEG_RADIUS
     );
-    pegGradient.addColorStop(0, '#69BE28');
-    pegGradient.addColorStop(1, '#4A8A1F');
+    pegGradient.addColorStop(0, '#FFD700');
+    pegGradient.addColorStop(0.7, '#FFA500');
+    pegGradient.addColorStop(1, '#CC8400');
     
     ctx.fillStyle = pegGradient;
     ctx.beginPath();
     ctx.arc(peg.x, peg.y, PEG_RADIUS, 0, Math.PI * 2);
     ctx.fill();
     
-    ctx.shadowColor = '#69BE28';
+    ctx.shadowColor = '#FFD700';
     ctx.shadowBlur = 8;
     ctx.fill();
     ctx.shadowBlur = 0;
   });
   
-  // Draw slots
+  // Draw slots with enhanced visuals
   const currentBoard = gameState.boards[gameState.currentBoard];
   const slotHeight = 80;
   const slotWidth = W / NUM_SLOTS;
   
   currentBoard.prizes.forEach((prize, index) => {
-    // Slot background
-    ctx.fillStyle = prize.color;
+    // Slot background with gradient
+    const slotGradient = ctx.createLinearGradient(
+      index * slotWidth, H - slotHeight,
+      index * slotWidth, H
+    );
+    slotGradient.addColorStop(0, prize.color);
+    slotGradient.addColorStop(1, darkenColor(prize.color, 30));
+    
+    ctx.fillStyle = slotGradient;
     ctx.fillRect(index * slotWidth, H - slotHeight, slotWidth, slotHeight);
     
-    // Slot border
-    ctx.strokeStyle = currentBoard.color;
-    ctx.lineWidth = 3;
+    // Slot border with glow for center slot
+    ctx.strokeStyle = index === 4 ? '#FFD700' : currentBoard.color;
+    ctx.lineWidth = index === 4 ? 5 : 3;
     ctx.strokeRect(index * slotWidth, H - slotHeight, slotWidth, slotHeight);
     
-    // Prize symbol (rotated)
+    // Prize symbol (rotated) with enhanced styling
     ctx.save();
     ctx.translate(index * slotWidth + slotWidth/2, H - slotHeight/2);
     ctx.rotate(-Math.PI/2);
     
     ctx.fillStyle = 'white';
-    ctx.font = 'bold 20px Montserrat';
+    ctx.font = 'bold 22px Montserrat';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    
+    if (index === 4) {
+      ctx.shadowColor = '#FFD700';
+      ctx.shadowBlur = 10;
+    }
+    
     ctx.fillText(prize.symbol, 0, 0);
+    ctx.shadowBlur = 0;
     
     ctx.restore();
   });
@@ -889,15 +1273,26 @@ function drawBoard() {
   ctx.globalAlpha = 1;
 }
 
+function darkenColor(color, percent) {
+  const num = parseInt(color.replace("#", ""), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = (num >> 16) - amt;
+  const G = (num >> 8 & 0x00FF) - amt;
+  const B = (num & 0x0000FF) - amt;
+  return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+}
+
 function drawPuck(x, y, rotation = 0) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(rotation);
   
   const puckGradient = ctx.createRadialGradient(-6, -6, 0, 0, 0, PUCK_RADIUS);
-  puckGradient.addColorStop(0, '#69BE28');
-  puckGradient.addColorStop(0.7, '#4A8A1F');
-  puckGradient.addColorStop(1, '#002244');
+  puckGradient.addColorStop(0, '#FF6B6B');
+  puckGradient.addColorStop(0.5, '#EE5A52');
+  puckGradient.addColorStop(1, '#CC0000');
   
   ctx.fillStyle = puckGradient;
   ctx.beginPath();
@@ -905,16 +1300,17 @@ function drawPuck(x, y, rotation = 0) {
   ctx.fill();
   
   ctx.strokeStyle = '#002244';
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 3;
   ctx.stroke();
   
+  // Puck details
   ctx.fillStyle = '#002244';
   ctx.beginPath();
   ctx.arc(-6, -6, PUCK_RADIUS * 0.3, 0, Math.PI * 2);
   ctx.fill();
   
   ctx.fillStyle = 'white';
-  ctx.font = 'bold 14px Montserrat';
+  ctx.font = 'bold 16px Oswald';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText('USL', 0, 0);
@@ -922,12 +1318,12 @@ function drawPuck(x, y, rotation = 0) {
   ctx.restore();
 }
 
-// Physics simulation
+// Enhanced physics simulation
 function updatePhysics() {
   if (!currentPuck) return;
   
-  // Apply gravity
-  currentPuck.vy += 0.5;
+  // Apply gravity with slight variation for realism
+  currentPuck.vy += 0.5 + (Math.random() * 0.1);
   
   // Update position
   currentPuck.x += currentPuck.vx;
@@ -942,16 +1338,16 @@ function updatePhysics() {
     saveGameStateToCloud();
   }
   
-  // Wall collisions
+  // Wall collisions with energy loss
   if (currentPuck.x - PUCK_RADIUS < 0) {
     currentPuck.x = PUCK_RADIUS;
-    currentPuck.vx = Math.abs(currentPuck.vx) * 0.8;
+    currentPuck.vx = Math.abs(currentPuck.vx) * 0.75;
   } else if (currentPuck.x + PUCK_RADIUS > W) {
     currentPuck.x = W - PUCK_RADIUS;
-    currentPuck.vx = -Math.abs(currentPuck.vx) * 0.8;
+    currentPuck.vx = -Math.abs(currentPuck.vx) * 0.75;
   }
   
-  // Peg collisions
+  // Peg collisions with improved physics
   pegs.forEach(peg => {
     const dx = currentPuck.x - peg.x;
     const dy = currentPuck.y - peg.y;
@@ -959,7 +1355,7 @@ function updatePhysics() {
     const minDistance = PUCK_RADIUS + PEG_RADIUS;
     
     if (distance < minDistance) {
-      // Collision response
+      // Collision response with energy conservation
       const angle = Math.atan2(dy, dx);
       const targetX = peg.x + Math.cos(angle) * minDistance;
       const targetY = peg.y + Math.sin(angle) * minDistance;
@@ -967,18 +1363,21 @@ function updatePhysics() {
       currentPuck.x = targetX;
       currentPuck.y = targetY;
       
-      // Reflect velocity with energy loss
+      // Reflect velocity with realistic energy loss
       const dot = currentPuck.vx * dx + currentPuck.vy * dy;
       currentPuck.vx -= 1.8 * dot * dx / (distance * distance);
       currentPuck.vy -= 1.8 * dot * dy / (distance * distance);
       
-      // Add some randomness for authentic Plinko behavior
-      currentPuck.vx += (Math.random() - 0.5) * 2;
-      currentPuck.vy += (Math.random() - 0.5) * 2;
+      // Add realistic randomness for authentic Plinko behavior
+      currentPuck.vx += (Math.random() - 0.5) * 1.5;
+      currentPuck.vy += (Math.random() - 0.5) * 1.5;
+      
+      // Add spin effect
+      currentPuck.rotation += currentPuck.vx * 0.05;
     }
   });
   
-  // Check if puck reached bottom slots
+  // Check if puck reached bottom slots with improved detection
   if (currentPuck.y + PUCK_RADIUS > H - 80) {
     const slotIndex = Math.floor(currentPuck.x / (W / NUM_SLOTS));
     const currentBoard = gameState.boards[gameState.currentBoard];
@@ -992,26 +1391,30 @@ function updatePhysics() {
       timestamp: Date.now()
     });
     
-    // Create celebration particles
-    for (let i = 0; i < 30; i++) {
+    // Create enhanced celebration particles
+    for (let i = 0; i < 50; i++) {
       particles.push({
         x: currentPuck.x,
         y: H - 40,
-        vx: (Math.random() - 0.5) * 10,
-        vy: -Math.random() * 15,
-        life: 60,
-        size: Math.random() * 4 + 2,
+        vx: (Math.random() - 0.5) * 12,
+        vy: -Math.random() * 18,
+        life: 80,
+        size: Math.random() * 5 + 3,
         color: prize.color
       });
     }
     
-    // Show win animation for special prizes
+    // Show enhanced win animation for special prizes
     if (slotIndex === 4) { // Middle slot - biggest prize
       const winElement = document.createElement('div');
       winElement.className = 'bigwin';
-      winElement.textContent = 'BIG PRIZE!';
+      winElement.textContent = 'JACKPOT!';
       document.body.appendChild(winElement);
-      setTimeout(() => winElement.remove(), 2000);
+      setTimeout(() => winElement.remove(), 2500);
+      
+      addNotification(`🎉 Player won JACKPOT: ${prize.name}`);
+    } else {
+      addNotification(`🎯 Player won: ${prize.name}`);
     }
     
     // Update game state
@@ -1020,14 +1423,20 @@ function updatePhysics() {
     gameState.currentPuck = null;
     currentPuck = null;
     
+    // Update player status
+    updatePlayerStatus('Won prize', `Won: ${prize.name}`);
+    
     // Check if should switch boards
     if (gameState.boardType === 'BOTH' && gameState.currentBoard === 'A') {
       gameState.currentBoard = 'B';
       updateBoardDisplay();
       initPegs();
+      updatePlayerStatus('Board switched', 'Now playing on Board B');
     } else if (gameState.pucksRemaining === 0) {
       // Game over
       gameState.isActive = false;
+      updatePlayerStatus('Game completed', 'All pucks used');
+      addNotification('🎊 Player completed the game!');
     }
     
     // Save final state to cloud
@@ -1074,6 +1483,10 @@ async function startGame() {
     
     // Start synchronization
     startSyncInterval(gameState.binId);
+    
+    // Add notification
+    addNotification(`🎮 New game started: ${playerName}`);
+    updatePlayerStatus('Game started', 'Ready to play');
   } catch (error) {
     console.error('Failed to create cloud game:', error);
     alert('Failed to create cloud game. Using local mode only.');
@@ -1085,7 +1498,7 @@ async function startGame() {
   updateGameDisplay();
   updateBoardDisplay();
   
-  // Initialize board
+  // Initialize board with improved physics
   initPegs();
   drawBoard();
   
@@ -1130,7 +1543,7 @@ function updateGameDisplay() {
     prizeElement.innerHTML = `
       <div class="prize-symbol">${prize.symbol}</div>
       <div class="prize-name">${prize.prize}</div>
-      <div style="font-size: 10px; color: #A5ACAF;">Board ${prize.board}</div>
+      <div style="font-size: 12px; color: #A5ACAF; margin-top: 5px;">Board ${prize.board}</div>
     `;
     wonPrizesElement.appendChild(prizeElement);
   });
@@ -1148,6 +1561,7 @@ canvas.addEventListener('mousemove', (e) => {
     currentPuck.x = Math.max(PUCK_RADIUS, Math.min(W - PUCK_RADIUS, x));
     currentPuck.y = Math.max(PUCK_RADIUS, Math.min(DROP_ZONE_HEIGHT - PUCK_RADIUS, y));
     drawBoard();
+    updatePlayerStatus('Positioning puck', 'Adjusting drop position');
   } else if (gameState.pucksRemaining > 0 && !currentPuck) {
     hoverPuck.x = x;
     hoverPuck.y = y;
@@ -1176,6 +1590,8 @@ canvas.addEventListener('mousedown', (e) => {
       rotation: 0
     };
     drawBoard();
+    updatePlayerStatus('Holding puck', 'Ready to drop');
+    addNotification('🎯 Player picked up a puck');
   }
 });
 
@@ -1190,6 +1606,9 @@ canvas.addEventListener('mouseup', () => {
     currentPuck.vx = (currentPuck.x - centerX) * 0.5;
     currentPuck.vy = 2;
     
+    updatePlayerStatus('Puck dropping', 'Watching physics in action');
+    addNotification('🎲 Player dropped the puck!');
+    
     animationId = requestAnimationFrame(updatePhysics);
   }
 });
@@ -1197,6 +1616,8 @@ canvas.addEventListener('mouseup', () => {
 // Board selection
 document.querySelectorAll('.board-option').forEach(option => {
   option.addEventListener('click', () => {
+    if (gameState.isAdmin || gameState.isActive) return;
+    
     document.querySelectorAll('.board-option').forEach(opt => opt.classList.remove('selected'));
     option.classList.add('selected');
   });
@@ -1214,11 +1635,14 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
       document.getElementById('playerSetup').style.display = 'block';
       document.getElementById('adminSetup').style.display = 'none';
       canvas.style.cursor = 'default';
+      document.getElementById('playerStatus').style.display = 'none';
     } else {
       gameState.isAdmin = true;
       document.getElementById('playerSetup').style.display = 'none';
       document.getElementById('adminSetup').style.display = 'block';
       canvas.style.cursor = 'default';
+      document.getElementById('playerStatus').style.display = 'block';
+      addNotification('👑 Admin mode activated');
     }
   });
 });
@@ -1258,6 +1682,8 @@ document.getElementById('resetGame').addEventListener('click', async () => {
     updateBoardDisplay();
     await saveGameStateToCloud();
     drawBoard();
+    addNotification('🔄 Game reset by admin');
+    updatePlayerStatus('Game reset', 'Ready for new game');
   }
 });
 
@@ -1266,6 +1692,8 @@ document.getElementById('addPuck').addEventListener('click', async () => {
   gameState.pucksTotal++;
   updateGameDisplay();
   await saveGameStateToCloud();
+  addNotification('➕ Admin added a puck');
+  updatePlayerStatus('Puck added', 'Extra puck granted');
 });
 
 document.getElementById('manualPrize').addEventListener('click', async () => {
@@ -1280,6 +1708,8 @@ document.getElementById('manualPrize').addEventListener('click', async () => {
     });
     updateGameDisplay();
     await saveGameStateToCloud();
+    addNotification(`🎁 Manual prize added: ${prizeName}`);
+    updatePlayerStatus('Prize awarded', `Manual: ${prizeName}`);
   }
 });
 
@@ -1289,6 +1719,8 @@ document.getElementById('switchBoard').addEventListener('click', async () => {
   initPegs();
   await saveGameStateToCloud();
   drawBoard();
+  addNotification(`🔄 Board switched to ${gameState.currentBoard}`);
+  updatePlayerStatus('Board switched', `Now on Board ${gameState.currentBoard}`);
 });
 
 document.getElementById('copyGameLink').addEventListener('click', () => {
@@ -1297,10 +1729,16 @@ document.getElementById('copyGameLink').addEventListener('click', () => {
     return;
   }
   
-  const gameLink = `${window.location.origin}${window.location.pathname}?game=${gameState.gameId}&admin=true`;
+  const gameLink = `${window.location.origin}${window.location.pathname}?game=${gameState.gameId}`;
   navigator.clipboard.writeText(gameLink).then(() => {
-    alert('Game link copied to clipboard!');
+    alert('Game link copied to clipboard! Send this to the player.');
+    addNotification('📋 Game link copied to clipboard');
   });
+});
+
+document.getElementById('showNotifications').addEventListener('click', () => {
+  const panel = document.getElementById('notificationPanel');
+  panel.classList.toggle('show');
 });
 
 // ==================== INITIALIZE LEGENDS ====================
@@ -1362,6 +1800,7 @@ function checkUrlParameters() {
     } else {
       // Auto-connect as player
       gameState.gameId = gameId;
+      gameState.isAdmin = false;
       loadGameStateFromCloud(gameId);
     }
   }
@@ -1381,6 +1820,13 @@ document.querySelector('.board-option[data-board="A"]').classList.add('selected'
 window.addEventListener('beforeunload', () => {
   stopSyncInterval();
 });
+
+// Show notification panel after a delay for admin
+setTimeout(() => {
+  if (gameState.isAdmin) {
+    document.getElementById('notificationPanel').classList.add('show');
+  }
+}, 1000);
 </script>
 </body>
 </html>
