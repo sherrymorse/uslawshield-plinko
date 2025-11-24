@@ -570,17 +570,25 @@
 </div>
 
 <script>
+const JSONBIN_CONFIG = {
+  BASE_URL: 'https://api.jsonbin.io/v3/b',
+  HEADERS: {
+    'Content-Type': 'application/json',
+    'X-Master-Key': '$2a$10$NckuWO.y9g8.amyZZWkc8.lKIMS.AVSCyN1qT9/0d5EtRjuV9lmS2',
+    'X-Access-Key': '$2a$10$g6RfQ66H6XQyYy3D848Cfurvs0dXgVt92aV0Rr0UqchZrBZwr7Vpy'
+  }
+};
+
 (function() {
   'use strict';
 
   const CONFIG = {
     GAME_PAGE: 'game.html',
-    STORAGE_KEY: 'plinko_game_state',
-    SESSION_KEY: 'plinko_active_session'
+    STORAGE_KEY: 'plinko_admin_state'
   };
 
   let currentGameState = {
-    sessionId: null,
+    binId: null,
     playerName: '',
     boardConfig: 'A',
     puckCountA: 3,
@@ -613,7 +621,7 @@
   function init() {
     setupEventListeners();
     loadExistingGame();
-    console.log('Admin panel initialized');
+    console.log('Admin panel initialized with JSONBin.io');
   }
 
   function setupEventListeners() {
@@ -623,7 +631,6 @@
         this.classList.add('selected');
         currentGameState.boardConfig = this.dataset.board;
         
-        // Update puck configuration visibility based on board selection
         updatePuckConfigVisibility();
       });
     });
@@ -641,8 +648,7 @@
     elements.resetGameBtn.addEventListener('click', resetGame);
     elements.addPuckBtn.addEventListener('click', addPuck);
 
-    window.addEventListener('storage', handleStorageChange);
-    setInterval(checkGameState, 2000);
+    setInterval(checkGameState, 3000);
   }
 
   function updatePuckConfigVisibility() {
@@ -665,7 +671,7 @@
     }
   }
 
-  function createGame() {
+  async function createGame() {
     const playerName = elements.playerName.value.trim();
     
     if (!playerName) {
@@ -674,9 +680,7 @@
       return;
     }
 
-    const sessionId = generateSessionId();
-    
-    // Calculate initial puck counts based on board configuration
+    // Calculate initial puck counts
     let initialPucksRemaining = 0;
     let puckCountA = parseInt(elements.puckCountA.value);
     let puckCountB = parseInt(elements.puckCountB.value);
@@ -693,8 +697,8 @@
         break;
     }
 
-    currentGameState = {
-      sessionId: sessionId,
+    const gameState = {
+      sessionId: generateSessionId(),
       playerName: playerName,
       boardConfig: currentGameState.boardConfig,
       puckCountA: puckCountA,
@@ -703,41 +707,67 @@
       pucksRemaining: initialPucksRemaining,
       gameActive: true,
       results: [],
+      prizesWon: [],
       createdAt: new Date().toISOString(),
-      totalPucks: initialPucksRemaining // Track total for percentage calculations
+      lastUpdated: new Date().toISOString(),
+      playerConnected: false
     };
 
-    saveGameState();
+    try {
+      // Create new bin on JSONBin.io
+      const response = await fetch(JSONBIN_CONFIG.BASE_URL, {
+        method: 'POST',
+        headers: JSONBIN_CONFIG.HEADERS,
+        body: JSON.stringify(gameState)
+      });
 
-    const playerUrl = generatePlayerUrl(sessionId);
-    elements.gameLink.value = playerUrl;
-    elements.gameLinkSection.style.display = 'block';
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-    updateStatusDisplay();
-    addNotification(`✅ Game created for ${playerName}`, 'success');
-    addNotification(`Session: ${sessionId}`, 'info');
-    
-    elements.successBanner.style.display = 'block';
-    setTimeout(() => {
-      elements.successBanner.style.display = 'none';
-    }, 5000);
-    
-    elements.createGameBtn.disabled = true;
-    elements.createGameBtn.textContent = '✅ GAME CREATED';
-    
-    setTimeout(() => {
-      elements.gameLinkSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      elements.gameLink.select();
-    }, 300);
+      const data = await response.json();
+      const binId = data.metadata.id;
+
+      // Update local state
+      currentGameState = { ...gameState, binId: binId };
+      saveAdminState();
+
+      // Generate player URL
+      const playerUrl = generatePlayerUrl(binId);
+      elements.gameLink.value = playerUrl;
+      elements.gameLinkSection.style.display = 'block';
+
+      updateStatusDisplay();
+      addNotification(`✅ Game created for ${playerName}`, 'success');
+      addNotification(`Bin ID: ${binId}`, 'info');
+      
+      elements.successBanner.style.display = 'block';
+      setTimeout(() => {
+        elements.successBanner.style.display = 'none';
+      }, 5000);
+      
+      elements.createGameBtn.disabled = true;
+      elements.createGameBtn.textContent = '✅ GAME CREATED';
+      
+      setTimeout(() => {
+        elements.gameLinkSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        elements.gameLink.select();
+      }, 300);
+
+    } catch (error) {
+      console.error('Failed to create game on JSONBin.io:', error);
+      addNotification('❌ Failed to create game on server', 'error');
+      showAlert('Failed to create game. Please check your connection and try again.');
+    }
   }
 
   function generateSessionId() {
     return 'plinko_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   }
 
-  function generatePlayerUrl(sessionId) {
+  function generatePlayerUrl(binId) {
     const baseUrl = window.location.origin + window.location.pathname;
-    return baseUrl.replace('index.html', CONFIG.GAME_PAGE) + '?session=' + sessionId;
+    return baseUrl.replace('index.html', CONFIG.GAME_PAGE) + '?game=' + binId;
   }
 
   function copyGameLink() {
@@ -781,13 +811,14 @@
     alert(message);
   }
 
-  function saveGameState() {
+  function saveAdminState() {
     try {
-      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(currentGameState));
-      localStorage.setItem(CONFIG.SESSION_KEY, currentGameState.sessionId);
+      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify({
+        binId: currentGameState.binId,
+        lastUpdated: new Date().toISOString()
+      }));
     } catch (e) {
-      console.error('Failed to save game state:', e);
-      addNotification('❌ Failed to save game state', 'error');
+      console.error('Failed to save admin state:', e);
     }
   }
 
@@ -795,22 +826,10 @@
     try {
       const savedState = localStorage.getItem(CONFIG.STORAGE_KEY);
       if (savedState) {
-        const parsedState = JSON.parse(savedState);
-        if (parsedState.gameActive && parsedState.sessionId) {
-          currentGameState = parsedState;
-          
-          // Restore UI state
-          elements.playerName.value = currentGameState.playerName;
-          document.querySelector(`[data-board="${currentGameState.boardConfig}"]`).click();
-          elements.puckCountA.value = currentGameState.puckCountA;
-          elements.puckCountB.value = currentGameState.puckCountB;
-          
-          elements.gameLinkSection.style.display = 'block';
-          elements.gameLink.value = generatePlayerUrl(currentGameState.sessionId);
-          updateStatusDisplay();
-          addNotification('🔄 Existing game loaded from storage', 'info');
-          elements.createGameBtn.disabled = true;
-          elements.createGameBtn.textContent = '✅ GAME ACTIVE';
+        const adminState = JSON.parse(savedState);
+        if (adminState.binId) {
+          // Load the existing game from JSONBin.io
+          loadGameFromBin(adminState.binId);
         }
       }
     } catch (e) {
@@ -818,58 +837,116 @@
     }
   }
 
-  function checkGameState() {
-    if (!currentGameState.gameActive || !currentGameState.sessionId) return;
+  async function loadGameFromBin(binId) {
+    try {
+      const gameState = await readGameBin(binId);
+      if (gameState && gameState.gameActive) {
+        currentGameState = { ...gameState, binId: binId };
+        
+        // Restore UI state
+        elements.playerName.value = currentGameState.playerName;
+        document.querySelector(`[data-board="${currentGameState.boardConfig}"]`).click();
+        elements.puckCountA.value = currentGameState.puckCountA;
+        elements.puckCountB.value = currentGameState.puckCountB;
+        
+        elements.gameLinkSection.style.display = 'block';
+        elements.gameLink.value = generatePlayerUrl(binId);
+        updateStatusDisplay();
+        addNotification('🔄 Existing game loaded from server', 'info');
+        elements.createGameBtn.disabled = true;
+        elements.createGameBtn.textContent = '✅ GAME ACTIVE';
+      }
+    } catch (error) {
+      console.error('Failed to load game from bin:', error);
+      addNotification('❌ Failed to load existing game', 'error');
+    }
+  }
+
+  async function checkGameState() {
+    if (!currentGameState.gameActive || !currentGameState.binId) return;
 
     try {
-      const savedState = localStorage.getItem(CONFIG.STORAGE_KEY);
-      if (savedState) {
-        const parsedState = JSON.parse(savedState);
-        
-        // Only process if it's the same session
-        if (parsedState.sessionId === currentGameState.sessionId) {
-          
-          // Check for puck count changes
-          if (parsedState.pucksRemaining !== currentGameState.pucksRemaining) {
-            const puckDiff = currentGameState.pucksRemaining - parsedState.pucksRemaining;
-            if (puckDiff > 0) {
-              addNotification(`🎯 Puck dropped! ${puckDiff} puck(s) used`, 'game');
-            }
-            currentGameState.pucksRemaining = parsedState.pucksRemaining;
-          }
-          
-          // Check for new results
-          if (parsedState.results && parsedState.results.length > currentGameState.results.length) {
-            const newResults = parsedState.results.slice(currentGameState.results.length);
-            newResults.forEach(result => {
-              addNotification(`🎯 Puck landed in slot ${result.slot + 1} on Board ${result.board}`, 'game');
-            });
-            currentGameState.results = parsedState.results;
-          }
-          
-          // Update current board if changed
-          if (parsedState.currentBoard !== currentGameState.currentBoard) {
-            currentGameState.currentBoard = parsedState.currentBoard;
-            addNotification(`🔄 Switched to Board ${currentGameState.currentBoard}`, 'info');
-          }
-          
-          // Check for game completion
-          if (parsedState.pucksRemaining === 0 && currentGameState.pucksRemaining > 0) {
-            currentGameState.gameActive = false;
-            addNotification('🎉 Game completed! All pucks used.', 'success');
-          }
-          
-          updateStatusDisplay();
+      const remoteState = await readGameBin(currentGameState.binId);
+      
+      if (!remoteState) return;
+
+      // Check for puck count changes
+      if (remoteState.pucksRemaining !== currentGameState.pucksRemaining) {
+        const puckDiff = currentGameState.pucksRemaining - remoteState.pucksRemaining;
+        if (puckDiff > 0) {
+          addNotification(`🎯 Puck dropped! ${puckDiff} puck(s) used`, 'game');
         }
+        currentGameState.pucksRemaining = remoteState.pucksRemaining;
       }
+      
+      // Check for new results
+      if (remoteState.results && remoteState.results.length > currentGameState.results.length) {
+        const newResults = remoteState.results.slice(currentGameState.results.length);
+        newResults.forEach(result => {
+          addNotification(`🎯 Puck landed in slot ${result.slot + 1} on Board ${result.board}`, 'game');
+        });
+        currentGameState.results = remoteState.results;
+      }
+      
+      // Update current board if changed
+      if (remoteState.currentBoard !== currentGameState.currentBoard) {
+        currentGameState.currentBoard = remoteState.currentBoard;
+        addNotification(`🔄 Switched to Board ${currentGameState.currentBoard}`, 'info');
+      }
+      
+      // Check for game completion
+      if (remoteState.pucksRemaining === 0 && currentGameState.pucksRemaining > 0) {
+        currentGameState.gameActive = false;
+        addNotification('🎉 Game completed! All pucks used.', 'success');
+      }
+      
+      // Update remote state with any local changes
+      currentGameState.lastUpdated = new Date().toISOString();
+      await updateGameBin(currentGameState.binId, currentGameState);
+      
+      updateStatusDisplay();
     } catch (e) {
       console.error('Error checking game state:', e);
     }
   }
 
-  function handleStorageChange(e) {
-    if (e.key === CONFIG.STORAGE_KEY) {
-      checkGameState();
+  async function readGameBin(binId) {
+    try {
+      const response = await fetch(`${JSONBIN_CONFIG.BASE_URL}/${binId}/latest`, {
+        headers: {
+          'X-Master-Key': JSONBIN_CONFIG.HEADERS['X-Master-Key'],
+          'X-Access-Key': JSONBIN_CONFIG.HEADERS['X-Access-Key']
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data.record;
+    } catch (error) {
+      console.error('Error reading from JSONBin:', error);
+      return null;
+    }
+  }
+
+  async function updateGameBin(binId, data) {
+    try {
+      const response = await fetch(`${JSONBIN_CONFIG.BASE_URL}/${binId}`, {
+        method: 'PUT',
+        headers: JSONBIN_CONFIG.HEADERS,
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error updating JSONBin:', error);
+      throw error;
     }
   }
 
@@ -880,8 +957,9 @@
     elements.pucksRemaining.textContent = currentGameState.pucksRemaining || '0';
     
     // Update puck remaining color based on percentage
-    if (currentGameState.totalPucks > 0) {
-      const percentage = (currentGameState.pucksRemaining / currentGameState.totalPucks) * 100;
+    if (currentGameState.puckCountA + currentGameState.puckCountB > 0) {
+      const totalPucks = currentGameState.puckCountA + currentGameState.puckCountB;
+      const percentage = (currentGameState.pucksRemaining / totalPucks) * 100;
       if (percentage < 25) {
         elements.pucksRemaining.style.color = '#FF6B6B';
       } else if (percentage < 50) {
@@ -892,13 +970,27 @@
     }
   }
 
-  function resetGame() {
+  async function resetGame() {
     if (currentGameState.gameActive && !confirm('Are you sure you want to reset the current game? All progress will be lost.')) {
       return;
     }
 
+    if (currentGameState.binId) {
+      try {
+        // Delete the bin from JSONBin.io
+        await fetch(`${JSONBIN_CONFIG.BASE_URL}/${currentGameState.binId}`, {
+          method: 'DELETE',
+          headers: {
+            'X-Master-Key': JSONBIN_CONFIG.HEADERS['X-Master-Key']
+          }
+        });
+      } catch (error) {
+        console.error('Error deleting bin:', error);
+      }
+    }
+
     currentGameState = {
-      sessionId: null,
+      binId: null,
       playerName: '',
       boardConfig: 'A',
       puckCountA: 3,
@@ -907,13 +999,11 @@
       pucksRemaining: 0,
       gameActive: false,
       results: [],
-      createdAt: null,
-      totalPucks: 0
+      createdAt: null
     };
 
     try {
       localStorage.removeItem(CONFIG.STORAGE_KEY);
-      localStorage.removeItem(CONFIG.SESSION_KEY);
     } catch (e) {
       console.error('Failed to clear storage:', e);
     }
@@ -933,7 +1023,7 @@
     addNotification('🔄 Game reset successfully', 'success');
   }
 
-  function addPuck() {
+  async function addPuck() {
     if (!currentGameState.gameActive) {
       showAlert('No active game! Please create a game first.');
       return;
@@ -945,10 +1035,16 @@
     }
 
     currentGameState.pucksRemaining++;
-    currentGameState.totalPucks = Math.max(currentGameState.totalPucks, currentGameState.pucksRemaining);
-    saveGameState();
-    updateStatusDisplay();
-    addNotification('➕ Added 1 puck to current game', 'success');
+    currentGameState.lastUpdated = new Date().toISOString();
+    
+    try {
+      await updateGameBin(currentGameState.binId, currentGameState);
+      updateStatusDisplay();
+      addNotification('➕ Added 1 puck to current game', 'success');
+    } catch (error) {
+      console.error('Failed to add puck:', error);
+      addNotification('❌ Failed to add puck', 'error');
+    }
   }
 
   function addNotification(message, type = 'info') {
