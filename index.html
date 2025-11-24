@@ -1,791 +1,325 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>U.S. LawShield Plinko</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Anton&family=Oswald:wght@400;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Oswald', sans-serif;
-      background: linear-gradient(135deg, #0e1d61 0%, #1a2a7a 100%);
-      padding: 20px;
-      min-height: 100vh;
-      color: white;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 30px;
-      padding: 30px 20px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 15px;
-    }
-    .main-title {
-      font-family: 'Anton', sans-serif;
-      font-size: 3.8em;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
-    }
-    .subtitle {
-      font-size: 1.4em;
-      font-weight: 700;
-      color: #0e1d61;
-      background: white;
-      padding: 10px 20px;
-      border-radius: 8px;
-      display: inline-block;
-      margin: 15px 0;
-    }
-    .tagline {
-      font-size: 1.1em;
-      font-weight: 700;
-      color: #e7d386;
-      letter-spacing: 2px;
-      margin-top: 10px;
-    }
-    .player-info {
-      text-align: center;
-      font-size: 1.2em;
-      margin-bottom: 20px;
-      padding: 15px;
-      background: rgba(231, 211, 134, 0.2);
-      border-radius: 10px;
-      font-weight: 600;
-    }
-    .controls { text-align: center; margin-bottom: 30px; }
-    button {
-      font-family: 'Oswald', sans-serif;
-      font-size: 1em;
-      font-weight: 700;
-      padding: 12px 30px;
-      margin: 0 10px 10px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
-      text-transform: uppercase;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #d51e47 0%, #b01838 100%);
-      color: white;
-    }
-    .btn-secondary {
-      background: white;
-      color: #0e1d61;
-      border: 2px solid #0e1d61;
-    }
-    .game-container {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-    .plinko-board {
-      background: linear-gradient(180deg, #1a2a7a 0%, #0e1d61 100%);
-      border: 4px solid #e7d386;
-      border-radius: 15px;
-      padding: 20px;
-    }
-    #plinkoCanvas {
-      display: block;
-      background: #ffffff;
-      border-radius: 10px;
-      cursor: grab;
-    }
-    .disc-sidebar {
-      background: rgba(255, 255, 255, 0.98);
-      border: 3px solid #0e1d61;
-      border-radius: 10px;
-      padding: 15px;
-      width: 300px;
-      max-height: 600px;
-      overflow-y: auto;
-      color: #333;
-    }
-    .disc-sidebar h4 {
-      color: #d51e47;
-      margin-bottom: 10px;
-    }
-    .disc-item {
-      background: #f8f9fa;
-      padding: 10px;
-      border-radius: 5px;
-      border-left: 4px solid #d51e47;
-      cursor: pointer;
-      margin-bottom: 10px;
-      transition: all 0.2s;
-      color: #333;
-      user-select: none;
-    }
-    .disc-item:hover { 
-      transform: scale(1.03); 
-      background: #e9ecef;
-    }
-    .disc-item.selected { 
-      opacity: 0.5; 
-      transform: scale(1.05);
-      background: #dee2e6;
-    }
-    .instructions {
-      font-size: 0.85em;
-      color: #e7d386;
-      text-align: center;
-      margin-bottom: 15px;
-      padding: 5px;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 5px;
-    }
-    .total-score {
-      text-align: center;
-      font-size: 1.5em;
-      margin-top: 20px;
-      color: #e7d386;
-      font-weight: 700;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
-    }
-    .modal-content {
-      background-color: white;
-      margin: 10% auto;
-      padding: 30px;
-      border: 4px solid #0e1d61;
-      border-radius: 15px;
-      width: 90%;
-      max-width: 500px;
-    }
-    .modal-title {
-      font-family: 'Anton', sans-serif;
-      font-size: 1.8em;
-      color: #0e1d61;
-      text-align: center;
-      margin-bottom: 10px;
-    }
-    .modal-body label {
-      display: block;
-      font-weight: 700;
-      color: #0e1d61;
-      margin: 15px 0 8px;
-    }
-    .modal-body input, .modal-body select {
-      width: 100%;
-      padding: 12px;
-      font-size: 1.1em;
-      border: 2px solid #0e1d61;
-      border-radius: 8px;
-    }
-    .error-message {
-      color: #d51e47;
-      font-size: 0.9em;
-      margin-top: 8px;
-      display: none;
-      font-weight: 600;
-    }
-    .modal-footer {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-    @media (max-width: 768px) {
-      .game-container { flex-direction: column; }
-      .disc-sidebar { width: 100%; max-height: 300px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<title>U.S. LawShield PLINKO – Cloud Version (jsonbin.io)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family:'Oswald',sans-serif;
+    background:linear-gradient(135deg,#1e3c72,#2a5298,#7e8ba3);
+    min-height:100vh;
+    color:white;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:''; position:fixed; inset:0;
+    background:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff10" d="M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,154.7C672,160,768,192,864,197.3C960,203,1056,181,1152,165.3C1248,149,1344,139,1392,133.3L1440,128L1440,320L0,320Z"></path></svg>') repeat-x;
+    animation:wave 20s linear infinite;
+    pointer-events:none;
+  }
+  @keyframes wave{0%{background-position-x:0}100%{background-position-x:1440px}}
+  .header{text-align:center;padding:20px;background:rgba(0,0,0,0.6);}
+  .main-title{font-family:'Bebas Neue',sans-serif;font-size:4.5em;letter-spacing:5px;
+    text-shadow:0 0 30px gold,3px 3px 0 #000;animation:glow 2s infinite alternate;}
+  @keyframes glow{to{text-shadow:0 0 60px gold,5px 5px 0 #000}}
+  .game-container{display:flex;gap:30px;justify-content:center;padding:20px;max-width:1400px;margin:auto;flex-wrap:wrap;}
+  .plinko-wrapper{background:#0f172a;border-radius:20px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,0.7);}
+  .plinko-wrapper::before{content:"PLINKO";position:absolute;top:-15px;left:50%;transform:translateX(-50%);
+    font-family:'Bebas Neue';font-size:2.5em;color:gold;letter-spacing:8px;}
+  canvas{background:#0f172a;border-radius:15px;box-shadow:inset 0 0 30px #000,0 0 30px gold;}
+  .controls-panel{background:white;color:#333;padding:25px;border-radius:20px;width:340px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.4);}
+  .drop-zone{background:linear-gradient(90deg,#22c55e,#84cc16);padding:15px;border-radius:12px;text-align:center;
+    font-weight:bold;animation:pulse 2s infinite;}
+  @keyframes pulse{50%{transform:scale(1.03)}}
+  .disc-item{background:#dc2626;color:white;padding:14px;border-radius:50px;margin:12px 0;cursor:grab;
+    text-align:center;font-weight:bold;transition:all .3s;box-shadow:0 5px 15px rgba(220,38,38,.5);}
+  .disc-item:hover{transform:scale(1.08);box-shadow:0 10px 25px rgba(220,38,38,.7);}
+  .disc-item:active{cursor:grabbing;transform:scale(.95);}
+  .btn{background:#7c3aed;color:white;padding:14px 28px;border:none;border-radius:50px;
+    font-weight:bold;cursor:pointer;margin-top:15px;width:100%;transition:all .3s;}
+  .btn:hover{transform:translateY(-3px);box-shadow:0 10px 20px rgba(124,58,237,.6);}
+  .stats{background:#f1f5f9;padding:15px;border-radius:12px;margin-top:20px;}
+  .stat{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ddd;}
+  .bigwin{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);
+    font-size:6em;color:gold;text-shadow:0 0 40px gold;z-index:9999;pointer-events:none;
+    animation:winpop 1.5s forwards;}
+  @keyframes winpop{0%{transform:translate(-50%,-50%) scale(0) rotate(-180deg)}50%{transform:translate(-50%,-50%) scale(1.3)}100%{transform:translate(-50%,-50%) scale(1)}}
+  .particle{position:fixed;pointer-events:none;background:gold;border-radius:50%;width:8px;height:8px;
+    box-shadow:0 0 10px gold;z-index:998;}
+  .status{position:fixed;top:10px;right:10px;background:rgba(0,0,0,.7);padding:8px 16px;border-radius:20px;font-size:13px;}
+</style>
 </head>
 <body>
-  <div class="header">
-    <h1 class="main-title">U.S. LAWSHIELD</h1>
-    <div class="subtitle">EMPLOYEE ENGAGEMENT PLINKO</div>
-    <p class="tagline">LEGAL DEFENSE FOR SELF DEFENSE®</p>
+
+<div class="status" id="status">Connecting to cloud…</div>
+
+<div class="header">
+  <h1 class="main-title">U.S. LAWSHIELD PLINKO</h1>
+  <p style="font-size:1.4em;letter-spacing:3px;">LEGAL DEFENSE FOR SELF DEFENSE®</p>
+</div>
+
+<div class="game-container">
+  <div class="plinko-wrapper">
+    <canvas id="c" width="700" height="950"></canvas>
   </div>
-  
-  <div class="player-info" id="playerInfo" style="display: none;"></div>
-  
-  <div class="controls">
-    <button class="btn-primary" id="earnDiscBtn">Earn Plinko Disc</button>
-    <button class="btn-secondary" id="clearProgressBtn">Clear Progress</button>
-  </div>
-  
-  <div class="game-container">
-    <div class="plinko-board">
-      <canvas id="plinkoCanvas" width="600" height="1000"></canvas>
-      <div class="total-score" id="totalScore">Total Winnings: $0</div>
-    </div>
-    
-    <div class="disc-sidebar">
-      <div class="instructions">Click a disc to select it (it will dim), then click anywhere on the gray ramp area at the top of the board to drop it!</div>
-      <h4>Available Discs <span id="availableCount"></span></h4>
-      <div id="availableDiscList"></div>
-      <button class="btn-primary" id="earnMoreBtn" style="width: 100%; margin-top: 10px;">Earn More Discs</button>
+
+  <div class="controls-panel">
+    <div class="drop-zone">Drag a disc here & release to drop!</div>
+    <div id="discs"></div>
+    <button class="btn" onclick="earnDisc()">Earn New Disc</button>
+    <div class="stats">
+      <div class="stat"><span>Total Winnings</span><b id="total">$0</b></div>
+      <div class="stat"><span>Discs Played</span><b id="played">0</b></div>
+      <div class="stat"><span>Best Drop</span><b id="best">$0</b></div>
     </div>
   </div>
+</div>
 
-  <div id="nameModal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <h2 class="modal-title">Welcome to U.S. LawShield Plinko!</h2>
-      <p style="color: #666; text-align: center; margin-bottom: 20px;">Please enter your name to get started</p>
-      <div class="modal-body">
-        <label for="nameInput">Your Name:</label>
-        <input type="text" id="nameInput" placeholder="Enter your name">
-        <div class="error-message" id="nameError">Please enter your name</div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-primary" id="submitNameBtn">Start Playing</button>
-      </div>
-    </div>
-  </div>
+<script>
+// ==================== JSONBIN.IO CLOUD DATABASE ====================
+const MASTER_KEY = "$2a$10$NckuWO.y9g8.amyZZWkc8.lKIMS.AVSCyN1qT9/0d5EtRjuV9lmS2";
+const BIN_URL = "https://api.jsonbin.io/v3/b";
+let BIN_ID = localStorage.getItem("plinko_bin_id");
+let cloud = {
+  employees: {},      // employeeId → {name, total, best, played}
+  activities: [],     // {employeeId, activity, memberId, timestamp}
+  discs: []           // {employeeId, activity, memberId, used:false}
+};
 
-  <div id="earnDiscModal" class="modal">
-    <div class="modal-content">
-      <h2 class="modal-title">Earn a Plinko Disc</h2>
-      <p style="color: #666; text-align: center; margin-bottom: 20px;">Select an activity and enter a valid Member ID</p>
-      <div class="modal-body">
-        <label for="activitySelect">Activity:</label>
-        <select id="activitySelect">
-          <option value="">Select Activity</option>
-          <option value="Single PR">Single PR</option>
-          <option value="Dual PR">Dual PR</option>
-          <option value="Dual Monthly LOC">Dual Monthly LOC</option>
-          <option value="Single Monthly LOC">Single Monthly LOC</option>
-          <option value="Single Annual LOC">Single Annual LOC</option>
-          <option value="Dual Annual LOC">Dual Annual LOC</option>
-          <option value="Add Secondary Legacy (Monthly)">Add Secondary Legacy (Monthly)</option>
-          <option value="Add Secondary Legacy (Annual)">Add Secondary Legacy (Annual)</option>
-          <option value="Conversion to Explore">Conversion to Explore</option>
-          <option value="Conversion to Navigate">Conversion to Navigate</option>
-          <option value="Conversion to Discover">Conversion to Discover</option>
-          <option value="Add E-Shield">Add E-Shield</option>
-          <option value="LSLP (monthly)">LSLP (monthly)</option>
-          <option value="LSLP (Annual)">LSLP (Annual)</option>
-          <option value="Save">Save</option>
-          <option value="Winback (monthly)">Winback (monthly)</option>
-          <option value="Winback (annual)">Winback (annual)</option>
-        </select>
-        <label for="memberIdInput">Member ID:</label>
-        <input type="text" id="memberIdInput" placeholder="e.g., ABC123456" maxlength="10" style="text-transform: uppercase; font-family: monospace;">
-        <div class="error-message" id="errorMessage"></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn-primary" id="submitDiscBtn">Submit</button>
-        <button type="button" class="btn-secondary" id="cancelDiscBtn">Cancel</button>
-      </div>
-    </div>
-  </div>
+async function loadCloud() {
+  try {
+    if (!BIN_ID) throw "no bin";
+    const r = await fetch(`${BIN_URL}/${BIN_ID}/latest`, {headers:{'X-Master-Key':MASTER_KEY}});
+    if (r.ok) { cloud = await r.json(); document.getElementById("status").textContent="Cloud Connected"; }
+  } catch(e) {
+    // first time → create new bin
+    const r = await fetch(BIN_URL, {
+      method:"POST",
+      headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY,'X-Bin-Name':'USLawShield-Plinko'},
+      body:JSON.stringify(cloud)
+    });
+    const data = await r.json();
+    BIN_ID = data.metadata.id;
+    localStorage.setItem("plinko_bin_id", BIN_ID);
+    document.getElementById("status").textContent="Cloud Created & Connected";
+  }
+}
+async function saveCloud() {
+  if (!BIN_ID) return;
+  await fetch(`${BIN_URL}/${BIN_ID}`, {
+    method:"PUT",
+    headers:{'Content-Type':'application/json','X-Master-Key':MASTER_KEY},
+    body:JSON.stringify(cloud)
+  });
+}
+// ==================================================================
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-app.js";
-    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.3.0/firebase-database.js";
+let employeeId = localStorage.getItem("employeeId");
+let employeeName = localStorage.getItem("employeeName") || prompt("Welcome! Enter your name to start:") || "Player";
+if (!employeeId) { employeeId = "emp_"+Date.now(); localStorage.setItem("employeeId",employeeId); }
+localStorage.setItem("employeeName",employeeName);
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDzNTPcHXIgb7T73yX0ngLyuJkSiyUd3dA",
-      authDomain: "uslawshield-bingo.firebaseapp.com",
-      databaseURL: "https://uslawshield-bingo-default-rtdb.firebaseio.com",
-      projectId: "uslawshield-bingo",
-      storageBucket: "uslawshield-bingo.appspot.com",
-      messagingSenderId: "227127069053",
-      appId: "1:227127069053:web:be6acba57a6561ad9ce414"
-    };
+if (!cloud.employees[employeeId]) cloud.employees[employeeId] = {name:employeeName,total:0,best:0,played:0};
+let emp = cloud.employees[employeeId];
 
-    const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app);
+// ==================== PLINKO PHYSICS (Price-is-Right accurate) ====================
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const ROWS = 16, PEG_R = 6, DISC_R = 22, DROP_H = 110;
+const SLOTS = 9;
+const VALUES = [100,500,1000,0,10000,0,1000,500,100];
+const pegs = [], particles = [];
+let disc = null, trail = [];
 
-    let playerId = null;
-    let gameState = { discs: [], totalScore: 0, playerName: '' };
-    let canvas, ctx;
-    const BOARD_WIDTH = 600;
-    const BOARD_HEIGHT = 1000;
-    const DISC_RADIUS = 20;
-    const PEG_RADIUS = 6;
-    const NUM_ROWS = 12;
-    const NUM_SLOTS = 9;
-    const SLOT_VALUES = [100, 500, 1000, 0, 10000, 0, 1000, 500, 100];
-    const SLOT_COLORS = ['#22c55e', '#22c55e', '#22c55e', '#ef4444', '#fbbf24', '#ef4444', '#22c55e', '#22c55e', '#22c55e'];
-    let pegs = [];
-    let currentDisc = null;
-    let animationFrameId = null;
-    let dragging = false;
-    let draggingIndex = -1;
-    let dragX = 0;
-    let dragY = 0;
-    const DROP_ZONE_Y_MAX = 220;
-    const RAMP_HEIGHT = 200;
-    const RAMP_SLOPE = -Math.PI / 6;
-
-    function initPlinkoBoard() {
-      canvas = document.getElementById('plinkoCanvas');
-      ctx = canvas.getContext('2d');
-      createPegs();
-      drawBoard();
-      
-      canvas.addEventListener('mousedown', handleCanvasMouseDown);
-      canvas.addEventListener('mousemove', handleCanvasMouseMove);
-      canvas.addEventListener('mouseup', handleCanvasMouseUp);
-      document.addEventListener('mousemove', handleDocumentMouseMove);
-      document.addEventListener('mouseup', handleDocumentMouseUp);
+function initPegs() {
+  const startY = DROP_H + 60;
+  const rowH = (H - 180 - startY) / ROWS;
+  const colW = W / 10;
+  for (let r=0; r<ROWS; r++) {
+    const cols = r%2===0 ? 9 : 10;
+    const offset = r%2===0 ? colW : colW/2;
+    for (let c=0; c<cols; c++) {
+      pegs.push({x: offset + c*colW, y: startY + r*rowH});
     }
+  }
+}
+initPegs();
 
-    function createPegs() {
-      const rowSpacing = (BOARD_HEIGHT - RAMP_HEIGHT) / (NUM_ROWS + 1);
-      const colSpacing = BOARD_WIDTH / 8;
-      for (let row = 0; row < NUM_ROWS; row++) {
-        const numCols = row % 2 === 0 ? 9 : 8;
-        const offset = row % 2 === 0 ? 0 : colSpacing / 2;
-        for (let col = 0; col < numCols; col++) {
-          pegs.push({
-            x: offset + col * colSpacing,
-            y: RAMP_HEIGHT + rowSpacing + row * rowSpacing,
-          });
-        }
+function draw() {
+  ctx.fillStyle = "#0f172a"; ctx.fillRect(0,0,W,H);
+
+  // drop zone
+  const grad = ctx.createLinearGradient(0,0,0,DROP_H);
+  grad.addColorStop(0,"#22c55e"); grad.addColorStop(1,"#84cc16");
+  ctx.fillStyle=grad; ctx.fillRect(0,0,W,DROP_H);
+  ctx.fillStyle="white"; ctx.font="bold 24px Oswald"; ctx.textAlign="center";
+  ctx.fillText("DROP ZONE", W/2, DROP_H/2+8);
+
+  // pegs
+  pegs.forEach(p=>{
+    const g = ctx.createRadialGradient(p.x-3,p.y-3,0,p.x,p.y,PEG_R);
+    g.addColorStop(0,"gold"); g.addColorStop(1,"#f59e0b");
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(p.x,p.y,PEG_R,0,Math.PI*2); ctx.fill();
+  });
+
+  // slots
+  const slotH = 90, slotW = W/SLOTS;
+  VALUES.forEach((v,i)=>{
+    ctx.fillStyle = i===4?"#f59e0b":(v===0?"#ef4444":"#22c55e");
+    ctx.fillRect(i*slotW, H-slotH, slotW, slotH);
+    ctx.strokeStyle="#000"; ctx.lineWidth=3; ctx.strokeRect(i*slotW, H-slotH, slotW, slotH);
+    ctx.fillStyle="white"; ctx.font="bold 30px Oswald";
+    ctx.fillText(v===0?"0":("$"+v), i*slotW + slotW/2, H-slotH/2 +10);
+  });
+
+  // trail
+  trail.forEach((t,i)=>{ ctx.globalAlpha = i/trail.length*.4;
+    ctx.fillStyle="#dc2626"; ctx.beginPath(); ctx.arc(t.x,t.y,DISC_R*.7,0,Math.PI*2); ctx.fill();
+  }); ctx.globalAlpha=1;
+
+  // current disc
+  if (disc) {
+    ctx.save(); ctx.translate(disc.x,disc.y); ctx.rotate(disc.spin);
+    const g = ctx.createRadialGradient(-6,-6,0,0,0,DISC_R);
+    g.addColorStop(0,"#ef4444"); g.addColorStop(0.7,"#991b1b"); g.addColorStop(1,"#450a0a");
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,DISC_R,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="rgba(255,255,255,.4)"; ctx.beginPath(); ctx.arc(-6,-6,DISC_R*.4,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="white"; ctx.font="bold 12px Oswald"; ctx.textAlign="center"; ctx.fillText("USL",0,4);
+    ctx.restore();
+  }
+
+  // particles
+  particles.forEach((p,i)=>{
+    p.y -= p.vy; p.life--;
+    ctx.globalAlpha = p.life/20;
+    ctx.fillStyle = p.color;
+    ctx.beginPath(); ctx.arc(p.x + Math.sin(p.life)*10, p.y, 6,0,Math.PI*2); ctx.fill();
+    if (p.life<=0) particles.splice(i,1);
+  }); ctx.globalAlpha=1;
+}
+
+let dragging = false;
+canvas.addEventListener("mousedown", e=>{
+  if (emp.discsUsed >= emp.discsEarned) return;
+  const r = canvas.getBoundingClientRect();
+  const y = e.clientY - r.top;
+  if (y < DROP_H) dragging = true;
+});
+canvas.addEventListener("mousemove", e=>{
+  if (!dragging) return;
+  const r = canvas.getBoundingClientRect();
+  disc = {x: e.clientX-r.left, y: Math.min(e.clientY-r.top, DROP_H-10), vx:0, vy:0, spin:0, spinV:0};
+  draw();
+});
+canvas.addEventListener("mouseup", e=>{
+  if (!dragging) return; dragging=false;
+  const r = canvas.getBoundingClientRect();
+  const x = e.clientX-r.left, y = e.clientY-r.top;
+  if (y <= DROP_H && emp.discsUsed < emp.discsEarned) {
+    emp.discsUsed = (emp.discsUsed||0) + 1;
+    disc = {x, y, vx:(Math.random()-0.5)*30, vy:0, spin:0, spinV:(Math.random()-0.5)*0.3};
+    trail=[]; updateDiscsUI(); saveCloud();
+    requestAnimationFrame(loop);
+  }
+  disc = null; draw();
+});
+
+function loop(){
+  if (!disc) return;
+  disc.vy += 480;                     // scaled gravity
+  disc.vx *= 0.995; disc.vy *= 0.995; // air
+  disc.x += disc.vx*0.016;
+  disc.y += disc.vy*0.016;
+  disc.spin += disc.spinV;
+  disc.spinV *= 0.99;
+
+  trail.push({x:disc.x,y:disc.y}); if(trail.length>25) trail.shift();
+
+  // peg collisions
+  pegs.forEach(p=>{
+    const dx = disc.x-p.x, dy=disc.y-p.y, dist=Math.hypot(dx,dy);
+    if (dist < DISC_R+PEG_R) {
+      const nx=dx/dist, ny=dy/dist;
+      const dot = disc.vx*nx + disc.vy*ny;
+      disc.vx -= 2*dot*nx*0.78;
+      disc.vy -= 2*dot*ny*0.78;
+      disc.spinV += (Math.random()-0.5)*0.4;
+      disc.vx += (Math.random()-0.5)*20;
+      disc.vy += (Math.random()-0.5)*10;
+      // push out
+      const overlap = DISC_R+PEG_R - dist;
+      disc.x += nx*overlap; disc.y += ny*overlap;
+    }
+  });
+
+  // walls
+  if (disc.x < DISC_R+20) { disc.x = DISC_R+20; disc.vx = Math.abs(disc.vx)*0.78; }
+  if (disc.x > W-DISC_R-20) { disc.x = W-DISC_R-20; disc.vx = -Math.abs(disc.vx)*0.78; }
+
+  // landing
+  if (disc.y > H-100) {
+    const slot = Math.floor(disc.x / (W/SLOTS));
+    const win = VALUES[Math.min(Math.max(slot,0),8)];
+    emp.total += win; emp.best = Math.max(emp.best,win); emp.played++;
+    document.getElementById("total").textContent = "$"+emp.total;
+    document.getElementById("best").textContent = "$"+emp.best;
+    document.getElementById("played").textContent = emp.played;
+
+    if (win >= 1000) {
+      const el = document.createElement("div"); el.className="bigwin"; el.textContent="$"+win+"!";
+      document.body.appendChild(el); setTimeout(()=>el.remove(),2000);
+      for(let i=0;i<50;i++){
+        particles.push({x:disc.x,y:H-50,vy:Math.random()*8+4,life:40,color:"#fbbf24"});
       }
     }
+    saveCloud();
+    disc=null; trail=[];
+  }
 
-    function drawBoard() {
-      ctx.clearRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
-      
-      const rampGradient = ctx.createLinearGradient(0, 0, 0, RAMP_HEIGHT);
-      rampGradient.addColorStop(0, '#6b7280');
-      rampGradient.addColorStop(0.5, '#4b5563');
-      rampGradient.addColorStop(1, '#374151');
-      ctx.fillStyle = rampGradient;
-      ctx.fillRect(0, 0, BOARD_WIDTH, RAMP_HEIGHT);
-      
-      ctx.strokeStyle = '#e7d386';
-      ctx.lineWidth = 4;
-      ctx.strokeRect(2, 2, BOARD_WIDTH - 4, RAMP_HEIGHT - 4);
-      
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-      ctx.lineWidth = 1;
-      for (let i = 20; i < RAMP_HEIGHT; i += 20) {
-        ctx.beginPath();
-        ctx.moveTo(0, i);
-        ctx.lineTo(BOARD_WIDTH, i);
-        ctx.stroke();
-      }
-      
-      pegs.forEach(peg => {
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = '#e7d386';
-        ctx.beginPath();
-        ctx.arc(peg.x, peg.y, PEG_RADIUS, 0, Math.PI * 2);
-        ctx.fillStyle = '#fbbf24';
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.strokeStyle = '#0e1d61';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      });
-      
-      const slotHeight = 50;
-      const slotWidth = BOARD_WIDTH / NUM_SLOTS;
-      for (let i = 0; i < NUM_SLOTS; i++) {
-        ctx.fillStyle = SLOT_COLORS[i];
-        ctx.fillRect(i * slotWidth, BOARD_HEIGHT - slotHeight, slotWidth, slotHeight);
-        ctx.fillStyle = 'white';
-        ctx.font = 'bold 20px Oswald';
-        ctx.textAlign = 'center';
-        ctx.fillText(`${SLOT_VALUES[i]}`, i * slotWidth + slotWidth / 2, BOARD_HEIGHT - slotHeight / 2 + 7);
-      }
-      
-      if (dragging && dragX && dragY) {
-        drawDisc(dragX, dragY);
-      }
-      
-      if (currentDisc) {
-        drawDisc(currentDisc.x, currentDisc.y);
-      }
-    }
+  draw();
+  if (disc) requestAnimationFrame(loop);
+}
 
-    function drawDisc(x, y) {
-      ctx.beginPath();
-      ctx.arc(x, y, DISC_RADIUS, 0, Math.PI * 2);
-      ctx.fillStyle = '#d51e47';
-      ctx.fill();
-      ctx.strokeStyle = 'white';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      
-      ctx.beginPath();
-      ctx.arc(x - 7, y - 7, DISC_RADIUS / 2, 0, Math.PI);
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-      ctx.fill();
-      
-      ctx.beginPath();
-      ctx.arc(x, y, 5, 0, Math.PI * 2);
-      ctx.fillStyle = '#e7d386';
-      ctx.fill();
-    }
+// ==================== DISC UI & EARNING ====================
+function updateDiscsUI(){
+  const list = document.getElementById("discs");
+  list.innerHTML="";
+  const available = (emp.discsEarned||0) - (emp.discsUsed||0);
+  for(let i=0;i<available;i++){
+    const d = document.createElement("div"); d.className="disc-item";
+    d.textContent = `Disc ${i+1} Ready`;
+    list.appendChild(d);
+  }
+  if(available===0) list.innerHTML="<p style='text-align:center;color:#666'>No discs — earn more!</p>";
+}
 
-    function animateDisc() {
-      if (!currentDisc) return;
-      
-      currentDisc.x += currentDisc.vx;
-      currentDisc.y += currentDisc.vy;
-      
-      if (currentDisc.y < RAMP_HEIGHT) {
-        currentDisc.vy += 0.15 * Math.sin(RAMP_SLOPE);
-        currentDisc.vx += 0.15 * Math.cos(RAMP_SLOPE);
-        currentDisc.vx *= 0.96;
-        currentDisc.vy *= 0.96;
-      } else {
-        currentDisc.vy += 0.15;
-        currentDisc.vx *= 0.94;
-        currentDisc.vy *= 0.94;
-      }
-      
-      if (currentDisc.x - DISC_RADIUS < 0) {
-        currentDisc.x = DISC_RADIUS + 2;
-        currentDisc.vx *= -0.95;
-        currentDisc.vx += (Math.random() - 0.5) * 1.2;
-      } else if (currentDisc.x + DISC_RADIUS > BOARD_WIDTH) {
-        currentDisc.x = BOARD_WIDTH - DISC_RADIUS - 2;
-        currentDisc.vx *= -0.95;
-        currentDisc.vx += (Math.random() - 0.5) * 1.2;
-      }
-      
-      pegs.forEach(peg => {
-        const dx = currentDisc.x - peg.x;
-        const dy = currentDisc.y - peg.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const minDist = DISC_RADIUS + PEG_RADIUS;
-        
-        if (dist < minDist) {
-          const nx = dx / (dist || 1);
-          const ny = dy / (dist || 1);
-          const overlap = minDist - dist;
-          
-          currentDisc.x += nx * overlap;
-          currentDisc.y += ny * overlap;
-          
-          const dot = currentDisc.vx * nx + currentDisc.vy * ny;
-          currentDisc.vx -= 2.2 * dot * nx;
-          currentDisc.vy -= 2.2 * dot * ny;
-          
-          currentDisc.vx += (Math.random() - 0.5) * 3.5;
-          currentDisc.vy += (Math.random() - 0.5) * 3.5;
-          currentDisc.vy = Math.max(currentDisc.vy, 0.8);
-        }
-      });
-      
-      if (currentDisc.y + DISC_RADIUS > BOARD_HEIGHT - 50) {
-        const slotIndex = Math.floor(currentDisc.x / (BOARD_WIDTH / NUM_SLOTS));
-        const winnings = SLOT_VALUES[slotIndex] || 0;
-        gameState.totalScore += winnings;
-        document.getElementById('totalScore').textContent = `Total Winnings: $${gameState.totalScore}`;
-        currentDisc = null;
-        saveGameState();
-        drawBoard();
-        cancelAnimationFrame(animationFrameId);
-        return;
-      }
-      
-      drawBoard();
-      animationFrameId = requestAnimationFrame(animateDisc);
-    }
+function earnDisc(){
+  const activities = ["Single PR","Dual PR","Monthly LOC","Annual LOC","Save","Winback","Add E-Shield","Conversion"];
+  const act = prompt("Activity completed:\n\n" + activities.map((a,i)=>`${i+1}. ${a}`).join("\n") + "\n\nEnter number or name:");
+  const member = prompt("Member ID (e.g. TX123456):")?.toUpperCase();
+  if (act && member && /^[A-Z]{2,3}\d+$/.test(member)) {
+    emp.discsEarned = (emp.discsEarned||0) + 1;
+    cloud.activities.push({employeeId, name:employeeName, activity:act, memberId:member, time:Date.now()});
+    updateDiscsUI(); saveCloud();
+    alert("Disc earned! You now have " + ((emp.discsEarned||0)-(emp.discsUsed||0)) + " discs");
+  } else alert("Invalid input — try again");
+}
 
-    function handleCanvasClick(e) {
-      if (currentDisc || selectedDiscIndex === -1) return;
-      
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      if (y <= DROP_ZONE_Y_MAX && x >= DISC_RADIUS && x <= BOARD_WIDTH - DISC_RADIUS) {
-        gameState.discs[selectedDiscIndex].used = true;
-        currentDisc = {
-          x: x,
-          y: y,
-          vx: (Math.random() - 0.5) * 2,
-          vy: 0
-        };
-        selectedDiscIndex = -1;
-        updateDiscList();
-        saveGameState();
-        animateDisc();
-      }
-    }
-
-    function handleCanvasMouseDown(e) {
-      // Not used for drag initiation anymore
-    }
-
-    function handleCanvasMouseMove(e) {
-      if (!dragging) return;
-      const rect = canvas.getBoundingClientRect();
-      let x = e.clientX - rect.left;
-      let y = e.clientY - rect.top;
-      
-      x = Math.max(DISC_RADIUS, Math.min(BOARD_WIDTH - DISC_RADIUS, x));
-      y = Math.min(y, DROP_ZONE_Y_MAX);
-      
-      dragX = x;
-      dragY = y;
-      drawBoard();
-    }
-
-    function handleCanvasMouseUp(e) {
-      if (!dragging) return;
-      
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      if (y <= DROP_ZONE_Y_MAX && x >= DISC_RADIUS && x <= BOARD_WIDTH - DISC_RADIUS) {
-        gameState.discs[draggingIndex].used = true;
-        currentDisc = {
-          x: x,
-          y: y,
-          vx: (Math.random() - 0.5) * 2,
-          vy: 0
-        };
-        updateDiscList();
-        saveGameState();
-        animateDisc();
-      }
-      
-      dragging = false;
-      draggingIndex = -1;
-      dragX = 0;
-      dragY = 0;
-      drawBoard();
-    }
-
-    function handleDocumentMouseMove(e) {
-      if (!dragging) return;
-      const rect = canvas.getBoundingClientRect();
-      let x = e.clientX - rect.left;
-      let y = e.clientY - rect.top;
-      
-      x = Math.max(DISC_RADIUS, Math.min(BOARD_WIDTH - DISC_RADIUS, x));
-      y = Math.min(y, DROP_ZONE_Y_MAX);
-      
-      dragX = x;
-      dragY = y;
-      drawBoard();
-    }
-
-    function handleDocumentMouseUp(e) {
-      if (!dragging) return;
-      
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      if (y <= DROP_ZONE_Y_MAX && x >= DISC_RADIUS && x <= BOARD_WIDTH - DISC_RADIUS) {
-        gameState.discs[draggingIndex].used = true;
-        currentDisc = {
-          x: x,
-          y: y,
-          vx: (Math.random() - 0.5) * 2,
-          vy: 0
-        };
-        updateDiscList();
-        saveGameState();
-        animateDisc();
-      }
-      
-      dragging = false;
-      draggingIndex = -1;
-      dragX = 0;
-      dragY = 0;
-      const items = document.querySelectorAll('.disc-item');
-      items.forEach(item => {
-        item.style.opacity = '1';
-        item.style.transform = 'scale(1)';
-      });
-      drawBoard();
-    }
-
-    function startDrag(index) {
-      if (currentDisc || gameState.discs[index].used) return;
-      dragging = true;
-      draggingIndex = index;
-      const item = document.querySelectorAll('.disc-item')[index];
-      if (item) {
-        item.style.opacity = '0.5';
-        item.style.transform = 'scale(1.1)';
-      }
-    }
-
-    function getOrCreatePlayerId() {
-      let id = localStorage.getItem('uslPlinkoPlayerId');
-      if (!id) {
-        id = 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('uslPlinkoPlayerId', id);
-      }
-      return id;
-    }
-
-    async function loadGameState() {
-      playerId = getOrCreatePlayerId();
-      const gameRef = ref(database, 'plinkoGames/' + playerId);
-      const snapshot = await get(gameRef);
-      if (snapshot.exists()) {
-        gameState = snapshot.val();
-      }
-    }
-
-    async function saveGameState() {
-      if (!playerId) return;
-      await set(ref(database, 'plinkoGames/' + playerId), gameState);
-    }
-
-    function showPlayerInfo() {
-      const playerInfo = document.getElementById('playerInfo');
-      const availCount = gameState.discs.filter(d => !d.used).length;
-      playerInfo.innerHTML = `Welcome, ${gameState.playerName}! 🎯 Discs Available: ${availCount}`;
-      playerInfo.style.display = 'block';
-    }
-
-    function updateDiscList() {
-      const list = document.getElementById('availableDiscList');
-      list.innerHTML = '';
-      const available = gameState.discs.filter((d, i) => !d.used);
-      
-      let availableIndex = 0;
-      gameState.discs.forEach((disc, index) => {
-        if (disc.used) return;
-        const item = document.createElement('div');
-        item.className = 'disc-item';
-        item.onmousedown = (e) => {
-          e.preventDefault();
-          startDrag(index);
-        };
-        item.innerHTML = `🎯 Disc #${index + 1}`;
-        list.appendChild(item);
-        availableIndex++;
-      });
-      
-      document.getElementById('availableCount').textContent = `(${available.length})`;
-      if (gameState.playerName) {
-        showPlayerInfo();
-      }
-    }
-
-    function openEarnDiscModal() {
-      document.getElementById('earnDiscModal').style.display = 'block';
-      document.getElementById('activitySelect').value = '';
-      document.getElementById('memberIdInput').value = '';
-      document.getElementById('errorMessage').style.display = 'none';
-    }
-
-    function closeEarnModal() {
-      document.getElementById('earnDiscModal').style.display = 'none';
-      document.getElementById('errorMessage').style.display = 'none';
-    }
-
-    function validateMemberId(memberId) {
-      const regex = /^[A-Z]{2,3}\d+$/;
-      return memberId.length >= 5 && memberId.length <= 10 && regex.test(memberId);
-    }
-
-    async function submitEarnDisc() {
-      console.log('submitEarnDisc called');
-      const activity = document.getElementById('activitySelect').value;
-      const memberId = document.getElementById('memberIdInput').value.trim().toUpperCase();
-      const errorMsg = document.getElementById('errorMessage');
-
-      console.log('Activity:', activity, 'Member ID:', memberId);
-
-      if (!activity) {
-        errorMsg.textContent = 'Please select an activity';
-        errorMsg.style.display = 'block';
-        return;
-      }
-
-      if (!validateMemberId(memberId)) {
-        errorMsg.textContent = 'Invalid Member ID. Must be 2-3 letters followed by numbers (5-10 characters total)';
-        errorMsg.style.display = 'block';
-        return;
-      }
-
-      gameState.discs.push({ activity, memberId, used: false });
-      console.log('Disc added to gameState:', gameState.discs);
-      closeEarnModal();
-      updateDiscList();
-      await saveGameState();
-      console.log('Game state saved');
-    }
-
-    function submitName() {
-      const name = document.getElementById('nameInput').value.trim();
-      const errorElement = document.getElementById('nameError');
-      if (!name) {
-        errorElement.style.display = 'block';
-        return;
-      }
-      gameState.playerName = name;
-      document.getElementById('nameModal').style.display = 'none';
-      showPlayerInfo();
-      saveGameState();
-    }
-
-    function clearProgress() {
-      if (confirm('Clear all discs and score? This cannot be undone.')) {
-        gameState.discs = [];
-        gameState.totalScore = 0;
-        updateDiscList();
-        document.getElementById('totalScore').textContent = 'Total Winnings: $0';
-        saveGameState();
-      }
-    }
-
-    window.onload = async function() {
-      console.log('Page loaded, initializing...');
-      await loadGameState();
-      initPlinkoBoard();
-      updateDiscList();
-      
-      if (!gameState.playerName) {
-        document.getElementById('nameModal').style.display = 'block';
-      } else {
-        showPlayerInfo();
-      }
-
-      // All event listeners
-      document.getElementById('earnDiscBtn').addEventListener('click', openEarnDiscModal);
-      document.getElementById('earnMoreBtn').addEventListener('click', openEarnDiscModal);
-      document.getElementById('clearProgressBtn').addEventListener('click', clearProgress);
-      document.getElementById('submitDiscBtn').addEventListener('click', function(e) {
-        console.log('Submit button clicked');
-        e.preventDefault();
-        submitEarnDisc();
-      });
-      document.getElementById('cancelDiscBtn').addEventListener('click', closeEarnModal);
-      document.getElementById('submitNameBtn').addEventListener('click', submitName);
-
-      document.getElementById('nameInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          submitName();
-        }
-      });
-      
-      document.getElementById('memberIdInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          submitEarnDisc();
-        }
-      });
-      
-      document.getElementById('memberIdInput').addEventListener('input', (e) => {
-        e.target.value = e.target.value.toUpperCase();
-      });
-      
-      document.getElementById('totalScore').textContent = `Total Winnings: $${gameState.totalScore}`;
-      console.log('All event listeners attached');
-    };
-  </script>
+// ==================== INIT ====================
+loadCloud().then(()=>{
+  emp.discsEarned = emp.discsEarned||0;
+  emp.discsUsed = emp.discsUsed||0;
+  document.getElementById("total").textContent = "$"+emp.total;
+  document.getElementById("best").textContent = "$"+emp.best;
+  document.getElementById("played").textContent = emp.played;
+  updateDiscsUI();
+  draw();
+});
+</script>
 </body>
 </html>
