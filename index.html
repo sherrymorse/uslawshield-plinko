@@ -13,9 +13,6 @@
     --seahawks-green: #69BE28;
     --seahawks-blue: #245998;
     --seahawks-action-green: #A5D52A;
-    --accent-gold: #FFD700;
-    --accent-orange: #FF8C00;
-    --accent-red: #FF6B6B;
   }
   
   body {
@@ -25,11 +22,8 @@
     min-height: 100vh;
     color: white;
     padding: 20px;
-    position: relative;
-    overflow-x: hidden;
   }
 
-  /* Animated background effect */
   body::before {
     content: '';
     position: fixed;
@@ -37,9 +31,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
-      radial-gradient(circle at 20% 50%, rgba(105, 190, 40, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(36, 89, 152, 0.15) 0%, transparent 50%);
+    background: radial-gradient(circle at 20% 50%, rgba(105, 190, 40, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(36, 89, 152, 0.15) 0%, transparent 50%);
     animation: pulse 8s ease-in-out infinite;
     pointer-events: none;
     z-index: 0;
@@ -64,8 +57,7 @@
     border-bottom: 6px solid var(--seahawks-green);
     border-radius: 25px;
     margin-bottom: 25px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 
-                0 0 80px rgba(105, 190, 40, 0.3) inset;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 80px rgba(105, 190, 40, 0.3) inset;
     position: relative;
     overflow: hidden;
   }
@@ -90,20 +82,11 @@
     font-family: 'Bebas Neue', sans-serif;
     font-size: 4.5em;
     letter-spacing: 8px;
-    text-shadow: 
-      0 0 40px var(--seahawks-green), 
-      3px 3px 0 #000,
-      0 0 20px rgba(105, 190, 40, 0.8);
+    text-shadow: 0 0 40px var(--seahawks-green), 3px 3px 0 #000, 0 0 20px rgba(105, 190, 40, 0.8);
     color: white;
     margin-bottom: 10px;
     position: relative;
     z-index: 1;
-    animation: titleGlow 2s ease-in-out infinite alternate;
-  }
-
-  @keyframes titleGlow {
-    from { text-shadow: 0 0 40px var(--seahawks-green), 3px 3px 0 #000, 0 0 20px rgba(105, 190, 40, 0.8); }
-    to { text-shadow: 0 0 60px var(--seahawks-green), 3px 3px 0 #000, 0 0 40px rgba(105, 190, 40, 1); }
   }
 
   .subtitle {
@@ -118,7 +101,7 @@
 
   .admin-badge {
     display: inline-block;
-    background: var(--accent-red);
+    background: #FF6B6B;
     color: white;
     padding: 8px 20px;
     border-radius: 20px;
@@ -127,12 +110,20 @@
     font-weight: 800;
     letter-spacing: 2px;
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.5);
-    animation: badgePulse 2s ease-in-out infinite;
   }
 
-  @keyframes badgePulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+  .success-banner {
+    background: linear-gradient(135deg, rgba(105, 190, 40, 0.95) 0%, rgba(165, 213, 42, 0.95) 100%);
+    color: var(--seahawks-navy);
+    padding: 15px;
+    border-radius: 15px;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 700;
+    border: 3px solid var(--seahawks-navy);
+    box-shadow: 0 8px 25px rgba(105, 190, 40, 0.5);
+    display: none;
+    font-size: 18px;
   }
 
   .setup-panel {
@@ -140,20 +131,8 @@
     border-radius: 30px;
     padding: 35px;
     border: 4px solid var(--seahawks-green);
-    box-shadow: 
-      0 20px 60px rgba(0,0,0,0.7),
-      0 0 40px rgba(105, 190, 40, 0.2) inset;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(105, 190, 40, 0.2) inset;
     margin-bottom: 25px;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .setup-panel:hover {
-    transform: translateY(-5px);
-    box-shadow: 
-      0 25px 70px rgba(0,0,0,0.8),
-      0 0 60px rgba(105, 190, 40, 0.3) inset;
   }
 
   .panel-title {
@@ -182,7 +161,7 @@
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
   }
 
-  input[type="text"], input[type="password"], select {
+  input[type="text"], select {
     width: 100%;
     padding: 16px;
     border: 3px solid var(--seahawks-green);
@@ -195,7 +174,7 @@
     transition: all 0.3s ease;
   }
 
-  input[type="text"]:focus, input[type="password"]:focus, select:focus {
+  input[type="text"]:focus, select:focus {
     outline: none;
     border-color: var(--seahawks-action-green);
     box-shadow: 0 0 20px rgba(105, 190, 40, 0.5);
@@ -221,26 +200,6 @@
     font-size: 16px;
     text-transform: uppercase;
     transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .board-option::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(105, 190, 40, 0.3);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.4s ease, height 0.4s ease;
-  }
-
-  .board-option:hover::before {
-    width: 300px;
-    height: 300px;
   }
 
   .board-option:hover {
@@ -257,11 +216,6 @@
     transform: scale(1.05);
   }
 
-  .board-option span {
-    position: relative;
-    z-index: 1;
-  }
-
   .puck-config {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -276,12 +230,6 @@
     border-radius: 15px;
     border: 3px solid var(--seahawks-green);
     transition: all 0.3s ease;
-  }
-
-  .puck-config-item:hover {
-    border-color: var(--seahawks-action-green);
-    box-shadow: 0 8px 25px rgba(105, 190, 40, 0.3);
-    transform: translateY(-3px);
   }
 
   .puck-config-title {
@@ -307,52 +255,23 @@
     border: 3px solid var(--seahawks-navy);
     width: 100%;
     transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
     box-shadow: 0 10px 30px rgba(105, 190, 40, 0.4);
   }
 
-  .btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.6s ease, height 0.6s ease;
-  }
-
-  .btn:hover::before {
-    width: 400px;
-    height: 400px;
-  }
-
-  .btn:hover {
+  .btn:hover:not(:disabled) {
     transform: translateY(-3px);
     box-shadow: 0 15px 40px rgba(105, 190, 40, 0.6);
   }
 
-  .btn:active {
-    transform: translateY(-1px);
-  }
-
-  .btn span {
-    position: relative;
-    z-index: 1;
-  }
-
-  .btn-cta {
-    font-size: 22px;
-    padding: 22px;
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   .game-link-section {
     margin-top: 30px;
     padding: 25px;
-    background: rgba(0, 25, 51, 0.8);
+    background: rgba(0, 25, 51, 0.9);
     border-radius: 20px;
     border: 3px solid var(--seahawks-green);
     display: none;
@@ -417,9 +336,39 @@
     border-radius: 30px;
     padding: 35px;
     border: 4px solid var(--seahawks-green);
-    box-shadow: 
-      0 20px 60px rgba(0,0,0,0.7),
-      0 0 40px rgba(105, 190, 40, 0.2) inset;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(105, 190, 40, 0.2) inset;
+  }
+
+  .status-indicators {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+  }
+
+  .status-item {
+    background: rgba(0, 25, 51, 0.85);
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    border: 3px solid var(--seahawks-green);
+    transition: all 0.3s ease;
+  }
+
+  .status-label {
+    color: var(--seahawks-green);
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+
+  .status-value {
+    color: white;
+    font-weight: 800;
+    font-size: 22px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
   }
 
   .notification-list {
@@ -454,7 +403,6 @@
     margin-bottom: 15px;
     border-left: 5px solid var(--seahawks-green);
     font-size: 14px;
-    transition: all 0.3s ease;
     animation: notificationSlide 0.4s ease;
   }
 
@@ -463,55 +411,11 @@
     to { opacity: 1; transform: translateX(0); }
   }
 
-  .notification-item:hover {
-    background: rgba(0, 34, 68, 1);
-    border-left-color: var(--seahawks-action-green);
-    transform: translateX(5px);
-  }
-
   .notification-time {
     color: var(--seahawks-green);
     font-size: 12px;
     font-weight: 700;
     margin-top: 8px;
-  }
-
-  .status-indicators {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-    margin-bottom: 25px;
-  }
-
-  .status-item {
-    background: rgba(0, 25, 51, 0.85);
-    padding: 20px;
-    border-radius: 15px;
-    text-align: center;
-    border: 3px solid var(--seahawks-green);
-    transition: all 0.3s ease;
-  }
-
-  .status-item:hover {
-    border-color: var(--seahawks-action-green);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(105, 190, 40, 0.3);
-  }
-
-  .status-label {
-    color: var(--seahawks-green);
-    font-weight: 700;
-    font-size: 13px;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    letter-spacing: 1px;
-  }
-
-  .status-value {
-    color: white;
-    font-weight: 800;
-    font-size: 22px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
   }
 
   .admin-controls {
@@ -530,35 +434,10 @@
     font-size: 15px;
     transition: all 0.3s ease;
     letter-spacing: 2px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .admin-btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.4s ease, height 0.4s ease;
-  }
-
-  .admin-btn:hover::before {
-    width: 300px;
-    height: 300px;
   }
 
   .admin-btn:hover {
     transform: translateY(-3px);
-  }
-
-  .admin-btn span {
-    position: relative;
-    z-index: 1;
   }
 
   .admin-btn.reset {
@@ -581,18 +460,6 @@
     box-shadow: 0 12px 35px rgba(105, 190, 40, 0.6);
   }
 
-  .warning-banner {
-    background: linear-gradient(135deg, rgba(255, 107, 107, 0.9) 0%, rgba(238, 90, 82, 0.9) 100%);
-    color: white;
-    padding: 15px;
-    border-radius: 15px;
-    text-align: center;
-    margin-bottom: 20px;
-    font-weight: 700;
-    border: 3px solid #fff;
-    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
-  }
-
   @media (max-width: 768px) {
     .title { font-size: 3em; }
     .subtitle { font-size: 1.2em; }
@@ -611,12 +478,8 @@
     <div class="admin-badge">🔐 ADMIN ACCESS ONLY</div>
   </div>
 
-  <div class="warning-banner" id="warningBanner" style="display:none;">
-    ⚠️ Please fill in all required fields
-  </div>
-  
-  <div class="warning-banner" id="successBanner" style="display:none; background: linear-gradient(135deg, rgba(105, 190, 40, 0.95) 0%, rgba(165, 213, 42, 0.95) 100%); color: var(--seahawks-navy);">
-    ✅ Game Created! Scroll down to copy the player link
+  <div class="success-banner" id="successBanner">
+    ✅ Game Created Successfully! Link Generated Below ↓
   </div>
 
   <div class="setup-panel">
@@ -630,9 +493,9 @@
     <div class="form-group">
       <label>🎯 Board Configuration:</label>
       <div class="board-selection">
-        <div class="board-option selected" data-board="A"><span>Board A Only</span></div>
-        <div class="board-option" data-board="B"><span>Board B Only</span></div>
-        <div class="board-option" data-board="BOTH"><span>Both Boards</span></div>
+        <div class="board-option selected" data-board="A">Board A Only</div>
+        <div class="board-option" data-board="B">Board B Only</div>
+        <div class="board-option" data-board="BOTH">Both Boards</div>
       </div>
     </div>
     
@@ -641,30 +504,26 @@
       <div class="puck-config">
         <div class="puck-config-item">
           <div class="puck-config-title">Board A Pucks</div>
-          <div class="puck-config-value">
-            <select id="puckCountA">
-              <option value="1">1 Puck</option>
-              <option value="2">2 Pucks</option>
-              <option value="3" selected>3 Pucks</option>
-              <option value="5">5 Pucks</option>
-            </select>
-          </div>
+          <select id="puckCountA">
+            <option value="1">1 Puck</option>
+            <option value="2">2 Pucks</option>
+            <option value="3" selected>3 Pucks</option>
+            <option value="5">5 Pucks</option>
+          </select>
         </div>
         <div class="puck-config-item">
           <div class="puck-config-title">Board B Pucks</div>
-          <div class="puck-config-value">
-            <select id="puckCountB">
-              <option value="1">1 Puck</option>
-              <option value="2">2 Pucks</option>
-              <option value="3" selected>3 Pucks</option>
-              <option value="5">5 Pucks</option>
-            </select>
-          </div>
+          <select id="puckCountB">
+            <option value="1">1 Puck</option>
+            <option value="2">2 Pucks</option>
+            <option value="3" selected>3 Pucks</option>
+            <option value="5">5 Pucks</option>
+          </select>
         </div>
       </div>
     </div>
     
-    <button class="btn btn-cta" id="createGame"><span>🚀 CREATE GAME & GENERATE LINK</span></button>
+    <button class="btn" id="createGame">🚀 CREATE GAME & GENERATE LINK</button>
     
     <div class="game-link-section" id="gameLinkSection">
       <h3 class="panel-title">🔗 PLAYER GAME LINK</h3>
@@ -675,10 +534,6 @@
         <input type="text" id="gameLink" readonly>
         <button id="copyGameLink">📋 COPY</button>
       </div>
-      <p style="margin-top: 15px; text-align: center; color: white; font-size: 14px;">
-        ✅ The player will use this link to access their game<br>
-        🔒 They will NOT see any admin controls
-      </p>
     </div>
   </div>
 
@@ -708,25 +563,22 @@
     </div>
     
     <div class="admin-controls">
-      <button class="admin-btn reset" id="resetGame"><span>🔄 RESET GAME</span></button>
-      <button class="admin-btn add" id="addPuck"><span>➕ ADD PUCK</span></button>
+      <button class="admin-btn reset" id="resetGame">🔄 RESET GAME</button>
+      <button class="admin-btn add" id="addPuck">➕ ADD PUCK</button>
     </div>
   </div>
 </div>
 
 <script>
-// Admin Panel JavaScript - Complete Implementation
 (function() {
   'use strict';
 
-  // Configuration
   const CONFIG = {
-    GAME_PAGE: 'game.html', // The player game page (separate from admin)
+    GAME_PAGE: 'game.html',
     STORAGE_KEY: 'plinko_game_state',
     SESSION_KEY: 'plinko_active_session'
   };
 
-  // State management
   let currentGameState = {
     sessionId: null,
     playerName: '',
@@ -740,7 +592,6 @@
     createdAt: null
   };
 
-  // DOM Elements
   const elements = {
     playerName: document.getElementById('playerName'),
     boardOptions: document.querySelectorAll('.board-option'),
@@ -756,20 +607,16 @@
     pucksRemaining: document.getElementById('pucksRemaining'),
     resetGameBtn: document.getElementById('resetGame'),
     addPuckBtn: document.getElementById('addPuck'),
-    warningBanner: document.getElementById('warningBanner'),
     successBanner: document.getElementById('successBanner')
   };
 
-  // Initialize
   function init() {
     setupEventListeners();
     loadExistingGame();
-    addNotification('Admin panel ready. Create a game to begin.', 'system');
+    console.log('Admin panel initialized');
   }
 
-  // Setup all event listeners
   function setupEventListeners() {
-    // Board selection
     elements.boardOptions.forEach(option => {
       option.addEventListener('click', function() {
         elements.boardOptions.forEach(opt => opt.classList.remove('selected'));
@@ -778,7 +625,6 @@
       });
     });
 
-    // Puck count changes
     elements.puckCountA.addEventListener('change', function() {
       currentGameState.puckCountA = parseInt(this.value);
     });
@@ -787,40 +633,26 @@
       currentGameState.puckCountB = parseInt(this.value);
     });
 
-    // Create game button
     elements.createGameBtn.addEventListener('click', createGame);
-
-    // Copy link button
     elements.copyGameLink.addEventListener('click', copyGameLink);
-
-    // Admin controls
     elements.resetGameBtn.addEventListener('click', resetGame);
     elements.addPuckBtn.addEventListener('click', addPuck);
 
-    // Listen for game state updates from player
     window.addEventListener('storage', handleStorageChange);
-    
-    // Poll for updates every 2 seconds
     setInterval(checkGameState, 2000);
   }
 
-  // Create a new game session
   function createGame() {
     const playerName = elements.playerName.value.trim();
     
     if (!playerName) {
-      showWarning('Please enter a player name!');
+      alert('Please enter a player name!');
       elements.playerName.focus();
       return;
     }
 
-    console.log('Creating game for:', playerName); // Debug log
-
-    // Generate unique session ID
     const sessionId = generateSessionId();
-    console.log('Generated session ID:', sessionId); // Debug log
     
-    // Update game state
     currentGameState = {
       sessionId: sessionId,
       playerName: playerName,
@@ -838,120 +670,80 @@
       createdAt: new Date().toISOString()
     };
 
-    // Save to localStorage
     saveGameState();
 
-    // Generate player link
     const playerUrl = generatePlayerUrl(sessionId);
-    console.log('Generated player URL:', playerUrl); // Debug log
-    
     elements.gameLink.value = playerUrl;
     elements.gameLinkSection.style.display = 'block';
 
-    // Update UI
     updateStatusDisplay();
     addNotification(`✅ Game created for ${playerName}`, 'success');
-    addNotification(`🔗 Player link generated - scroll down to copy!`, 'info');
-    addNotification(`Session ID: ${sessionId}`, 'info');
+    addNotification(`Session: ${sessionId}`, 'info');
     
-    // Show success banner
     elements.successBanner.style.display = 'block';
     setTimeout(() => {
       elements.successBanner.style.display = 'none';
     }, 5000);
     
-    // Disable create button and change text
     elements.createGameBtn.disabled = true;
-    elements.createGameBtn.style.opacity = '0.5';
-    elements.createGameBtn.innerHTML = '<span>✅ GAME CREATED - LINK BELOW</span>';
+    elements.createGameBtn.textContent = '✅ GAME CREATED';
     
-    // Scroll to the link section smoothly
     setTimeout(() => {
       elements.gameLinkSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }, 300);
-    
-    // Also automatically select the link text for easy copying
-    setTimeout(() => {
       elements.gameLink.select();
-    }, 800);
+    }, 300);
   }
 
-  // Generate unique session ID
   function generateSessionId() {
     return 'plinko_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   }
 
-  // Generate player URL (NO ADMIN ACCESS)
   function generatePlayerUrl(sessionId) {
-    const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
-    // Only pass the session ID - player page will validate and load game state
+    const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
     return `${baseUrl}${CONFIG.GAME_PAGE}?session=${sessionId}`;
   }
 
-  // Copy game link to clipboard
   function copyGameLink() {
     elements.gameLink.select();
-    elements.gameLink.setSelectionRange(0, 99999); // For mobile devices
+    elements.gameLink.setSelectionRange(0, 99999);
     
-    // Try modern clipboard API first, fallback to execCommand
-    if (navigator.clipboard && navigator.clipboard.writeText) {
+    if (navigator.clipboard) {
       navigator.clipboard.writeText(elements.gameLink.value)
-        .then(() => {
-          console.log('Link copied via Clipboard API'); // Debug log
-          showCopySuccess();
-        })
-        .catch(err => {
-          console.log('Clipboard API failed, using execCommand'); // Debug log
-          fallbackCopy();
-        });
+        .then(() => showCopySuccess())
+        .catch(() => fallbackCopy());
     } else {
       fallbackCopy();
     }
   }
   
-  // Fallback copy method
   function fallbackCopy() {
     try {
-      const successful = document.execCommand('copy');
-      console.log('Copy via execCommand:', successful); // Debug log
-      if (successful) {
-        showCopySuccess();
-      } else {
-        alert('Please manually copy the link: ' + elements.gameLink.value);
-      }
+      document.execCommand('copy');
+      showCopySuccess();
     } catch (err) {
-      console.error('Copy failed:', err);
-      alert('Please manually copy the link: ' + elements.gameLink.value);
+      alert('Please manually copy: ' + elements.gameLink.value);
     }
   }
   
-  // Show copy success feedback
   function showCopySuccess() {
-    // Visual feedback on button
-    const originalText = elements.copyGameLink.innerHTML;
-    elements.copyGameLink.innerHTML = '✅ COPIED!';
-    elements.copyGameLink.style.background = 'linear-gradient(135deg, #69BE28, #A5D52A)';
-    
+    elements.copyGameLink.textContent = '✅ COPIED!';
+    elements.copyGameLink.style.background = '#69BE28';
     setTimeout(() => {
-      elements.copyGameLink.innerHTML = originalText;
+      elements.copyGameLink.textContent = '📋 COPY';
       elements.copyGameLink.style.background = '';
     }, 2000);
-    
-    addNotification('✅ Link copied to clipboard!', 'success');
+    addNotification('Link copied!', 'success');
   }
 
-  // Save game state to localStorage
   function saveGameState() {
     try {
       localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(currentGameState));
       localStorage.setItem(CONFIG.SESSION_KEY, currentGameState.sessionId);
     } catch (e) {
-      console.error('Failed to save game state:', e);
-      addNotification('Error saving game state', 'error');
+      console.error('Failed to save:', e);
     }
   }
 
-  // Load existing game from localStorage
   function loadExistingGame() {
     try {
       const savedState = localStorage.getItem(CONFIG.STORAGE_KEY);
@@ -962,17 +754,16 @@
           elements.gameLinkSection.style.display = 'block';
           elements.gameLink.value = generatePlayerUrl(currentGameState.sessionId);
           updateStatusDisplay();
-          addNotification('Existing game session loaded', 'info');
+          addNotification('Existing game loaded', 'info');
           elements.createGameBtn.disabled = true;
-          elements.createGameBtn.style.opacity = '0.5';
+          elements.createGameBtn.textContent = '✅ GAME ACTIVE';
         }
       }
     } catch (e) {
-      console.error('Failed to load game state:', e);
+      console.error('Failed to load:', e);
     }
   }
 
-  // Check game state for updates
   function checkGameState() {
     if (!currentGameState.gameActive) return;
 
@@ -981,19 +772,15 @@
       if (savedState) {
         const parsedState = JSON.parse(savedState);
         
-        // Check for changes
         if (parsedState.pucksRemaining !== currentGameState.pucksRemaining) {
-          currentGameState = parsedState;
-          updateStatusDisplay();
-          
-          // Check if puck was just used
           if (parsedState.results && parsedState.results.length > currentGameState.results.length) {
             const latestResult = parsedState.results[parsedState.results.length - 1];
-            addNotification(`Puck landed in slot ${latestResult.slot} on Board ${latestResult.board}`, 'game');
+            addNotification(`Puck landed in slot ${latestResult.slot + 1} on Board ${latestResult.board}`, 'game');
           }
+          currentGameState = parsedState;
+          updateStatusDisplay();
         }
         
-        // Check if game completed
         if (parsedState.pucksRemaining === 0 && currentGameState.pucksRemaining > 0) {
           currentGameState = parsedState;
           updateStatusDisplay();
@@ -1001,31 +788,25 @@
         }
       }
     } catch (e) {
-      console.error('Error checking game state:', e);
+      console.error('Error checking state:', e);
     }
   }
 
-  // Handle storage changes from other tabs
   function handleStorageChange(e) {
     if (e.key === CONFIG.STORAGE_KEY) {
       checkGameState();
     }
   }
 
-  // Update status display
   function updateStatusDisplay() {
     elements.playerStatus.textContent = currentGameState.gameActive ? 'Active' : 'Waiting';
     elements.currentBoard.textContent = currentGameState.currentBoard || '-';
     elements.pucksRemaining.textContent = currentGameState.pucksRemaining || '0';
   }
 
-  // Reset game
   function resetGame() {
-    if (!confirm('Are you sure you want to reset the game? This will clear all progress.')) {
-      return;
-    }
+    if (!confirm('Reset game? This clears all progress.')) return;
 
-    // Clear game state
     currentGameState = {
       sessionId: null,
       playerName: '',
@@ -1039,79 +820,54 @@
       createdAt: null
     };
 
-    // Clear localStorage
     localStorage.removeItem(CONFIG.STORAGE_KEY);
     localStorage.removeItem(CONFIG.SESSION_KEY);
 
-    // Reset UI
     elements.gameLinkSection.style.display = 'none';
     elements.createGameBtn.disabled = false;
-    elements.createGameBtn.style.opacity = '1';
+    elements.createGameBtn.textContent = '🚀 CREATE GAME & GENERATE LINK';
     elements.playerName.value = '';
     updateStatusDisplay();
     
-    addNotification('Game reset successfully', 'success');
+    addNotification('Game reset', 'success');
   }
 
-  // Add puck to current game
   function addPuck() {
     if (!currentGameState.gameActive) {
-      showWarning('No active game! Create a game first.');
+      alert('No active game!');
       return;
     }
 
     currentGameState.pucksRemaining++;
     saveGameState();
     updateStatusDisplay();
-    addNotification('Added 1 puck to the game', 'success');
+    addNotification('Added 1 puck', 'success');
   }
 
-  // Add notification to the list
   function addNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = 'notification-item';
-    
-    const icon = {
+    const icons = {
       success: '✅',
       error: '❌',
       warning: '⚠️',
       info: 'ℹ️',
-      game: '🎮',
-      system: '⚙️'
-    }[type] || 'ℹ️';
+      game: '🎮'
+    };
     
+    const notification = document.createElement('div');
+    notification.className = 'notification-item';
     notification.innerHTML = `
-      ${icon} ${message}
+      ${icons[type] || 'ℹ️'} ${message}
       <div class="notification-time">${new Date().toLocaleTimeString()}</div>
     `;
     
     elements.notificationList.insertBefore(notification, elements.notificationList.firstChild);
     
-    // Keep only last 50 notifications
     while (elements.notificationList.children.length > 50) {
       elements.notificationList.removeChild(elements.notificationList.lastChild);
     }
   }
 
-  // Show warning banner
-  function showWarning(message) {
-    elements.warningBanner.textContent = '⚠️ ' + message;
-    elements.warningBanner.style.display = 'block';
-    
-    setTimeout(() => {
-      elements.warningBanner.style.display = 'none';
-    }, 3000);
-  }
-
-  // Start the admin panel
   init();
-  
-  // Debug info
-  console.log('=================================');
-  console.log('PLINKO ADMIN PANEL INITIALIZED');
-  console.log('Current URL:', window.location.href);
-  console.log('Game page will be:', CONFIG.GAME_PAGE);
-  console.log('=================================');
 })();
 </script>
 </body>
