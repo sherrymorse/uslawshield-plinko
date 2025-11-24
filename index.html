@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>U.S. LawShield PLINKO – Premium Edition</title>
+<title>U.S. LawShield PLINKO</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;800&family=Oswald:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   
@@ -12,7 +12,6 @@
     --seahawks-navy: #002244;
     --seahawks-green: #69BE28;
     --seahawks-blue: #245998;
-    --seahawks-gray: #A5ACAF;
     --accent-gold: #FFD700;
     --accent-orange: #FF8C00;
     --accent-red: #FF6B6B;
@@ -26,12 +25,12 @@
     min-height: 100vh;
     color: white;
     overflow-x: hidden;
+    padding: 20px;
   }
 
   .container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 20px;
     display: grid;
     grid-template-columns: 1fr 400px;
     gap: 25px;
@@ -78,7 +77,6 @@
     color: var(--accent-gold);
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     font-weight: 800;
-    font-family: 'Oswald', sans-serif;
   }
 
   .game-section {
@@ -120,7 +118,6 @@
     text-align: center;
     position: relative;
     animation: pulse-glow 2s infinite;
-    font-family: 'Oswald', sans-serif;
     text-transform: uppercase;
     letter-spacing: 2px;
   }
@@ -264,7 +261,6 @@
     text-transform: uppercase;
     letter-spacing: 2px;
     border: 3px solid var(--seahawks-navy);
-    font-family: 'Oswald', sans-serif;
     width: 100%;
     box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
   }
@@ -394,7 +390,6 @@
     text-transform: uppercase;
     letter-spacing: 2px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    font-family: 'Oswald', sans-serif;
   }
 
   .puck-counter {
@@ -412,7 +407,6 @@
     text-transform: uppercase;
     letter-spacing: 2px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    font-family: 'Oswald', sans-serif;
   }
 
   .connection-status {
@@ -483,7 +477,6 @@
     transition: all 0.3s;
     text-transform: uppercase;
     letter-spacing: 1px;
-    font-family: 'Oswald', sans-serif;
     font-size: 16px;
     box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
     border: 2px solid rgba(255, 255, 255, 0.3);
@@ -547,44 +540,6 @@
 
   .board-b .legend-symbol {
     border-color: var(--accent-gold);
-  }
-
-  .mode-selector {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 25px;
-    grid-column: 1 / -1;
-  }
-
-  .mode-btn {
-    flex: 1;
-    padding: 18px;
-    background: rgba(0, 25, 51, 0.8);
-    border: 3px solid var(--accent-gold);
-    border-radius: 15px;
-    color: var(--accent-gold);
-    font-weight: 800;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.3s;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-family: 'Oswald', sans-serif;
-    font-size: 18px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  }
-
-  .mode-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
-  }
-
-  .mode-btn.active {
-    background: var(--accent-gold);
-    color: var(--seahawks-navy);
-    border-color: var(--seahawks-navy);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
   }
 
   .notification-panel {
@@ -687,6 +642,50 @@
   .locked-field::placeholder {
     color: rgba(255, 215, 0, 0.6) !important;
   }
+
+  .hidden {
+    display: none;
+  }
+
+  .game-link-section {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(0, 25, 51, 0.7);
+    border-radius: 15px;
+    border: 2px solid var(--accent-gold);
+  }
+
+  .link-display {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .link-display input {
+    flex: 1;
+    background: rgba(0, 34, 68, 0.9);
+    color: var(--accent-gold);
+    border: 2px solid var(--accent-gold);
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: 600;
+  }
+
+  .link-display button {
+    background: var(--accent-gold);
+    color: var(--seahawks-navy);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .link-display button:hover {
+    background: #FFE55C;
+    transform: translateY(-2px);
+  }
 </style>
 </head>
 <body>
@@ -706,11 +705,6 @@
     <p class="subtitle">LEGAL DEFENSE FOR SELF DEFENSE®</p>
   </div>
 
-  <div class="mode-selector">
-    <div class="mode-btn active" data-mode="player">🎮 PLAYER VIEW</div>
-    <div class="mode-btn" data-mode="admin">⚙️ ADMIN VIEW</div>
-  </div>
-
   <div class="game-section">
     <div class="canvas-wrapper">
       <div class="current-board" id="currentBoard">BOARD A</div>
@@ -725,8 +719,8 @@
   </div>
 
   <div class="control-section">
-    <div class="setup-panel" id="playerSetup">
-      <h3 class="panel-title">PLAYER SETUP</h3>
+    <div class="setup-panel" id="adminSetup">
+      <h3 class="panel-title">GAME SETUP</h3>
       <div class="form-group">
         <label for="playerName">Player Name:</label>
         <input type="text" id="playerName" placeholder="Enter player name">
@@ -748,16 +742,19 @@
           <option value="5">5 Pucks</option>
         </select>
       </div>
-      <button class="btn btn-cta" id="startGame">START GAME</button>
-    </div>
-
-    <div class="setup-panel" id="adminSetup" style="display: none;">
-      <h3 class="panel-title">ADMIN SETUP</h3>
-      <div class="form-group">
-        <label for="gameIdInput">Game ID to Monitor:</label>
-        <input type="text" id="gameIdInput" placeholder="Enter Game ID">
+      <button class="btn btn-cta" id="startGame">CREATE GAME</button>
+      
+      <div class="game-link-section" id="gameLinkSection" style="display: none;">
+        <h3 class="panel-title">PLAYER LINK</h3>
+        <p>Share this link with the player:</p>
+        <div class="link-display">
+          <input type="text" id="gameLink" readonly>
+          <button id="copyGameLink">COPY</button>
+        </div>
+        <p style="margin-top: 10px; font-size: 12px; color: var(--accent-gold);">
+          Link expires in 5 minutes
+        </p>
       </div>
-      <button class="btn btn-cta" id="connectToGame">CONNECT TO GAME</button>
     </div>
 
     <div class="game-info">
@@ -814,7 +811,6 @@
       <button class="admin-btn" id="addPuck">Add Puck</button>
       <button class="admin-btn" id="manualPrize">Add Manual Prize</button>
       <button class="admin-btn" id="switchBoard">Switch Board</button>
-      <button class="admin-btn" id="copyGameLink">Copy Game Link</button>
       <button class="admin-btn" id="showNotifications">Show Notifications</button>
     </div>
     
@@ -857,6 +853,7 @@ const gameState = {
   lastUpdated: 0,
   playerStatus: 'waiting',
   lastActivity: null,
+  expirationTime: null,
   boards: {
     A: {
       name: "Board A",
@@ -1114,6 +1111,7 @@ function lockPlayerFields() {
   });
   
   document.getElementById('startGame').style.display = 'none';
+  document.getElementById('gameLinkSection').style.display = 'none';
 }
 
 // ==================== PLINKO PHYSICS ====================
@@ -1178,7 +1176,7 @@ function drawBoard() {
   ctx.shadowColor = '#69BE28';
   ctx.shadowBlur = 10;
   ctx.fillStyle = '#002244';
-  ctx.font = 'bold 28px Oswald';
+  ctx.font = 'bold 28px Montserrat';
   ctx.textAlign = 'center';
   ctx.fillText('DROP ZONE', W/2, DROP_ZONE_HEIGHT/2 + 10);
   ctx.shadowBlur = 0;
@@ -1310,7 +1308,7 @@ function drawPuck(x, y, rotation = 0) {
   ctx.fill();
   
   ctx.fillStyle = 'white';
-  ctx.font = 'bold 16px Oswald';
+  ctx.font = 'bold 16px Montserrat';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText('USL', 0, 0);
@@ -1471,10 +1469,11 @@ async function startGame() {
   gameState.currentBoard = selectedBoard === 'B' ? 'B' : 'A';
   gameState.prizesWon = [];
   gameState.isActive = true;
-  gameState.isAdmin = false;
+  gameState.isAdmin = true; // Creator is admin
   gameState.gameId = 'G' + Date.now().toString().slice(-6);
   gameState.lastUpdated = Date.now();
-  
+  gameState.expirationTime = Date.now() + 5 * 60 * 1000; // 5 minutes from now
+
   try {
     // Create cloud storage
     gameState.binId = await createGameBin(gameState);
@@ -1485,8 +1484,14 @@ async function startGame() {
     startSyncInterval(gameState.binId);
     
     // Add notification
-    addNotification(`🎮 New game started: ${playerName}`);
-    updatePlayerStatus('Game started', 'Ready to play');
+    addNotification(`🎮 New game created: ${playerName}`);
+    updatePlayerStatus('Game created', 'Waiting for player');
+    
+    // Generate and show game link
+    const gameLink = `${window.location.origin}${window.location.pathname}?game=${gameState.binId}`;
+    document.getElementById('gameLink').value = gameLink;
+    document.getElementById('gameLinkSection').style.display = 'block';
+    
   } catch (error) {
     console.error('Failed to create cloud game:', error);
     alert('Failed to create cloud game. Using local mode only.');
@@ -1616,56 +1621,22 @@ canvas.addEventListener('mouseup', () => {
 // Board selection
 document.querySelectorAll('.board-option').forEach(option => {
   option.addEventListener('click', () => {
-    if (gameState.isAdmin || gameState.isActive) return;
+    if (gameState.isActive) return;
     
     document.querySelectorAll('.board-option').forEach(opt => opt.classList.remove('selected'));
     option.classList.add('selected');
   });
 });
 
-// Mode selection
-document.querySelectorAll('.mode-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    
-    const mode = btn.dataset.mode;
-    if (mode === 'player') {
-      gameState.isAdmin = false;
-      document.getElementById('playerSetup').style.display = 'block';
-      document.getElementById('adminSetup').style.display = 'none';
-      canvas.style.cursor = 'default';
-      document.getElementById('playerStatus').style.display = 'none';
-    } else {
-      gameState.isAdmin = true;
-      document.getElementById('playerSetup').style.display = 'none';
-      document.getElementById('adminSetup').style.display = 'block';
-      canvas.style.cursor = 'default';
-      document.getElementById('playerStatus').style.display = 'block';
-      addNotification('👑 Admin mode activated');
-    }
-  });
-});
-
 // Start game button
 document.getElementById('startGame').addEventListener('click', startGame);
 
-// Connect to game button
-document.getElementById('connectToGame').addEventListener('click', async () => {
-  const gameId = document.getElementById('gameIdInput').value.trim();
-  if (!gameId) {
-    alert('Please enter a Game ID');
-    return;
-  }
-  
-  gameState.isAdmin = true;
-  gameState.gameId = gameId;
-  const success = await loadGameStateFromCloud(gameId);
-  if (success) {
-    updateGameDisplay();
-  } else {
-    alert('Failed to connect to game. Check the Game ID.');
-  }
+// Copy game link button
+document.getElementById('copyGameLink').addEventListener('click', () => {
+  const gameLink = document.getElementById('gameLink');
+  gameLink.select();
+  document.execCommand('copy');
+  addNotification('📋 Game link copied to clipboard');
 });
 
 // Admin controls
@@ -1723,19 +1694,6 @@ document.getElementById('switchBoard').addEventListener('click', async () => {
   updatePlayerStatus('Board switched', `Now on Board ${gameState.currentBoard}`);
 });
 
-document.getElementById('copyGameLink').addEventListener('click', () => {
-  if (!gameState.gameId) {
-    alert('No active game to copy link for');
-    return;
-  }
-  
-  const gameLink = `${window.location.origin}${window.location.pathname}?game=${gameState.gameId}`;
-  navigator.clipboard.writeText(gameLink).then(() => {
-    alert('Game link copied to clipboard! Send this to the player.');
-    addNotification('📋 Game link copied to clipboard');
-  });
-});
-
 document.getElementById('showNotifications').addEventListener('click', () => {
   const panel = document.getElementById('notificationPanel');
   panel.classList.toggle('show');
@@ -1788,21 +1746,24 @@ function initializeLegends() {
 function checkUrlParameters() {
   const urlParams = new URLSearchParams(window.location.search);
   const gameId = urlParams.get('game');
-  const isAdmin = urlParams.get('admin') === 'true';
   
   if (gameId) {
-    if (isAdmin) {
-      document.querySelector('.mode-btn[data-mode="admin"]').click();
-      document.getElementById('gameIdInput').value = gameId;
-      setTimeout(() => {
-        document.getElementById('connectToGame').click();
-      }, 500);
-    } else {
-      // Auto-connect as player
-      gameState.gameId = gameId;
-      gameState.isAdmin = false;
-      loadGameStateFromCloud(gameId);
-    }
+    // Auto-connect as player
+    gameState.gameId = gameId;
+    gameState.isAdmin = false;
+    loadGameStateFromCloud(gameId);
+    
+    // Check if the game has expired (5 minutes)
+    setTimeout(() => {
+      if (gameState.expirationTime && Date.now() > gameState.expirationTime) {
+        alert('This game link has expired. Please ask the admin for a new link.');
+        // Optionally redirect or disable the game
+      }
+    }, 100);
+  } else {
+    // No game parameter, so we're in admin mode
+    gameState.isAdmin = true;
+    document.getElementById('playerStatus').style.display = 'block';
   }
 }
 
