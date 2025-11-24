@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>U.S. LawShield PLINKO - Play Game</title>
+<title>U.S. LawShield PLINKO - Admin</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
@@ -12,7 +12,6 @@
     --seahawks-navy: #002244;
     --seahawks-green: #69BE28;
     --seahawks-blue: #245998;
-    --seahawks-action-green: #A5D52A;
     --accent-gold: #FFD700;
     --accent-orange: #FF8C00;
   }
@@ -20,704 +19,484 @@
   body {
     font-family: 'Montserrat', sans-serif;
     background: linear-gradient(135deg, var(--seahawks-navy) 0%, var(--seahawks-blue) 50%, var(--seahawks-navy) 100%);
-    background-attachment: fixed;
     min-height: 100vh;
     color: white;
     padding: 20px;
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at 20% 50%, rgba(105, 190, 40, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(36, 89, 152, 0.15) 0%, transparent 50%);
-    animation: pulse 8s ease-in-out infinite;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 0.8; }
   }
 
   .container {
-    max-width: 1400px;
+    max-width: 900px;
     margin: 0 auto;
-    position: relative;
-    z-index: 1;
   }
 
   .header {
     text-align: center;
-    padding: 30px 25px;
-    background: linear-gradient(135deg, rgba(0, 34, 68, 0.95) 0%, rgba(36, 89, 152, 0.85) 100%);
-    border-bottom: 6px solid var(--seahawks-green);
-    border-radius: 25px;
+    padding: 25px;
+    background: linear-gradient(180deg, rgba(0, 34, 68, 0.95) 0%, rgba(41, 128, 185, 0.8) 100%);
+    border-bottom: 6px solid var(--accent-gold);
+    border-radius: 20px;
     margin-bottom: 25px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 80px rgba(105, 190, 40, 0.3) inset;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent 30%, rgba(105, 190, 40, 0.1) 50%, transparent 70%);
-    animation: shimmer 3s linear infinite;
-  }
-
-  @keyframes shimmer {
-    0% { transform: translateX(-50%) translateY(-50%) rotate(0deg); }
-    100% { transform: translateX(-50%) translateY(-50%) rotate(360deg); }
   }
 
   .title {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 4.5em;
     letter-spacing: 8px;
-    text-shadow: 0 0 40px var(--seahawks-green), 3px 3px 0 #000, 0 0 20px rgba(105, 190, 40, 0.8);
+    text-shadow: 0 0 40px var(--accent-gold), 4px 4px 0 #000;
     color: white;
     margin-bottom: 10px;
-    position: relative;
-    z-index: 1;
   }
 
   .subtitle {
-    font-size: 1.6em;
+    font-size: 1.4em;
     letter-spacing: 4px;
-    color: var(--seahawks-green);
-    text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+    color: var(--accent-gold);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     font-weight: 800;
-    position: relative;
-    z-index: 1;
   }
 
-  .player-name {
-    display: inline-block;
-    background: var(--seahawks-green);
-    color: var(--seahawks-navy);
-    padding: 10px 25px;
+  .setup-panel {
+    background: linear-gradient(135deg, rgba(0, 34, 68, 0.9) 0%, rgba(36, 89, 152, 0.9) 100%);
     border-radius: 25px;
-    font-size: 0.85em;
-    margin-top: 15px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    box-shadow: 0 6px 20px rgba(105, 190, 40, 0.6);
-  }
-
-  .game-area {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: 25px;
+    padding: 30px;
+    border: 4px solid var(--accent-gold);
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
     margin-bottom: 25px;
   }
 
-  .board-container {
-    background: linear-gradient(135deg, rgba(0, 34, 68, 0.92) 0%, rgba(36, 89, 152, 0.92) 100%);
-    border-radius: 30px;
-    padding: 35px;
-    border: 4px solid var(--seahawks-green);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 40px rgba(105, 190, 40, 0.2) inset;
-  }
-
-  .board-title {
-    color: var(--seahawks-green);
-    font-size: 32px;
+  .panel-title {
+    color: var(--accent-gold);
+    font-size: 28px;
     margin-bottom: 25px;
     text-align: center;
     font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 4px;
+    letter-spacing: 3px;
     text-transform: uppercase;
-    text-shadow: 0 0 20px rgba(105, 190, 40, 0.6);
   }
 
-  .plinko-board {
-    background: rgba(0, 25, 51, 0.9);
-    border-radius: 20px;
-    padding: 30px;
-    border: 3px solid var(--seahawks-green);
-    position: relative;
-    min-height: 500px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  .form-group {
+    margin-bottom: 25px;
   }
 
-  .peg-grid {
+  label {
+    display: block;
+    color: var(--accent-gold);
+    margin-bottom: 10px;
+    font-weight: 700;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  input[type="text"], select {
     width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
+    padding: 15px;
+    border: 3px solid var(--accent-gold);
+    border-radius: 12px;
+    background: rgba(0, 25, 51, 0.8);
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
   }
 
-  .peg-row {
+  .board-selection {
     display: flex;
-    justify-content: center;
-    margin: 15px 0;
+    gap: 12px;
   }
 
-  .peg {
-    width: 16px;
-    height: 16px;
-    background: linear-gradient(135deg, var(--seahawks-green), var(--seahawks-action-green));
-    border-radius: 50%;
-    margin: 0 20px;
-    box-shadow: 0 0 15px rgba(105, 190, 40, 0.8), 0 4px 8px rgba(0,0,0,0.5);
+  .board-option {
+    flex: 1;
+    text-align: center;
+    padding: 15px;
+    background: rgba(0, 25, 51, 0.8);
+    border: 3px solid var(--accent-gold);
+    border-radius: 12px;
+    cursor: pointer;
+    color: var(--accent-gold);
+    font-weight: 700;
+    font-size: 16px;
+    text-transform: uppercase;
+    transition: all 0.3s;
   }
 
-  .drop-zone {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 30px;
-    margin-bottom: 20px;
-  }
-
-  .drop-button {
-    background: linear-gradient(135deg, var(--seahawks-green) 0%, var(--seahawks-action-green) 100%);
+  .board-option.selected {
+    background: var(--accent-gold);
     color: var(--seahawks-navy);
-    padding: 18px 30px;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+  }
+
+  .puck-config {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .puck-config-item {
+    text-align: center;
+    padding: 15px;
+    background: rgba(0, 25, 51, 0.8);
+    border-radius: 12px;
+    border: 2px solid var(--accent-gold);
+  }
+
+  .puck-config-title {
+    color: var(--accent-gold);
+    font-weight: 700;
+    margin-bottom: 10px;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  .btn-cta {
+    background: linear-gradient(135deg, var(--seahawks-green) 0%, #4A8A1F 100%);
+    color: var(--seahawks-navy);
+    padding: 20px;
     border: none;
     border-radius: 50px;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 800;
     cursor: pointer;
     text-transform: uppercase;
     letter-spacing: 2px;
-    border: 3px solid var(--seahawks-navy);
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 30px rgba(105, 190, 40, 0.5);
+    width: 100%;
+    border: 3px solid var(--accent-gold);
+    box-shadow: 0 10px 30px rgba(105, 190, 40, 0.6);
   }
 
-  .drop-button:hover:not(:disabled) {
+  .btn-cta:hover {
     transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(105, 190, 40, 0.7);
+    box-shadow: 0 15px 40px rgba(105, 190, 40, 0.9);
   }
 
-  .drop-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .puck {
-    width: 30px;
-    height: 30px;
-    background: radial-gradient(circle at 30% 30%, var(--accent-gold), var(--accent-orange));
-    border-radius: 50%;
-    position: absolute;
-    box-shadow: 0 0 20px var(--accent-gold), 0 4px 10px rgba(0,0,0,0.6);
-    z-index: 10;
-  }
-
-  .prize-slots {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 30px;
-    flex-wrap: wrap;
-  }
-
-  .prize-slot {
-    flex: 1;
-    min-width: 60px;
-    max-width: 80px;
-    padding: 15px 10px;
-    background: linear-gradient(135deg, rgba(0, 34, 68, 0.9), rgba(36, 89, 152, 0.9));
-    border: 3px solid var(--seahawks-green);
-    border-radius: 12px;
-    text-align: center;
-    font-weight: 800;
-    font-size: 18px;
-    color: var(--accent-gold);
-    text-shadow: 0 2px 4px rgba(0,0,0,0.7);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    transition: all 0.3s ease;
-  }
-
-  .prize-slot.active {
-    background: linear-gradient(135deg, var(--seahawks-green), var(--seahawks-action-green));
-    color: var(--seahawks-navy);
-    transform: scale(1.15);
-    border-color: var(--accent-gold);
-    animation: slotWin 0.5s ease;
-  }
-
-  @keyframes slotWin {
-    0%, 100% { transform: scale(1.15); }
-    50% { transform: scale(1.25); }
-  }
-
-  .info-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .stat-card {
-    background: linear-gradient(135deg, rgba(0, 34, 68, 0.92) 0%, rgba(36, 89, 152, 0.92) 100%);
-    border-radius: 20px;
-    padding: 25px;
-    border: 4px solid var(--seahawks-green);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.6), 0 0 30px rgba(105, 190, 40, 0.2) inset;
-    transition: all 0.3s ease;
-  }
-
-  .stat-label {
-    color: var(--seahawks-green);
-    font-weight: 700;
-    font-size: 14px;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    letter-spacing: 2px;
-  }
-
-  .stat-value {
-    color: white;
-    font-weight: 800;
-    font-size: 42px;
-    text-shadow: 0 0 15px rgba(105, 190, 40, 0.5);
-  }
-
-  .results-panel {
-    background: rgba(0, 25, 51, 0.85);
-    border-radius: 15px;
+  .game-link-section {
+    margin-top: 25px;
     padding: 20px;
-    border: 3px solid var(--seahawks-green);
-    max-height: 300px;
+    background: rgba(0, 25, 51, 0.7);
+    border-radius: 15px;
+    border: 2px solid var(--accent-gold);
+    display: none;
+  }
+
+  .link-display {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .link-display input {
+    flex: 1;
+    background: rgba(0, 34, 68, 0.9);
+    color: var(--accent-gold);
+    border: 2px solid var(--accent-gold);
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: 600;
+  }
+
+  .link-display button {
+    background: var(--accent-gold);
+    color: var(--seahawks-navy);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-weight: 800;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+
+  .link-display button:hover {
+    background: #FFE55C;
+    transform: translateY(-2px);
+  }
+
+  .notification-panel {
+    background: linear-gradient(135deg, rgba(0, 34, 68, 0.9) 0%, rgba(36, 89, 152, 0.9) 100%);
+    border-radius: 25px;
+    padding: 30px;
+    border: 4px solid var(--accent-gold);
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+  }
+
+  .notification-list {
+    height: 500px;
     overflow-y: auto;
+    background: rgba(0, 25, 51, 0.7);
+    border-radius: 15px;
+    padding: 15px;
+    border: 2px solid var(--accent-gold);
   }
 
-  .results-panel::-webkit-scrollbar {
-    width: 10px;
-  }
-
-  .results-panel::-webkit-scrollbar-track {
-    background: rgba(0, 25, 51, 0.5);
-    border-radius: 10px;
-  }
-
-  .results-panel::-webkit-scrollbar-thumb {
-    background: var(--seahawks-green);
-    border-radius: 10px;
-  }
-
-  .result-item {
-    background: rgba(0, 34, 68, 0.95);
+  .notification-item {
+    background: rgba(0, 34, 68, 0.9);
     padding: 15px;
     border-radius: 10px;
     margin-bottom: 12px;
-    border-left: 4px solid var(--seahawks-green);
-    animation: resultSlide 0.4s ease;
-  }
-
-  @keyframes resultSlide {
-    from { opacity: 0; transform: translateX(20px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  .result-board {
-    color: var(--seahawks-green);
-    font-weight: 800;
+    border-left: 4px solid var(--accent-gold);
     font-size: 14px;
-    margin-bottom: 5px;
+    animation: fadeIn 0.5s ease;
   }
 
-  .result-slot {
-    color: var(--accent-gold);
-    font-weight: 800;
-    font-size: 20px;
-  }
-
-  .error-message {
-    background: linear-gradient(135deg, rgba(255, 107, 107, 0.9), rgba(238, 90, 82, 0.9));
-    color: white;
-    padding: 20px;
-    border-radius: 20px;
-    text-align: center;
-    margin: 40px auto;
-    max-width: 600px;
-    font-weight: 700;
-    border: 3px solid white;
-    box-shadow: 0 15px 40px rgba(255, 107, 107, 0.5);
-  }
-
-  .error-message h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2.5em;
-    margin-bottom: 15px;
-    letter-spacing: 3px;
-  }
-
-  .game-complete {
-    background: linear-gradient(135deg, rgba(105, 190, 40, 0.95), rgba(165, 213, 42, 0.95));
-    color: var(--seahawks-navy);
-    padding: 30px;
-    border-radius: 25px;
-    text-align: center;
-    margin: 30px 0;
-    font-weight: 700;
-    border: 4px solid var(--seahawks-navy);
-    box-shadow: 0 20px 60px rgba(105, 190, 40, 0.6);
-    animation: completeSlide 0.6s ease;
-  }
-
-  @keyframes completeSlide {
-    from { opacity: 0; transform: translateY(-30px); }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .game-complete h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 3em;
-    margin-bottom: 15px;
-    letter-spacing: 4px;
-  }
-
-  @media (max-width: 1024px) {
-    .game-area { grid-template-columns: 1fr; }
-    .title { font-size: 3em; }
-    .subtitle { font-size: 1.2em; }
-  }
-
-  @media (max-width: 768px) {
-    .title { font-size: 2.5em; }
-    .peg { width: 12px; height: 12px; margin: 0 12px; }
-    .peg-row { margin: 10px 0; }
+  .notification-time {
+    color: var(--accent-gold);
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 5px;
   }
 </style>
 </head>
 <body>
 <div class="container">
-  <div id="errorScreen" style="display:none;">
-    <div class="header">
-      <h1 class="title">U.S. LAWSHIELD PLINKO</h1>
+  <div class="header">
+    <h1 class="title">U.S. LAWSHIELD PLINKO</h1>
+    <p class="subtitle">ADMIN CONTROL PANEL</p>
+  </div>
+
+  <div class="setup-panel">
+    <h2 class="panel-title">GAME SETUP</h2>
+    
+    <div class="form-group">
+      <label for="playerName">Player Name:</label>
+      <input type="text" id="playerName" placeholder="Enter player name">
     </div>
-    <div class="error-message">
-      <h2>⚠️ INVALID SESSION</h2>
-      <p>This game link is invalid or has expired.</p>
-      <p style="margin-top: 15px;">Please contact the administrator for a new game link.</p>
+    
+    <div class="form-group">
+      <label>Select Board(s):</label>
+      <div class="board-selection">
+        <div class="board-option selected" data-board="A">Board A</div>
+        <div class="board-option" data-board="B">Board B</div>
+        <div class="board-option" data-board="BOTH">Both</div>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label>Puck Configuration:</label>
+      <div class="puck-config">
+        <div class="puck-config-item">
+          <div class="puck-config-title">Board A Pucks</div>
+          <select id="puckCountA">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+        <div class="puck-config-item">
+          <div class="puck-config-title">Board B Pucks</div>
+          <select id="puckCountB">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <button class="btn-cta" id="createGame">CREATE GAME</button>
+    
+    <div class="game-link-section" id="gameLinkSection">
+      <h3 class="panel-title">PLAYER LINK</h3>
+      <p style="color: var(--accent-gold); font-weight: 700; margin-bottom: 10px;">Share this link with the player:</p>
+      <div class="link-display">
+        <input type="text" id="gameLink" readonly>
+        <button id="copyGameLink">COPY</button>
+      </div>
     </div>
   </div>
 
-  <div id="gameScreen" style="display:none;">
-    <div class="header">
-      <h1 class="title">U.S. LAWSHIELD PLINKO</h1>
-      <p class="subtitle">DROP THE PUCK & WIN!</p>
-      <div class="player-name" id="playerName">Loading...</div>
-    </div>
-
-    <div id="gameCompleteMessage" style="display:none;" class="game-complete">
-      <h2>🎉 GAME COMPLETE!</h2>
-      <p style="font-size: 1.3em;">Thanks for playing!</p>
-      <p style="margin-top: 10px;">Check your results below</p>
-    </div>
-
-    <div class="game-area">
-      <div class="board-container">
-        <h2 class="board-title" id="boardTitle">BOARD A</h2>
-        
-        <div class="drop-zone">
-          <button class="drop-button" id="dropButton">🎯 DROP PUCK</button>
-        </div>
-
-        <div class="plinko-board" id="plinkoBoard">
-          <div class="peg-grid" id="pegGrid"></div>
-          <div class="prize-slots" id="prizeSlots"></div>
-        </div>
-      </div>
-
-      <div class="info-panel">
-        <div class="stat-card">
-          <div class="stat-label">Pucks Remaining</div>
-          <div class="stat-value" id="pucksRemaining">0</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">Current Board</div>
-          <div class="stat-value" id="currentBoardDisplay">-</div>
-        </div>
-
-        <div class="stat-card" style="flex: 1;">
-          <div class="stat-label">🏆 Results</div>
-          <div class="results-panel" id="resultsPanel">
-            <p style="text-align: center; color: var(--seahawks-green); font-size: 14px;">No results yet</p>
-          </div>
-        </div>
+  <div class="notification-panel">
+    <h2 class="panel-title">🔔 GAME NOTIFICATIONS</h2>
+    <div class="notification-list" id="notificationList">
+      <div class="notification-item">
+        Admin panel initialized
+        <div class="notification-time">Just now</div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-(function() {
-  'use strict';
+const JSONBIN_CONFIG = {
+  MASTER_KEY: '$2a$10$NckuWO.y9g8.amyZZWkc8.lKIMS.AVSCyN1qT9/0d5EtRjuV9lmS2',
+  BASE_URL: 'https://api.jsonbin.io/v3/b',
+  HEADERS: {
+    'Content-Type': 'application/json',
+    'X-Master-Key': '$2a$10$NckuWO.y9g8.amyZZWkc8.lKIMS.AVSCyN1qT9/0d5EtRjuV9lmS2'
+  }
+};
 
-  const CONFIG = {
-    STORAGE_KEY: 'plinko_game_state',
-    BOARD_A_PRIZES: [100, 500, 1000, 500, 100],
-    BOARD_B_PRIZES: [250, 750, 1500, 750, 250],
-    PEG_ROWS: 8
+const boards = {
+  A: {
+    name: "Board A",
+    prizes: [
+      { symbol: '🎁', name: '$25 Gift Card' },
+      { symbol: '⏰', name: '1 Hour Campaign of Your Choice' },
+      { symbol: '👥', name: 'Shadow an Agent for 1 Hour' },
+      { symbol: '🚪', name: 'Leave 15min Early / Come in 15min Late' },
+      { symbol: '☕', name: 'Extra 15 Minute Break' },
+      { symbol: '📊', name: 'Replace QA Score with Call of Your Choice' },
+      { symbol: '💼', name: 'Coffee with Leadership' },
+      { symbol: '⏰', name: '1 Hour Campaign of Your Choice' },
+      { symbol: '🎁', name: '$25 Gift Card' }
+    ]
+  },
+  B: {
+    name: "Board B",
+    prizes: [
+      { symbol: '🕑', name: '2 Hours Campaign of Your Choice' },
+      { symbol: '💰', name: '$50 Gift Card' },
+      { symbol: '⏱️', name: 'Leave 30 Minutes Early' },
+      { symbol: '💯', name: 'Replace Lowest QA Score with 100' },
+      { symbol: '🕓', name: '4 Hours Campaign of Your Choice' },
+      { symbol: '🍽️', name: 'Lunch on Leadership' },
+      { symbol: '🎴', name: 'Wild Card' },
+      { symbol: '💰', name: '$50 Gift Card' },
+      { symbol: '🕑', name: '2 Hours Campaign of Your Choice' }
+    ]
+  }
+};
+
+const gameState = { binId: null, lastUpdated: 0 };
+const notifications = [];
+let syncInterval = null;
+
+function addNotification(message) {
+  const timestamp = new Date().toLocaleTimeString();
+  notifications.unshift({ message, timestamp });
+  if (notifications.length > 50) notifications.pop();
+  
+  const list = document.getElementById('notificationList');
+  list.innerHTML = '';
+  notifications.forEach(n => {
+    const item = document.createElement('div');
+    item.className = 'notification-item';
+    item.innerHTML = `${n.message}<div class="notification-time">${n.timestamp}</div>`;
+    list.appendChild(item);
+  });
+}
+
+async function createGameBin(data) {
+  const response = await fetch(JSONBIN_CONFIG.BASE_URL, {
+    method: 'POST',
+    headers: JSONBIN_CONFIG.HEADERS,
+    body: JSON.stringify({ ...data, boards, created: Date.now() })
+  });
+  const result = await response.json();
+  return result.metadata.id;
+}
+
+async function readGameBin(binId) {
+  const response = await fetch(`${JSONBIN_CONFIG.BASE_URL}/${binId}/latest`, {
+    headers: { 'X-Master-Key': JSONBIN_CONFIG.HEADERS['X-Master-Key'] }
+  });
+  const data = await response.json();
+  return data.record;
+}
+
+async function createGame() {
+  const playerName = document.getElementById('playerName').value.trim();
+  const boardType = document.querySelector('.board-option.selected').dataset.board;
+  const pucksA = parseInt(document.getElementById('puckCountA').value);
+  const pucksB = parseInt(document.getElementById('puckCountB').value);
+  
+  if (!playerName) {
+    alert('Please enter a player name');
+    return;
+  }
+  
+  const gameData = {
+    playerName,
+    boardType,
+    pucksA,
+    pucksB,
+    pucksRemaining: boardType === 'BOTH' ? pucksA + pucksB : (boardType === 'A' ? pucksA : pucksB),
+    currentBoard: boardType === 'B' ? 'B' : 'A',
+    prizesWon: [],
+    isActive: true,
+    playerConnected: false,
+    puckGrabbed: false,
+    gameId: 'G' + Date.now().toString().slice(-6),
+    lastUpdated: Date.now()
   };
-
-  let gameState = null;
-  let sessionId = null;
-  let isDropping = false;
-
-  const elements = {
-    errorScreen: document.getElementById('errorScreen'),
-    gameScreen: document.getElementById('gameScreen'),
-    playerName: document.getElementById('playerName'),
-    boardTitle: document.getElementById('boardTitle'),
-    dropButton: document.getElementById('dropButton'),
-    plinkoBoard: document.getElementById('plinkoBoard'),
-    pegGrid: document.getElementById('pegGrid'),
-    prizeSlots: document.getElementById('prizeSlots'),
-    pucksRemaining: document.getElementById('pucksRemaining'),
-    currentBoardDisplay: document.getElementById('currentBoardDisplay'),
-    resultsPanel: document.getElementById('resultsPanel'),
-    gameCompleteMessage: document.getElementById('gameCompleteMessage')
-  };
-
-  function init() {
-    const urlParams = new URLSearchParams(window.location.search);
-    sessionId = urlParams.get('session');
-
-    if (!sessionId || !loadGameState() || gameState.sessionId !== sessionId) {
-      showError();
-      return;
-    }
-
-    elements.errorScreen.style.display = 'none';
-    elements.gameScreen.style.display = 'block';
-
-    setupGame();
-    setupEventListeners();
-  }
-
-  function loadGameState() {
-    try {
-      const savedState = localStorage.getItem(CONFIG.STORAGE_KEY);
-      if (!savedState) return false;
-      
-      gameState = JSON.parse(savedState);
-      return gameState.gameActive;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function saveGameState() {
-    try {
-      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(gameState));
-    } catch (e) {
-      console.error('Save failed:', e);
-    }
-  }
-
-  function setupGame() {
-    elements.playerName.textContent = `🎮 ${gameState.playerName}`;
-    setupBoard();
-    updateUI();
-  }
-
-  function setupEventListeners() {
-    elements.dropButton.addEventListener('click', dropPuck);
-  }
-
-  function setupBoard() {
-    elements.boardTitle.textContent = `BOARD ${gameState.currentBoard}`;
-    generatePegs();
-    const prizes = gameState.currentBoard === 'A' ? CONFIG.BOARD_A_PRIZES : CONFIG.BOARD_B_PRIZES;
-    generatePrizeSlots(prizes);
-  }
-
-  function generatePegs() {
-    elements.pegGrid.innerHTML = '';
+  
+  try {
+    gameState.binId = await createGameBin(gameData);
     
-    for (let row = 0; row < CONFIG.PEG_ROWS; row++) {
-      const pegRow = document.createElement('div');
-      pegRow.className = 'peg-row';
-      
-      const pegsInRow = row + 3;
-      for (let col = 0; col < pegsInRow; col++) {
-        const peg = document.createElement('div');
-        peg.className = 'peg';
-        pegRow.appendChild(peg);
-      }
-      
-      elements.pegGrid.appendChild(pegRow);
-    }
+    const gameLink = `${window.location.origin}/game.html?game=${gameState.binId}`;
+    document.getElementById('gameLink').value = gameLink;
+    document.getElementById('gameLinkSection').style.display = 'block';
+    
+    addNotification(`🎮 Game created for "${playerName}"`);
+    addNotification(`📋 Configuration: ${boardType === 'BOTH' ? 'Both Boards' : `Board ${boardType}`}`);
+    addNotification(`🎯 Pucks: Board A=${pucksA}, Board B=${pucksB}`);
+    
+    startMonitoring();
+  } catch (error) {
+    alert('Failed to create game');
   }
+}
 
-  function generatePrizeSlots(prizes) {
-    elements.prizeSlots.innerHTML = '';
+function startMonitoring() {
+  if (syncInterval) clearInterval(syncInterval);
+  
+  let prevState = {};
+  
+  syncInterval = setInterval(async () => {
+    const remote = await readGameBin(gameState.binId);
+    if (!remote || remote.lastUpdated <= gameState.lastUpdated) return;
     
-    prizes.forEach((prize, index) => {
-      const slot = document.createElement('div');
-      slot.className = 'prize-slot';
-      slot.textContent = prize;
-      slot.dataset.slotIndex = index;
-      elements.prizeSlots.appendChild(slot);
-    });
-  }
-
-  async function dropPuck() {
-    if (isDropping || gameState.pucksRemaining <= 0) return;
-    
-    isDropping = true;
-    elements.dropButton.disabled = true;
-    
-    const puck = document.createElement('div');
-    puck.className = 'puck';
-    elements.plinkoBoard.appendChild(puck);
-    
-    const slotIndex = await animatePuckFall(puck);
-    
-    elements.plinkoBoard.removeChild(puck);
-    highlightSlot(slotIndex);
-    recordResult(slotIndex);
-    
-    gameState.pucksRemaining--;
-    checkBoardSwitch();
-    saveGameState();
-    updateUI();
-    
-    if (gameState.pucksRemaining === 0) {
-      completeGame();
+    if (!prevState.playerConnected && remote.playerConnected) {
+      addNotification(`🟢 Player "${remote.playerName}" connected to game`);
     }
     
-    isDropping = false;
-    elements.dropButton.disabled = false;
-  }
-
-  function animatePuckFall(puck) {
-    return new Promise((resolve) => {
-      const boardRect = elements.plinkoBoard.getBoundingClientRect();
-      
-      let x = boardRect.width / 2;
-      let y = 20;
-      
-      puck.style.left = x + 'px';
-      puck.style.top = y + 'px';
-      
-      let currentRow = 0;
-      const rowHeight = (boardRect.height - 200) / CONFIG.PEG_ROWS;
-      
-      const interval = setInterval(() => {
-        if (currentRow >= CONFIG.PEG_ROWS) {
-          clearInterval(interval);
-          
-          const slots = gameState.currentBoard === 'A' ? 
-            CONFIG.BOARD_A_PRIZES.length : 
-            CONFIG.BOARD_B_PRIZES.length;
-          
-          const slotIndex = Math.min(Math.max(
-            Math.floor((Math.random() + Math.random()) * slots / 2),
-            0
-          ), slots - 1);
-          
-          resolve(slotIndex);
-          return;
-        }
-        
-        y += rowHeight;
-        x += (Math.random() - 0.5) * 40;
-        x = Math.max(50, Math.min(boardRect.width - 50, x));
-        
-        puck.style.left = x + 'px';
-        puck.style.top = y + 'px';
-        
-        currentRow++;
-      }, 150);
-    });
-  }
-
-  function highlightSlot(slotIndex) {
-    const slots = elements.prizeSlots.querySelectorAll('.prize-slot');
-    slots[slotIndex].classList.add('active');
-    
-    setTimeout(() => {
-      slots[slotIndex].classList.remove('active');
-    }, 2000);
-  }
-
-  function recordResult(slotIndex) {
-    const prizes = gameState.currentBoard === 'A' ? CONFIG.BOARD_A_PRIZES : CONFIG.BOARD_B_PRIZES;
-    
-    const result = {
-      board: gameState.currentBoard,
-      slot: slotIndex,
-      prize: prizes[slotIndex],
-      timestamp: new Date().toISOString()
-    };
-    
-    if (!gameState.results) gameState.results = [];
-    gameState.results.push(result);
-    
-    addResultToPanel(result);
-  }
-
-  function addResultToPanel(result) {
-    if (elements.resultsPanel.children.length === 1 && 
-        elements.resultsPanel.firstChild.tagName === 'P') {
-      elements.resultsPanel.innerHTML = '';
+    if (!prevState.puckGrabbed && remote.puckGrabbed) {
+      addNotification(`🎯 Player grabbed the puck`);
     }
     
-    const resultItem = document.createElement('div');
-    resultItem.className = 'result-item';
-    resultItem.innerHTML = `
-      <div class="result-board">Board ${result.board}</div>
-      <div class="result-slot">Slot ${result.slot + 1}: ${result.prize}</div>
-    `;
-    
-    elements.resultsPanel.insertBefore(resultItem, elements.resultsPanel.firstChild);
-  }
-
-  function checkBoardSwitch() {
-    if (gameState.boardConfig !== 'BOTH') return;
-    
-    if (gameState.currentBoard === 'A') {
-      const aPucksUsed = gameState.results.filter(r => r.board === 'A').length;
-      if (aPucksUsed >= gameState.puckCountA) {
-        gameState.currentBoard = 'B';
-        setupBoard();
-      }
+    if (prevState.pucksRemaining > remote.pucksRemaining) {
+      addNotification(`🎲 Player dropped puck on Board ${remote.currentBoard}`);
     }
-  }
-
-  function updateUI() {
-    elements.pucksRemaining.textContent = gameState.pucksRemaining;
-    elements.currentBoardDisplay.textContent = gameState.currentBoard;
     
-    if (gameState.pucksRemaining === 0) {
-      elements.dropButton.disabled = true;
-      elements.dropButton.textContent = '🏁 GAME COMPLETE';
+    if (remote.prizesWon?.length > (prevState.prizesWon?.length || 0)) {
+      const newPrize = remote.prizesWon[remote.prizesWon.length - 1];
+      addNotification(`🎉 WON: ${newPrize.prize} (Board ${newPrize.board})`);
     }
-  }
+    
+    if (prevState.currentBoard && prevState.currentBoard !== remote.currentBoard) {
+      addNotification(`🔄 Switched to Board ${remote.currentBoard}`);
+    }
+    
+    if (remote.pucksRemaining === 0 && prevState.pucksRemaining > 0) {
+      addNotification(`🏁 Game completed! Total prizes won: ${remote.prizesWon.length}`);
+    }
+    
+    prevState = { ...remote };
+    gameState.lastUpdated = remote.lastUpdated;
+  }, 2000);
+}
 
-  function completeGame() {
-    elements.gameCompleteMessage.style.display = 'block';
-    gameState.gameActive = false;
-    saveGameState();
-  }
+document.querySelectorAll('.board-option').forEach(option => {
+  option.addEventListener('click', () => {
+    document.querySelectorAll('.board-option').forEach(opt => opt.classList.remove('selected'));
+    option.classList.add('selected');
+  });
+});
 
-  function showError() {
-    elements.errorScreen.style.display = 'block';
-    elements.gameScreen.style.display = 'none';
-  }
+document.getElementById('createGame').addEventListener('click', createGame);
 
-  init();
-})();
+document.getElementById('copyGameLink').addEventListener('click', () => {
+  const link = document.getElementById('gameLink');
+  link.select();
+  document.execCommand('copy');
+  addNotification('📋 Link copied to clipboard');
+});
 </script>
 </body>
 </html>
