@@ -356,12 +356,25 @@
     border-radius: 20px;
     border: 3px solid var(--seahawks-green);
     display: none;
-    animation: slideIn 0.5s ease;
+    animation: slideIn 0.5s ease, linkPulse 2s ease-in-out 3;
+    box-shadow: 0 0 30px rgba(105, 190, 40, 0.6);
   }
 
   @keyframes slideIn {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes linkPulse {
+    0%, 100% { 
+      box-shadow: 0 0 30px rgba(105, 190, 40, 0.6);
+      border-color: var(--seahawks-green);
+    }
+    50% { 
+      box-shadow: 0 0 50px rgba(105, 190, 40, 1);
+      border-color: var(--seahawks-action-green);
+      transform: scale(1.02);
+    }
   }
 
   .link-display {
@@ -601,6 +614,10 @@
   <div class="warning-banner" id="warningBanner" style="display:none;">
     ⚠️ Please fill in all required fields
   </div>
+  
+  <div class="warning-banner" id="successBanner" style="display:none; background: linear-gradient(135deg, rgba(105, 190, 40, 0.95) 0%, rgba(165, 213, 42, 0.95) 100%); color: var(--seahawks-navy);">
+    ✅ Game Created! Scroll down to copy the player link
+  </div>
 
   <div class="setup-panel">
     <h2 class="panel-title">🎮 GAME SETUP</h2>
@@ -651,13 +668,17 @@
     
     <div class="game-link-section" id="gameLinkSection">
       <h3 class="panel-title">🔗 PLAYER GAME LINK</h3>
-      <p style="margin-bottom: 15px; text-align: center; color: var(--seahawks-green); font-weight: 600;">
-        Copy and share this link with the player:
+      <p style="margin-bottom: 15px; text-align: center; color: var(--seahawks-green); font-weight: 700; font-size: 18px;">
+        📋 COPY THIS LINK AND SEND IT TO YOUR PLAYER:
       </p>
       <div class="link-display">
         <input type="text" id="gameLink" readonly>
         <button id="copyGameLink">📋 COPY</button>
       </div>
+      <p style="margin-top: 15px; text-align: center; color: white; font-size: 14px;">
+        ✅ The player will use this link to access their game<br>
+        🔒 They will NOT see any admin controls
+      </p>
     </div>
   </div>
 
@@ -735,7 +756,8 @@
     pucksRemaining: document.getElementById('pucksRemaining'),
     resetGameBtn: document.getElementById('resetGame'),
     addPuckBtn: document.getElementById('addPuck'),
-    warningBanner: document.getElementById('warningBanner')
+    warningBanner: document.getElementById('warningBanner'),
+    successBanner: document.getElementById('successBanner')
   };
 
   // Initialize
@@ -792,8 +814,11 @@
       return;
     }
 
+    console.log('Creating game for:', playerName); // Debug log
+
     // Generate unique session ID
     const sessionId = generateSessionId();
+    console.log('Generated session ID:', sessionId); // Debug log
     
     // Update game state
     currentGameState = {
@@ -818,17 +843,37 @@
 
     // Generate player link
     const playerUrl = generatePlayerUrl(sessionId);
+    console.log('Generated player URL:', playerUrl); // Debug log
+    
     elements.gameLink.value = playerUrl;
     elements.gameLinkSection.style.display = 'block';
 
     // Update UI
     updateStatusDisplay();
-    addNotification(`Game created for ${playerName}`, 'success');
+    addNotification(`✅ Game created for ${playerName}`, 'success');
+    addNotification(`🔗 Player link generated - scroll down to copy!`, 'info');
     addNotification(`Session ID: ${sessionId}`, 'info');
     
-    // Disable create button
+    // Show success banner
+    elements.successBanner.style.display = 'block';
+    setTimeout(() => {
+      elements.successBanner.style.display = 'none';
+    }, 5000);
+    
+    // Disable create button and change text
     elements.createGameBtn.disabled = true;
     elements.createGameBtn.style.opacity = '0.5';
+    elements.createGameBtn.innerHTML = '<span>✅ GAME CREATED - LINK BELOW</span>';
+    
+    // Scroll to the link section smoothly
+    setTimeout(() => {
+      elements.gameLinkSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 300);
+    
+    // Also automatically select the link text for easy copying
+    setTimeout(() => {
+      elements.gameLink.select();
+    }, 800);
   }
 
   // Generate unique session ID
@@ -846,15 +891,53 @@
   // Copy game link to clipboard
   function copyGameLink() {
     elements.gameLink.select();
-    document.execCommand('copy');
+    elements.gameLink.setSelectionRange(0, 99999); // For mobile devices
     
-    // Visual feedback
-    elements.copyGameLink.textContent = '✅ COPIED!';
+    // Try modern clipboard API first, fallback to execCommand
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(elements.gameLink.value)
+        .then(() => {
+          console.log('Link copied via Clipboard API'); // Debug log
+          showCopySuccess();
+        })
+        .catch(err => {
+          console.log('Clipboard API failed, using execCommand'); // Debug log
+          fallbackCopy();
+        });
+    } else {
+      fallbackCopy();
+    }
+  }
+  
+  // Fallback copy method
+  function fallbackCopy() {
+    try {
+      const successful = document.execCommand('copy');
+      console.log('Copy via execCommand:', successful); // Debug log
+      if (successful) {
+        showCopySuccess();
+      } else {
+        alert('Please manually copy the link: ' + elements.gameLink.value);
+      }
+    } catch (err) {
+      console.error('Copy failed:', err);
+      alert('Please manually copy the link: ' + elements.gameLink.value);
+    }
+  }
+  
+  // Show copy success feedback
+  function showCopySuccess() {
+    // Visual feedback on button
+    const originalText = elements.copyGameLink.innerHTML;
+    elements.copyGameLink.innerHTML = '✅ COPIED!';
+    elements.copyGameLink.style.background = 'linear-gradient(135deg, #69BE28, #A5D52A)';
+    
     setTimeout(() => {
-      elements.copyGameLink.textContent = '📋 COPY';
+      elements.copyGameLink.innerHTML = originalText;
+      elements.copyGameLink.style.background = '';
     }, 2000);
     
-    addNotification('Link copied to clipboard!', 'success');
+    addNotification('✅ Link copied to clipboard!', 'success');
   }
 
   // Save game state to localStorage
@@ -1022,6 +1105,13 @@
 
   // Start the admin panel
   init();
+  
+  // Debug info
+  console.log('=================================');
+  console.log('PLINKO ADMIN PANEL INITIALIZED');
+  console.log('Current URL:', window.location.href);
+  console.log('Game page will be:', CONFIG.GAME_PAGE);
+  console.log('=================================');
 })();
 </script>
 </body>
