@@ -852,8 +852,6 @@ async function createGame() {
 }
 
 function updateGameDisplay() {
-  document.getElementById('gameId').textContent = gameState.gameId || '-';
-  document.getElementById('playerDisplay').textContent = gameState.playerName || '-';
   document.getElementById('pucksRemaining').textContent = gameState.pucksRemaining;
   document.getElementById('currentBoard').textContent = `Board ${gameState.currentBoard}`;
   
