@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>U.S. LawShield PLINKO – Professional Edition</title>
+<title>U.S. LawShield PLINKO – JSONBin.io Real-Time</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
@@ -305,6 +305,21 @@
     z-index: 10;
   }
 
+  .connection-status {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 34, 68, 0.9);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 2px solid #69BE28;
+    color: #69BE28;
+    font-weight: 600;
+    font-size: 12px;
+    z-index: 10;
+  }
+
   .bigwin {
     position: fixed;
     top: 50%;
@@ -401,6 +416,31 @@
   .board-b .legend-symbol {
     border-color: #FFD700;
   }
+
+  .mode-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .mode-btn {
+    flex: 1;
+    padding: 12px;
+    background: #001933;
+    border: 2px solid #69BE28;
+    border-radius: 8px;
+    color: #A5ACAF;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .mode-btn.active {
+    background: #69BE28;
+    color: #002244;
+    border-color: #002244;
+  }
 </style>
 </head>
 <body>
@@ -410,10 +450,16 @@
     <p class="subtitle">LEGAL DEFENSE FOR SELF DEFENSE®</p>
   </div>
 
+  <div class="mode-selector">
+    <div class="mode-btn active" data-mode="player">🎮 PLAYER VIEW</div>
+    <div class="mode-btn" data-mode="admin">⚙️ ADMIN VIEW</div>
+  </div>
+
   <div class="game-section">
     <div class="canvas-wrapper">
       <div class="current-board" id="currentBoard">BOARD A</div>
       <div class="puck-counter">PUCKS: <span id="puckCounter">0</span></div>
+      <div class="connection-status" id="connectionStatus">🔴 OFFLINE</div>
       <canvas id="plinkoCanvas" width="800" height="1000"></canvas>
     </div>
     <div class="drop-zone">
@@ -423,7 +469,7 @@
   </div>
 
   <div class="control-section">
-    <div class="setup-panel">
+    <div class="setup-panel" id="playerSetup">
       <h3 class="panel-title">PLAYER SETUP</h3>
       <div class="form-group">
         <label for="playerName">Player Name:</label>
@@ -447,6 +493,15 @@
         </select>
       </div>
       <button class="btn btn-cta" id="startGame">START GAME</button>
+    </div>
+
+    <div class="setup-panel" id="adminSetup" style="display: none;">
+      <h3 class="panel-title">ADMIN SETUP</h3>
+      <div class="form-group">
+        <label for="gameIdInput">Game ID to Monitor:</label>
+        <input type="text" id="gameIdInput" placeholder="Enter Game ID">
+      </div>
+      <button class="btn btn-cta" id="connectToGame">CONNECT TO GAME</button>
     </div>
 
     <div class="game-info">
@@ -500,6 +555,17 @@
 </div>
 
 <script>
+// ==================== JSONBIN.IO CONFIGURATION ====================
+const JSONBIN_CONFIG = {
+  MASTER_KEY: '$2a$10$NckuWO.y9g8.amyZZWkc8.lKIMS.AVSCyN1qT9/0d5EtRjuV9lmS2',
+  ACCESS_KEY: '$2a$10$g6RfQ66H6XQyYy3D848Cfurvs0dXgVt92aV0Rr0UqchZrBZwr7Vpy',
+  BASE_URL: 'https://api.jsonbin.io/v3/b',
+  HEADERS: {
+    'Content-Type': 'application/json',
+    'X-Master-Key': '$2a$10$NckuWO.y9g8.amyZZWkc8.lKIMS.AVSCyN1qT9/0d5EtRjuV9lmS2'
+  }
+};
+
 // ==================== GAME STATE ====================
 const gameState = {
   gameId: null,
@@ -512,6 +578,10 @@ const gameState = {
   prizesWon: [],
   isActive: false,
   currentPuck: null,
+  isAdmin: false,
+  connected: false,
+  binId: null,
+  lastUpdated: 0,
   boards: {
     A: {
       name: "Board A",
@@ -545,6 +615,145 @@ const gameState = {
     }
   }
 };
+
+// ==================== JSONBIN.IO REAL-TIME SYNC ====================
+let syncInterval = null;
+let isConnected = false;
+
+async function createGameBin(gameState) {
+  try {
+    const response = await fetch(JSONBIN_CONFIG.BASE_URL, {
+      method: 'POST',
+      headers: JSONBIN_CONFIG.HEADERS,
+      body: JSON.stringify({
+        ...gameState,
+        created: Date.now(),
+        version: 1
+      })
+    });
+    
+    const data = await response.json();
+    if (data.metadata && data.metadata.id) {
+      return data.metadata.id;
+    }
+    throw new Error('Failed to create bin');
+  } catch (error) {
+    console.error('Error creating game bin:', error);
+    throw error;
+  }
+}
+
+async function updateGameBin(binId, gameState) {
+  try {
+    const response = await fetch(`${JSONBIN_CONFIG.BASE_URL}/${binId}`, {
+      method: 'PUT',
+      headers: JSONBIN_CONFIG.HEADERS,
+      body: JSON.stringify({
+        ...gameState,
+        lastUpdated: Date.now()
+      })
+    });
+    
+    const data = await response.json();
+    return data.metadata && data.metadata.id;
+  } catch (error) {
+    console.error('Error updating game bin:', error);
+    return false;
+  }
+}
+
+async function readGameBin(binId) {
+  try {
+    const response = await fetch(`${JSONBIN_CONFIG.BASE_URL}/${binId}/latest`, {
+      headers: {
+        'X-Master-Key': JSONBIN_CONFIG.HEADERS['X-Master-Key']
+      }
+    });
+    
+    if (!response.ok) throw new Error('Failed to read bin');
+    
+    const data = await response.json();
+    return data.record;
+  } catch (error) {
+    console.error('Error reading game bin:', error);
+    return null;
+  }
+}
+
+function startSyncInterval(binId) {
+  if (syncInterval) clearInterval(syncInterval);
+  
+  syncInterval = setInterval(async () => {
+    if (!binId) return;
+    
+    const remoteState = await readGameBin(binId);
+    if (remoteState && remoteState.lastUpdated > gameState.lastUpdated) {
+      // Don't override if we have local changes that are newer
+      if (gameState.lastUpdated && gameState.lastUpdated > remoteState.lastUpdated) {
+        return;
+      }
+      
+      // Update from remote state
+      Object.keys(remoteState).forEach(key => {
+        if (key !== 'currentPuck' || !gameState.currentPuck) {
+          gameState[key] = remoteState[key];
+        }
+      });
+      
+      updateGameDisplay();
+      updateBoardDisplay();
+      drawBoard();
+      
+      // Update connection status
+      isConnected = true;
+      updateConnectionStatus();
+    }
+  }, 2000); // Sync every 2 seconds to stay within rate limits
+}
+
+function stopSyncInterval() {
+  if (syncInterval) {
+    clearInterval(syncInterval);
+    syncInterval = null;
+  }
+}
+
+function updateConnectionStatus() {
+  const statusElement = document.getElementById('connectionStatus');
+  if (isConnected) {
+    statusElement.textContent = '🟢 SYNCED';
+    statusElement.style.borderColor = '#69BE28';
+  } else {
+    statusElement.textContent = '🔴 OFFLINE';
+    statusElement.style.borderColor = '#ff6b6b';
+  }
+}
+
+async function saveGameStateToCloud() {
+  if (!gameState.binId) return false;
+  
+  gameState.lastUpdated = Date.now();
+  const success = await updateGameBin(gameState.binId, gameState);
+  isConnected = success;
+  updateConnectionStatus();
+  return success;
+}
+
+async function loadGameStateFromCloud(binId) {
+  const remoteState = await readGameBin(binId);
+  if (remoteState) {
+    Object.assign(gameState, remoteState);
+    gameState.binId = binId;
+    isConnected = true;
+    updateConnectionStatus();
+    updateGameDisplay();
+    updateBoardDisplay();
+    drawBoard();
+    startSyncInterval(binId);
+    return true;
+  }
+  return false;
+}
 
 // ==================== PLINKO PHYSICS ====================
 const canvas = document.getElementById('plinkoCanvas');
@@ -654,7 +863,7 @@ function drawBoard() {
   });
   
   // Draw hover puck (if available and not dragging)
-  if (gameState.pucksRemaining > 0 && !currentPuck && !dragging) {
+  if (gameState.pucksRemaining > 0 && !currentPuck && !dragging && !gameState.isAdmin) {
     drawPuck(hoverPuck.x, hoverPuck.y);
   }
   
@@ -727,6 +936,12 @@ function updatePhysics() {
   // Update rotation based on velocity
   currentPuck.rotation += currentPuck.vx * 0.02;
   
+  // Save puck position to cloud for real-time sync
+  if (gameState.binId) {
+    gameState.currentPuck = currentPuck;
+    saveGameStateToCloud();
+  }
+  
   // Wall collisions
   if (currentPuck.x - PUCK_RADIUS < 0) {
     currentPuck.x = PUCK_RADIUS;
@@ -773,7 +988,8 @@ function updatePhysics() {
     gameState.prizesWon.push({
       board: gameState.currentBoard,
       prize: prize.name,
-      symbol: prize.symbol
+      symbol: prize.symbol,
+      timestamp: Date.now()
     });
     
     // Create celebration particles
@@ -801,21 +1017,23 @@ function updatePhysics() {
     // Update game state
     gameState.pucksUsed++;
     gameState.pucksRemaining--;
-    updateGameDisplay();
+    gameState.currentPuck = null;
+    currentPuck = null;
     
     // Check if should switch boards
     if (gameState.boardType === 'BOTH' && gameState.currentBoard === 'A') {
       gameState.currentBoard = 'B';
-      document.getElementById('currentBoard').textContent = 'BOARD B';
-      document.getElementById('legendA').style.display = 'none';
-      document.getElementById('legendB').style.display = 'block';
+      updateBoardDisplay();
       initPegs();
     } else if (gameState.pucksRemaining === 0) {
       // Game over
       gameState.isActive = false;
     }
     
-    currentPuck = null;
+    // Save final state to cloud
+    saveGameStateToCloud();
+    updateGameDisplay();
+    
     cancelAnimationFrame(animationId);
     drawBoard();
     return;
@@ -826,7 +1044,7 @@ function updatePhysics() {
 }
 
 // ==================== GAME CONTROLS ====================
-function startGame() {
+async function startGame() {
   const playerName = document.getElementById('playerName').value.trim();
   const puckCount = parseInt(document.getElementById('puckCount').value);
   const selectedBoard = document.querySelector('.board-option.selected').dataset.board;
@@ -844,10 +1062,40 @@ function startGame() {
   gameState.currentBoard = selectedBoard === 'B' ? 'B' : 'A';
   gameState.prizesWon = [];
   gameState.isActive = true;
+  gameState.isAdmin = false;
   gameState.gameId = 'G' + Date.now().toString().slice(-6);
+  gameState.lastUpdated = Date.now();
+  
+  try {
+    // Create cloud storage
+    gameState.binId = await createGameBin(gameState);
+    isConnected = true;
+    updateConnectionStatus();
+    
+    // Start synchronization
+    startSyncInterval(gameState.binId);
+  } catch (error) {
+    console.error('Failed to create cloud game:', error);
+    alert('Failed to create cloud game. Using local mode only.');
+    isConnected = false;
+    updateConnectionStatus();
+  }
   
   // Update displays
   updateGameDisplay();
+  updateBoardDisplay();
+  
+  // Initialize board
+  initPegs();
+  drawBoard();
+  
+  // Animate hover puck
+  if (!gameState.isAdmin) {
+    animateHoverPuck();
+  }
+}
+
+function updateBoardDisplay() {
   document.getElementById('currentBoard').textContent = `BOARD ${gameState.currentBoard}`;
   
   // Show appropriate legend
@@ -855,17 +1103,10 @@ function startGame() {
     gameState.currentBoard === 'A' || gameState.boardType === 'BOTH' ? 'block' : 'none';
   document.getElementById('legendB').style.display = 
     gameState.currentBoard === 'B' ? 'block' : 'none';
-  
-  // Initialize board
-  initPegs();
-  drawBoard();
-  
-  // Animate hover puck
-  animateHoverPuck();
 }
 
 function animateHoverPuck() {
-  if (!gameState.isActive || currentPuck || gameState.pucksRemaining === 0) return;
+  if (!gameState.isActive || currentPuck || gameState.pucksRemaining === 0 || gameState.isAdmin) return;
   
   hoverPuck.x = W/2 + Math.sin(Date.now() * 0.002) * (W/2 - PUCK_RADIUS - 50);
   drawBoard();
@@ -873,8 +1114,8 @@ function animateHoverPuck() {
 }
 
 function updateGameDisplay() {
-  document.getElementById('gameId').textContent = gameState.gameId;
-  document.getElementById('playerDisplay').textContent = gameState.playerName;
+  document.getElementById('gameId').textContent = gameState.gameId || '-';
+  document.getElementById('playerDisplay').textContent = gameState.playerName || '-';
   document.getElementById('puckCounter').textContent = gameState.pucksRemaining;
   document.getElementById('pucksRemaining').textContent = gameState.pucksRemaining;
   document.getElementById('totalWon').textContent = `${gameState.prizesWon.length} prizes`;
@@ -897,6 +1138,8 @@ function updateGameDisplay() {
 
 // ==================== EVENT HANDLERS ====================
 canvas.addEventListener('mousemove', (e) => {
+  if (gameState.isAdmin) return; // Admins can't interact with the board
+  
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
@@ -912,7 +1155,7 @@ canvas.addEventListener('mousemove', (e) => {
 });
 
 canvas.addEventListener('mousedown', (e) => {
-  if (!gameState.isActive || currentPuck || gameState.pucksRemaining === 0) return;
+  if (gameState.isAdmin || !gameState.isActive || currentPuck || gameState.pucksRemaining === 0) return;
   
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
@@ -937,6 +1180,8 @@ canvas.addEventListener('mousedown', (e) => {
 });
 
 canvas.addEventListener('mouseup', () => {
+  if (gameState.isAdmin) return;
+  
   if (dragging && currentPuck) {
     dragging = false;
     
@@ -957,49 +1202,102 @@ document.querySelectorAll('.board-option').forEach(option => {
   });
 });
 
+// Mode selection
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    const mode = btn.dataset.mode;
+    if (mode === 'player') {
+      gameState.isAdmin = false;
+      document.getElementById('playerSetup').style.display = 'block';
+      document.getElementById('adminSetup').style.display = 'none';
+      canvas.style.cursor = 'default';
+    } else {
+      gameState.isAdmin = true;
+      document.getElementById('playerSetup').style.display = 'none';
+      document.getElementById('adminSetup').style.display = 'block';
+      canvas.style.cursor = 'default';
+    }
+  });
+});
+
 // Start game button
 document.getElementById('startGame').addEventListener('click', startGame);
 
+// Connect to game button
+document.getElementById('connectToGame').addEventListener('click', async () => {
+  const gameId = document.getElementById('gameIdInput').value.trim();
+  if (!gameId) {
+    alert('Please enter a Game ID');
+    return;
+  }
+  
+  gameState.isAdmin = true;
+  gameState.gameId = gameId;
+  const success = await loadGameStateFromCloud(gameId);
+  if (success) {
+    updateGameDisplay();
+  } else {
+    alert('Failed to connect to game. Check the Game ID.');
+  }
+});
+
 // Admin controls
-document.getElementById('resetGame').addEventListener('click', () => {
+document.getElementById('resetGame').addEventListener('click', async () => {
   if (confirm('Reset the game? This will clear all progress.')) {
     gameState.isActive = false;
     currentPuck = null;
+    gameState.currentPuck = null;
     gameState.prizesWon = [];
+    gameState.pucksRemaining = gameState.pucksTotal;
+    gameState.pucksUsed = 0;
+    gameState.currentBoard = gameState.boardType === 'B' ? 'B' : 'A';
     updateGameDisplay();
+    updateBoardDisplay();
+    await saveGameStateToCloud();
     drawBoard();
   }
 });
 
-document.getElementById('addPuck').addEventListener('click', () => {
+document.getElementById('addPuck').addEventListener('click', async () => {
   gameState.pucksRemaining++;
   gameState.pucksTotal++;
   updateGameDisplay();
+  await saveGameStateToCloud();
 });
 
-document.getElementById('manualPrize').addEventListener('click', () => {
+document.getElementById('manualPrize').addEventListener('click', async () => {
   const prizeName = prompt('Enter prize name:');
   if (prizeName) {
     gameState.prizesWon.push({
       board: gameState.currentBoard,
       prize: prizeName,
-      symbol: '🎁'
+      symbol: '🎁',
+      timestamp: Date.now(),
+      manual: true
     });
     updateGameDisplay();
+    await saveGameStateToCloud();
   }
 });
 
-document.getElementById('switchBoard').addEventListener('click', () => {
+document.getElementById('switchBoard').addEventListener('click', async () => {
   gameState.currentBoard = gameState.currentBoard === 'A' ? 'B' : 'A';
-  document.getElementById('currentBoard').textContent = `BOARD ${gameState.currentBoard}`;
-  document.getElementById('legendA').style.display = gameState.currentBoard === 'A' ? 'block' : 'none';
-  document.getElementById('legendB').style.display = gameState.currentBoard === 'B' ? 'block' : 'none';
+  updateBoardDisplay();
   initPegs();
+  await saveGameStateToCloud();
   drawBoard();
 });
 
 document.getElementById('copyGameLink').addEventListener('click', () => {
-  const gameLink = `${window.location.origin}${window.location.pathname}?game=${gameState.gameId}`;
+  if (!gameState.gameId) {
+    alert('No active game to copy link for');
+    return;
+  }
+  
+  const gameLink = `${window.location.origin}${window.location.pathname}?game=${gameState.gameId}&admin=true`;
   navigator.clipboard.writeText(gameLink).then(() => {
     alert('Game link copied to clipboard!');
   });
@@ -1048,13 +1346,41 @@ function initializeLegends() {
   });
 }
 
-// Initialize the game
+// ==================== URL PARAMETERS ====================
+function checkUrlParameters() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const gameId = urlParams.get('game');
+  const isAdmin = urlParams.get('admin') === 'true';
+  
+  if (gameId) {
+    if (isAdmin) {
+      document.querySelector('.mode-btn[data-mode="admin"]').click();
+      document.getElementById('gameIdInput').value = gameId;
+      setTimeout(() => {
+        document.getElementById('connectToGame').click();
+      }, 500);
+    } else {
+      // Auto-connect as player
+      gameState.gameId = gameId;
+      loadGameStateFromCloud(gameId);
+    }
+  }
+}
+
+// ==================== INITIALIZATION ====================
 initializeLegends();
 initPegs();
 drawBoard();
+checkUrlParameters();
+updateConnectionStatus();
 
 // Set default board selection
 document.querySelector('.board-option[data-board="A"]').classList.add('selected');
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+  stopSyncInterval();
+});
 </script>
 </body>
 </html>
