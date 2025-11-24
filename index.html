@@ -769,7 +769,7 @@ const JSONBIN_CONFIG = {
   function generatePlayerUrl(binId) {
       const baseUrl = window.location.origin + window.location.pathname;
       // Make sure we're generating the correct game.html path
-      return baseUrl.replace('index.html', '') + 'game.html?game=' + binId;
+      return baseUrl + 'game.html?game=' + binId;
   }
  
   function copyGameLink() {
