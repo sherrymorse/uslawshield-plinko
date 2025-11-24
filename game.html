@@ -207,6 +207,7 @@
     text-align: center;
     z-index: 100;
     box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+    display: none;
   }
 
   .game-over h2 {
@@ -250,24 +251,27 @@
 </div>
 
 <script>
-// Fixed configuration - using localStorage instead of JSONBin for reliability
-const CONFIG = {
-    STORAGE_KEY: 'plinko_game_state',
-    SESSION_KEY: 'plinko_active_session'
+const JSONBIN_CONFIG = {
+  BASE_URL: 'https://api.jsonbin.io/v3/b',
+  HEADERS: {
+    'Content-Type': 'application/json',
+    'X-Master-Key': '$2a$10$NckuWO.y9g8.amyZZWkc8.lKIMS.AVSCyN1qT9/0d5EtRjuV9lmS2',
+    'X-Access-Key': '$2a$10$g6RfQ66H6XQyYy3D848Cfurvs0dXgVt92aV0Rr0UqchZrBZwr7Vpy'
+  }
 };
 
-// Check for game parameter
+// FIXED: Check for game parameter (not session)
 const urlParams = new URLSearchParams(window.location.search);
-const sessionId = urlParams.get('session');
+const binId = urlParams.get('game'); // FIXED: Changed from 'session' to 'game'
 
-if (!sessionId) {
-    showError();
+if (!binId) {
+  showError();
 } else {
-    initGame(sessionId);
+  initGame(binId);
 }
 
 function showError() {
-    document.getElementById('gameContainer').innerHTML = `
+  document.getElementById('gameContainer').innerHTML = `
     <div class="error-screen">
       <div class="error-icon">⚠️</div>
       <h2 class="error-title">INVALID SESSION</h2>
@@ -279,646 +283,678 @@ function showError() {
   `;
 }
 
-function initGame(sessionId) {
-    try {
-        const savedState = localStorage.getItem(CONFIG.STORAGE_KEY);
-        if (!savedState) {
-            showError();
-            return;
-        }
-
-        const gameState = JSON.parse(savedState);
-        
-        // Verify session matches
-        if (gameState.sessionId !== sessionId) {
-            showError();
-            return;
-        }
-
-        // Mark player as connected
-        gameState.playerConnected = true;
-        gameState.lastActivity = Date.now();
-        localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(gameState));
-        
-        // Start game
-        startPlinko(sessionId, gameState);
-        
-    } catch (error) {
-        console.error('Error loading game:', error);
-        showError();
+async function initGame(binId) {
+  try {
+    const gameState = await readGameBin(binId);
+    
+    if (!gameState) {
+      throw new Error('Failed to load game');
     }
+    
+    // Mark player as connected
+    gameState.playerConnected = true;
+    gameState.lastUpdated = new Date().toISOString();
+    await updateGameBin(binId, gameState);
+    
+    // Start game
+    startPlinko(binId, gameState);
+    
+  } catch (error) {
+    console.error('Error loading game:', error);
+    showError();
+  }
 }
 
-function startPlinko(sessionId, gameState) {
-    const canvas = document.getElementById('plinkoCanvas');
-    const ctx = canvas.getContext('2d');
-    const W = canvas.width, H = canvas.height;
-    const DROP_ZONE_HEIGHT = 120;
-    const PUCK_RADIUS = 18;
-    const PEG_RADIUS = 8;
-    const NUM_ROWS = 12;
-    const NUM_SLOTS = 9;
-
-    let pegs = [];
-    let currentPuck = null;
-    let isDragging = false;
-    let hoverPuck = { x: W/2, y: DROP_ZONE_HEIGHT/2 };
-    let animationId = null;
-    let particles = [];
-    let lastTime = 0;
-    let gameActive = true;
-
-    // Define board configurations
-    const BOARD_CONFIGS = {
-        A: {
-            prizes: [
-                { name: "T-Shirt", symbol: "👕", color: "#FF6B6B", value: 1 },
-                { name: "Hat", symbol: "🧢", color: "#4ECDC4", value: 2 },
-                { name: "Sticker Pack", symbol: "⭐", color: "#45B7D1", value: 3 },
-                { name: "Water Bottle", symbol: "💧", color: "#96CEB4", value: 4 },
-                { name: "JACKPOT", symbol: "🎯", color: "#FFD700", value: 10 },
-                { name: "Water Bottle", symbol: "💧", color: "#96CEB4", value: 4 },
-                { name: "Sticker Pack", symbol: "⭐", color: "#45B7D1", value: 3 },
-                { name: "Hat", symbol: "🧢", color: "#4ECDC4", value: 2 },
-                { name: "T-Shirt", symbol: "👕", color: "#FF6B6B", value: 1 }
-            ]
-        },
-        B: {
-            prizes: [
-                { name: "Keychain", symbol: "🔑", color: "#FFA5A5", value: 1 },
-                { name: "Lanyard", symbol: "🎫", color: "#A5D6FF", value: 2 },
-                { name: "Pen", symbol: "✏️", color: "#B19CFF", value: 3 },
-                { name: "Notebook", symbol: "📓", color: "#FFB8A5", value: 4 },
-                { name: "JACKPOT", symbol: "🎯", color: "#FFD700", value: 15 },
-                { name: "Notebook", symbol: "📓", color: "#FFB8A5", value: 4 },
-                { name: "Pen", symbol: "✏️", color: "#B19CFF", value: 3 },
-                { name: "Lanyard", symbol: "🎫", color: "#A5D6FF", value: 2 },
-                { name: "Keychain", symbol: "🔑", color: "#FFA5A5", value: 1 }
-            ]
-        }
-    };
-
-    // Initialize pegs with proper physics layout
-    function initPegs() {
-        pegs = [];
-        const startY = DROP_ZONE_HEIGHT + 80;
-        const verticalSpacing = (H - startY - 180) / NUM_ROWS;
-        const horizontalSpacing = W / 8;
-        
-        for (let row = 0; row < NUM_ROWS; row++) {
-            const numPegs = 8 + (row % 2); // Alternating pattern
-            const offset = row % 2 === 0 ? horizontalSpacing / 2 : 0;
-            
-            for (let col = 0; col < numPegs; col++) {
-                pegs.push({
-                    x: offset + col * horizontalSpacing,
-                    y: startY + row * verticalSpacing,
-                    lastHit: 0 // For collision cooldown
-                });
-            }
-        }
+async function updateGameBin(binId, data) {
+  try {
+    const response = await fetch(`${JSONBIN_CONFIG.BASE_URL}/${binId}`, {
+      method: 'PUT',
+      headers: JSONBIN_CONFIG.HEADERS,
+      body: JSON.stringify(data)
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating JSONBin:', error);
+    throw error;
+  }
+}
 
-    function drawBoard() {
-        // Clear canvas with gradient background
-        const bgGradient = ctx.createLinearGradient(0, 0, 0, H);
-        bgGradient.addColorStop(0, '#001933');
-        bgGradient.addColorStop(1, '#003366');
-        ctx.fillStyle = bgGradient;
-        ctx.fillRect(0, 0, W, H);
-        
-        // Draw drop zone with interactive feedback
-        const dropGradient = ctx.createLinearGradient(0, 0, 0, DROP_ZONE_HEIGHT);
-        if (gameState.pucksRemaining > 0 && !currentPuck) {
-            dropGradient.addColorStop(0, '#69BE28');
-            dropGradient.addColorStop(1, '#2D5F1D');
-        } else {
-            dropGradient.addColorStop(0, '#4A8A1F');
-            dropGradient.addColorStop(1, '#1E3D1E');
-        }
-        ctx.fillStyle = dropGradient;
-        ctx.fillRect(0, 0, W, DROP_ZONE_HEIGHT);
-        
-        ctx.strokeStyle = '#002244';
-        ctx.lineWidth = 6;
-        ctx.strokeRect(0, 0, W, DROP_ZONE_HEIGHT);
-        
-        // Draw pegs with physics-optimized rendering
-        const currentTime = Date.now();
-        pegs.forEach(peg => {
-            const timeSinceHit = currentTime - peg.lastHit;
-            const glow = Math.max(0, 1 - (timeSinceHit / 300));
-            
-            const pegGradient = ctx.createRadialGradient(
-                peg.x - 3, peg.y - 3, 0, 
-                peg.x, peg.y, PEG_RADIUS
-            );
-            
-            if (glow > 0) {
-                pegGradient.addColorStop(0, '#FFFFFF');
-                pegGradient.addColorStop(0.3, '#FFD700');
-                pegGradient.addColorStop(1, '#FFA500');
-            } else {
-                pegGradient.addColorStop(0, '#FFD700');
-                pegGradient.addColorStop(0.7, '#FFA500');
-                pegGradient.addColorStop(1, '#CC8400');
-            }
-            
-            ctx.fillStyle = pegGradient;
-            ctx.beginPath();
-            ctx.arc(peg.x, peg.y, PEG_RADIUS, 0, Math.PI * 2);
-            ctx.fill();
-            
-            if (glow > 0) {
-                ctx.shadowColor = '#FFD700';
-                ctx.shadowBlur = 10 * glow;
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
-        });
-        
-        // Draw slots for current board
-        const currentBoardConfig = BOARD_CONFIGS[gameState.currentBoard];
-        const slotHeight = 100;
-        const slotWidth = W / NUM_SLOTS;
-        
-        currentBoardConfig.prizes.forEach((prize, index) => {
-            const slotGradient = ctx.createLinearGradient(
-                index * slotWidth, H - slotHeight, 
-                index * slotWidth, H
-            );
-            slotGradient.addColorStop(0, prize.color);
-            slotGradient.addColorStop(1, darkenColor(prize.color, 40));
-            
-            ctx.fillStyle = slotGradient;
-            ctx.fillRect(index * slotWidth, H - slotHeight, slotWidth, slotHeight);
-            
-            // Enhanced border for jackpot
-            ctx.strokeStyle = index === 4 ? '#FFD700' : '#69BE28';
-            ctx.lineWidth = index === 4 ? 6 : 3;
-            ctx.strokeRect(index * slotWidth, H - slotHeight, slotWidth, slotHeight);
-            
-            // Prize symbol
-            ctx.save();
-            ctx.translate(index * slotWidth + slotWidth/2, H - slotHeight/2);
-            ctx.rotate(-Math.PI/2);
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 22px Montserrat';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            
-            if (index === 4) {
-                ctx.shadowColor = '#FFD700';
-                ctx.shadowBlur = 15;
-            }
-            ctx.fillText(prize.symbol, 0, 0);
-            ctx.shadowBlur = 0;
-            ctx.restore();
-        });
-        
-        // Draw hover puck with glow effect
-        if (gameState.pucksRemaining > 0 && !currentPuck && !isDragging) {
-            drawPuck(hoverPuck.x, hoverPuck.y, 0, true);
-        }
-        
-        // Draw current puck with physics-based rotation
-        if (currentPuck) {
-            drawPuck(currentPuck.x, currentPuck.y, currentPuck.rotation, false);
-        }
-        
-        // Draw particles with physics
-        particles.forEach((particle, index) => {
-            particle.life--;
-            if (particle.life <= 0) {
-                particles.splice(index, 1);
-                return;
-            }
-            
-            particle.x += particle.vx;
-            particle.y += particle.vy;
-            particle.vy += 0.2; // Gravity
-            
-            ctx.globalAlpha = particle.life / particle.maxLife;
-            ctx.fillStyle = particle.color;
-            ctx.beginPath();
-            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-            ctx.fill();
-        });
-        ctx.globalAlpha = 1;
+async function readGameBin(binId) {
+  try {
+    const response = await fetch(`${JSONBIN_CONFIG.BASE_URL}/${binId}/latest`, {
+      headers: {
+        'X-Master-Key': JSONBIN_CONFIG.HEADERS['X-Master-Key'],
+        'X-Access-Key': JSONBIN_CONFIG.HEADERS['X-Access-Key']
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+    
+    const data = await response.json();
+    return data.record;
+  } catch (error) {
+    console.error('Error reading from JSONBin:', error);
+    return null;
+  }
+}
 
-    function darkenColor(color, percent) {
-        const num = parseInt(color.replace("#", ""), 16);
-        const amt = Math.round(2.55 * percent);
-        const R = Math.max(0, (num >> 16) - amt);
-        const G = Math.max(0, (num >> 8 & 0x00FF) - amt);
-        const B = Math.max(0, (num & 0x0000FF) - amt);
-        return "#" + (0x1000000 + (R < 255 ? R : 255) * 0x10000 +
-                      (G < 255 ? G : 255) * 0x100 +
-                      (B < 255 ? B : 255)).toString(16).slice(1);
+function startPlinko(binId, gameState) {
+  const canvas = document.getElementById('plinkoCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const DROP_ZONE_HEIGHT = 120;
+  const PUCK_RADIUS = 18;
+  const PEG_RADIUS = 8;
+  const NUM_ROWS = 12;
+  const NUM_SLOTS = 9;
+
+  let pegs = [];
+  let currentPuck = null;
+  let isDragging = false;
+  let hoverPuck = { x: W/2, y: DROP_ZONE_HEIGHT/2 };
+  let animationId = null;
+  let particles = [];
+  let lastTime = 0;
+  let gameActive = true;
+
+  // Define board configurations
+  const BOARD_CONFIGS = {
+    A: {
+      prizes: [
+        { name: "T-Shirt", symbol: "👕", color: "#FF6B6B", value: 1 },
+        { name: "Hat", symbol: "🧢", color: "#4ECDC4", value: 2 },
+        { name: "Sticker Pack", symbol: "⭐", color: "#45B7D1", value: 3 },
+        { name: "Water Bottle", symbol: "💧", color: "#96CEB4", value: 4 },
+        { name: "JACKPOT", symbol: "🎯", color: "#FFD700", value: 10 },
+        { name: "Water Bottle", symbol: "💧", color: "#96CEB4", value: 4 },
+        { name: "Sticker Pack", symbol: "⭐", color: "#45B7D1", value: 3 },
+        { name: "Hat", symbol: "🧢", color: "#4ECDC4", value: 2 },
+        { name: "T-Shirt", symbol: "👕", color: "#FF6B6B", value: 1 }
+      ]
+    },
+    B: {
+      prizes: [
+        { name: "Keychain", symbol: "🔑", color: "#FFA5A5", value: 1 },
+        { name: "Lanyard", symbol: "🎫", color: "#A5D6FF", value: 2 },
+        { name: "Pen", symbol: "✏️", color: "#B19CFF", value: 3 },
+        { name: "Notebook", symbol: "📓", color: "#FFB8A5", value: 4 },
+        { name: "JACKPOT", symbol: "🎯", color: "#FFD700", value: 15 },
+        { name: "Notebook", symbol: "📓", color: "#FFB8A5", value: 4 },
+        { name: "Pen", symbol: "✏️", color: "#B19CFF", value: 3 },
+        { name: "Lanyard", symbol: "🎫", color: "#A5D6FF", value: 2 },
+        { name: "Keychain", symbol: "🔑", color: "#FFA5A5", value: 1 }
+      ]
     }
+  };
 
-    function drawPuck(x, y, rotation = 0, isHover = false) {
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(rotation);
-        
-        // Enhanced puck gradient
-        const puckGradient = ctx.createRadialGradient(-8, -8, 0, 0, 0, PUCK_RADIUS);
-        if (isHover) {
-            puckGradient.addColorStop(0, '#FFFFFF');
-            puckGradient.addColorStop(0.3, '#FF6B6B');
-            puckGradient.addColorStop(1, '#CC0000');
-        } else {
-            puckGradient.addColorStop(0, '#FF6B6B');
-            puckGradient.addColorStop(0.5, '#EE5A52');
-            puckGradient.addColorStop(1, '#CC0000');
-        }
-        
-        ctx.fillStyle = puckGradient;
-        ctx.beginPath();
-        ctx.arc(0, 0, PUCK_RADIUS, 0, Math.PI * 2);
+  // Initialize pegs with proper physics layout
+  function initPegs() {
+    pegs = [];
+    const startY = DROP_ZONE_HEIGHT + 80;
+    const verticalSpacing = (H - startY - 180) / NUM_ROWS;
+    const horizontalSpacing = W / 8;
+    
+    for (let row = 0; row < NUM_ROWS; row++) {
+      const numPegs = 8 + (row % 2); // Alternating pattern
+      const offset = row % 2 === 0 ? horizontalSpacing / 2 : 0;
+      
+      for (let col = 0; col < numPegs; col++) {
+        pegs.push({
+          x: offset + col * horizontalSpacing,
+          y: startY + row * verticalSpacing,
+          lastHit: 0 // For collision cooldown
+        });
+      }
+    }
+  }
+
+  function drawBoard() {
+    // Clear canvas with gradient background
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, H);
+    bgGradient.addColorStop(0, '#001933');
+    bgGradient.addColorStop(1, '#003366');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, W, H);
+    
+    // Draw drop zone with interactive feedback
+    const dropGradient = ctx.createLinearGradient(0, 0, 0, DROP_ZONE_HEIGHT);
+    if (gameState.pucksRemaining > 0 && !currentPuck) {
+      dropGradient.addColorStop(0, '#69BE28');
+      dropGradient.addColorStop(1, '#2D5F1D');
+    } else {
+      dropGradient.addColorStop(0, '#4A8A1F');
+      dropGradient.addColorStop(1, '#1E3D1E');
+    }
+    ctx.fillStyle = dropGradient;
+    ctx.fillRect(0, 0, W, DROP_ZONE_HEIGHT);
+    
+    ctx.strokeStyle = '#002244';
+    ctx.lineWidth = 6;
+    ctx.strokeRect(0, 0, W, DROP_ZONE_HEIGHT);
+    
+    // Draw pegs with physics-optimized rendering
+    const currentTime = Date.now();
+    pegs.forEach(peg => {
+      const timeSinceHit = currentTime - peg.lastHit;
+      const glow = Math.max(0, 1 - (timeSinceHit / 300));
+      
+      const pegGradient = ctx.createRadialGradient(
+        peg.x - 3, peg.y - 3, 0, 
+        peg.x, peg.y, PEG_RADIUS
+      );
+      
+      if (glow > 0) {
+        pegGradient.addColorStop(0, '#FFFFFF');
+        pegGradient.addColorStop(0.3, '#FFD700');
+        pegGradient.addColorStop(1, '#FFA500');
+      } else {
+        pegGradient.addColorStop(0, '#FFD700');
+        pegGradient.addColorStop(0.7, '#FFA500');
+        pegGradient.addColorStop(1, '#CC8400');
+      }
+      
+      ctx.fillStyle = pegGradient;
+      ctx.beginPath();
+      ctx.arc(peg.x, peg.y, PEG_RADIUS, 0, Math.PI * 2);
+      ctx.fill();
+      
+      if (glow > 0) {
+        ctx.shadowColor = '#FFD700';
+        ctx.shadowBlur = 10 * glow;
         ctx.fill();
-        
-        // Enhanced border
-        ctx.strokeStyle = '#002244';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        
-        // Logo/details
-        ctx.fillStyle = '#002244';
-        ctx.beginPath();
-        ctx.arc(-6, -6, PUCK_RADIUS * 0.25, 0, Math.PI * 2);
-        ctx.fill();
-        
-        ctx.fillStyle = 'white';
-        ctx.font = 'bold 14px Montserrat';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('USL', 0, 0);
-        
-        // Hover glow effect
-        if (isHover) {
-            ctx.shadowColor = '#FF6B6B';
-            ctx.shadowBlur = 15;
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-        }
-        
-        ctx.restore();
-    }
-
-    function updatePhysics(timestamp) {
-        if (!currentPuck || !gameActive) return;
-        
-        const deltaTime = timestamp - lastTime;
-        lastTime = timestamp;
-        
-        // Apply gravity with delta time
-        currentPuck.vy += 0.5 * (deltaTime / 16);
-        currentPuck.x += currentPuck.vx * (deltaTime / 16);
-        currentPuck.y += currentPuck.vy * (deltaTime / 16);
-        currentPuck.rotation += currentPuck.vx * 0.02 * (deltaTime / 16);
-        
-        // Air resistance
-        currentPuck.vx *= 0.998;
-        currentPuck.vy *= 0.998;
-        
-        // Wall collisions with energy loss
-        if (currentPuck.x - PUCK_RADIUS < 0) {
-            currentPuck.x = PUCK_RADIUS;
-            currentPuck.vx = Math.abs(currentPuck.vx) * 0.7;
-        } else if (currentPuck.x + PUCK_RADIUS > W) {
-            currentPuck.x = W - PUCK_RADIUS;
-            currentPuck.vx = -Math.abs(currentPuck.vx) * 0.7;
-        }
-        
-        // Enhanced peg collisions with cooldown
-        const currentTime = Date.now();
-        pegs.forEach(peg => {
-            if (currentTime - peg.lastHit < 100) return; // Collision cooldown
-            
-            const dx = currentPuck.x - peg.x;
-            const dy = currentPuck.y - peg.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const minDistance = PUCK_RADIUS + PEG_RADIUS;
-            
-            if (distance < minDistance) {
-                peg.lastHit = currentTime;
-                
-                // Normalize collision vector
-                const nx = dx / distance;
-                const ny = dy / distance;
-                
-                // Separate the puck from the peg
-                const overlap = minDistance - distance;
-                currentPuck.x += nx * overlap * 0.5;
-                currentPuck.y += ny * overlap * 0.5;
-                
-                // Calculate reflection with energy loss and randomness
-                const dot = currentPuck.vx * nx + currentPuck.vy * ny;
-                currentPuck.vx -= 1.8 * dot * nx;
-                currentPuck.vy -= 1.8 * dot * ny;
-                
-                // Add realistic randomness
-                currentPuck.vx += (Math.random() - 0.5) * 2;
-                currentPuck.vy += (Math.random() - 0.5) * 1;
-                
-                // Rotation based on collision
-                currentPuck.rotation += currentPuck.vx * 0.05;
-                
-                // Collision particles
-                for (let i = 0; i < 3; i++) {
-                    particles.push({
-                        x: currentPuck.x,
-                        y: currentPuck.y,
-                        vx: (Math.random() - 0.5) * 8,
-                        vy: (Math.random() - 0.5) * 8,
-                        life: 30,
-                        maxLife: 30,
-                        size: Math.random() * 2 + 1,
-                        color: '#FFD700'
-                    });
-                }
-            }
-        });
-        
-        // Check if puck reached bottom slots
-        if (currentPuck.y + PUCK_RADIUS > H - 100) {
-            handlePuckLanding();
-            return;
-        }
-        
-        // Continue animation
-        drawBoard();
-        animationId = requestAnimationFrame(updatePhysics);
-    }
-
-    function handlePuckLanding() {
-        const slotWidth = W / NUM_SLOTS;
-        const slotIndex = Math.min(NUM_SLOTS - 1, Math.max(0, Math.floor(currentPuck.x / slotWidth)));
-        const currentBoardConfig = BOARD_CONFIGS[gameState.currentBoard];
-        const prize = currentBoardConfig.prizes[slotIndex];
-        
-        // Record result
-        if (!gameState.results) gameState.results = [];
-        gameState.results.push({
-            board: gameState.currentBoard,
-            slot: slotIndex,
-            prize: prize.name,
-            value: prize.value,
-            timestamp: Date.now()
-        });
-        
-        // Create celebration particles
-        for (let i = 0; i < 80; i++) {
-            particles.push({
-                x: currentPuck.x,
-                y: H - 50,
-                vx: (Math.random() - 0.5) * 15,
-                vy: -Math.random() * 20,
-                life: 120,
-                maxLife: 120,
-                size: Math.random() * 6 + 2,
-                color: prize.color
-            });
-        }
-        
-        // Jackpot celebration
-        if (slotIndex === 4) {
-            const winElement = document.createElement('div');
-            winElement.className = 'bigwin';
-            winElement.textContent = 'JACKPOT!';
-            document.body.appendChild(winElement);
-            setTimeout(() => winElement.remove(), 2500);
-            
-            // Extra particles for jackpot
-            for (let i = 0; i < 50; i++) {
-                particles.push({
-                    x: W / 2,
-                    y: H / 2,
-                    vx: (Math.random() - 0.5) * 25,
-                    vy: (Math.random() - 0.5) * 25,
-                    life: 180,
-                    maxLife: 180,
-                    size: Math.random() * 8 + 3,
-                    color: '#FFD700'
-                });
-            }
-        }
-        
-        // Update game state
-        gameState.pucksRemaining--;
-        gameState.lastActivity = Date.now();
-        
-        // Save state immediately
-        saveState();
-        
-        // Check for board switch
-        if (gameState.boardConfig === 'BOTH' && gameState.currentBoard === 'A' && 
-            gameState.pucksRemaining <= gameState.puckCountB) {
-            gameState.currentBoard = 'B';
-            initPegs(); // Reinitialize pegs for new board
-        }
-        
-        // Check for game completion
-        if (gameState.pucksRemaining <= 0) {
-            gameActive = false;
-            setTimeout(() => {
-                document.getElementById('gameOverScreen').style.display = 'block';
-            }, 2000);
-        }
-        
-        currentPuck = null;
-        updateDisplay();
-        
-        cancelAnimationFrame(animationId);
-        drawBoard();
-    }
-
-    function animateHoverPuck() {
-        if (!gameActive) return;
-        
-        if (currentPuck || gameState.pucksRemaining === 0) {
-            requestAnimationFrame(animateHoverPuck);
-            return;
-        }
-        
-        // Smooth hovering motion
-        const time = Date.now() * 0.002;
-        hoverPuck.x = W/2 + Math.sin(time) * (W/2 - PUCK_RADIUS - 60);
-        hoverPuck.y = DROP_ZONE_HEIGHT/2 + Math.cos(time * 0.7) * 10;
-        
-        drawBoard();
-        requestAnimationFrame(animateHoverPuck);
-    }
-
-    function updateDisplay() {
-        document.getElementById('puckCounter').textContent = gameState.pucksRemaining;
-        document.getElementById('currentBoard').textContent = `BOARD ${gameState.currentBoard}`;
-        
-        // Update puck counter color based on remaining count
-        const puckCounter = document.getElementById('puckCounter');
-        if (gameState.pucksRemaining <= 2) {
-            puckCounter.style.color = '#FF6B6B';
-        } else if (gameState.pucksRemaining <= 5) {
-            puckCounter.style.color = '#FFA726';
-        } else {
-            puckCounter.style.color = '#69BE28';
-        }
-    }
-
-    function saveState() {
-        try {
-            localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(gameState));
-        } catch (error) {
-            console.error('Failed to save game state:', error);
-        }
-    }
-
-    // Enhanced event handlers
-    canvas.addEventListener('mousemove', (e) => {
-        if (!gameActive) return;
-        
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const x = (e.clientX - rect.left) * scaleX;
-        const y = (e.clientY - rect.top) * scaleY;
-        
-        if (isDragging && currentPuck) {
-            // Constrain to drop zone during drag
-            currentPuck.x = Math.max(PUCK_RADIUS, Math.min(W - PUCK_RADIUS, x));
-            currentPuck.y = Math.max(PUCK_RADIUS, Math.min(DROP_ZONE_HEIGHT - PUCK_RADIUS, y));
-            drawBoard();
-        } else if (gameState.pucksRemaining > 0 && !currentPuck) {
-            hoverPuck.x = x;
-            hoverPuck.y = y;
-        }
+        ctx.shadowBlur = 0;
+      }
     });
-
-    canvas.addEventListener('mousedown', (e) => {
-        if (!gameActive || currentPuck || gameState.pucksRemaining === 0) return;
-        
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const x = (e.clientX - rect.left) * scaleX;
-        const y = (e.clientY - rect.top) * scaleY;
-        
-        // Check if clicking near hover puck
-        const distance = Math.sqrt(Math.pow(x - hoverPuck.x, 2) + Math.pow(y - hoverPuck.y, 2));
-        
-        if (distance < PUCK_RADIUS * 2) {
-            isDragging = true;
-            currentPuck = { 
-                x: x, 
-                y: y, 
-                vx: 0, 
-                vy: 0, 
-                rotation: 0 
-            };
-            gameState.lastActivity = Date.now();
-            saveState();
-            drawBoard();
-        }
+    
+    // Draw slots for current board
+    const currentBoardConfig = BOARD_CONFIGS[gameState.currentBoard];
+    const slotHeight = 100;
+    const slotWidth = W / NUM_SLOTS;
+    
+    currentBoardConfig.prizes.forEach((prize, index) => {
+      const slotGradient = ctx.createLinearGradient(
+        index * slotWidth, H - slotHeight, 
+        index * slotWidth, H
+      );
+      slotGradient.addColorStop(0, prize.color);
+      slotGradient.addColorStop(1, darkenColor(prize.color, 40));
+      
+      ctx.fillStyle = slotGradient;
+      ctx.fillRect(index * slotWidth, H - slotHeight, slotWidth, slotHeight);
+      
+      // Enhanced border for jackpot
+      ctx.strokeStyle = index === 4 ? '#FFD700' : '#69BE28';
+      ctx.lineWidth = index === 4 ? 6 : 3;
+      ctx.strokeRect(index * slotWidth, H - slotHeight, slotWidth, slotHeight);
+      
+      // Prize symbol
+      ctx.save();
+      ctx.translate(index * slotWidth + slotWidth/2, H - slotHeight/2);
+      ctx.rotate(-Math.PI/2);
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 22px Montserrat';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      if (index === 4) {
+        ctx.shadowColor = '#FFD700';
+        ctx.shadowBlur = 15;
+      }
+      ctx.fillText(prize.symbol, 0, 0);
+      ctx.shadowBlur = 0;
+      ctx.restore();
     });
-
-    canvas.addEventListener('mouseup', () => {
-        if (!gameActive || !isDragging || !currentPuck) return;
-        
-        isDragging = false;
-        
-        // Enhanced release validation
-        if (currentPuck.y > DROP_ZONE_HEIGHT) {
-            const warning = document.getElementById('releaseWarning');
-            warning.classList.add('show');
-            setTimeout(() => warning.classList.remove('show'), 2000);
-            currentPuck = null;
-            drawBoard();
-            return;
-        }
-        
-        // Calculate initial velocity based on release position
-        const centerX = W / 2;
-        currentPuck.vx = (currentPuck.x - centerX) * 0.8;
-        currentPuck.vy = 3 + Math.random() * 2;
-        
-        lastTime = performance.now();
-        animationId = requestAnimationFrame(updatePhysics);
-        saveState();
+    
+    // Draw hover puck with glow effect
+    if (gameState.pucksRemaining > 0 && !currentPuck && !isDragging) {
+      drawPuck(hoverPuck.x, hoverPuck.y, 0, true);
+    }
+    
+    // Draw current puck with physics-based rotation
+    if (currentPuck) {
+      drawPuck(currentPuck.x, currentPuck.y, currentPuck.rotation, false);
+    }
+    
+    // Draw particles with physics
+    particles.forEach((particle, index) => {
+      particle.life--;
+      if (particle.life <= 0) {
+        particles.splice(index, 1);
+        return;
+      }
+      
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+      particle.vy += 0.2; // Gravity
+      
+      ctx.globalAlpha = particle.life / particle.maxLife;
+      ctx.fillStyle = particle.color;
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+      ctx.fill();
     });
+    ctx.globalAlpha = 1;
+  }
 
-    // Touch support for mobile devices
-    canvas.addEventListener('touchmove', (e) => {
-        if (!gameActive) return;
-        e.preventDefault();
+  function darkenColor(color, percent) {
+    const num = parseInt(color.replace("#", ""), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = Math.max(0, (num >> 16) - amt);
+    const G = Math.max(0, (num >> 8 & 0x00FF) - amt);
+    const B = Math.max(0, (num & 0x0000FF) - amt);
+    return "#" + (0x1000000 + (R < 255 ? R : 255) * 0x10000 +
+                  (G < 255 ? G : 255) * 0x100 +
+                  (B < 255 ? B : 255)).toString(16).slice(1);
+  }
+
+  function drawPuck(x, y, rotation = 0, isHover = false) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rotation);
+    
+    // Enhanced puck gradient
+    const puckGradient = ctx.createRadialGradient(-8, -8, 0, 0, 0, PUCK_RADIUS);
+    if (isHover) {
+      puckGradient.addColorStop(0, '#FFFFFF');
+      puckGradient.addColorStop(0.3, '#FF6B6B');
+      puckGradient.addColorStop(1, '#CC0000');
+    } else {
+      puckGradient.addColorStop(0, '#FF6B6B');
+      puckGradient.addColorStop(0.5, '#EE5A52');
+      puckGradient.addColorStop(1, '#CC0000');
+    }
+    
+    ctx.fillStyle = puckGradient;
+    ctx.beginPath();
+    ctx.arc(0, 0, PUCK_RADIUS, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Enhanced border
+    ctx.strokeStyle = '#002244';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    // Logo/details
+    ctx.fillStyle = '#002244';
+    ctx.beginPath();
+    ctx.arc(-6, -6, PUCK_RADIUS * 0.25, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 14px Montserrat';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('USL', 0, 0);
+    
+    // Hover glow effect
+    if (isHover) {
+      ctx.shadowColor = '#FF6B6B';
+      ctx.shadowBlur = 15;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+    
+    ctx.restore();
+  }
+
+  function updatePhysics(timestamp) {
+    if (!currentPuck || !gameActive) return;
+    
+    const deltaTime = timestamp - lastTime;
+    lastTime = timestamp;
+    
+    // Apply gravity with delta time
+    currentPuck.vy += 0.5 * (deltaTime / 16);
+    currentPuck.x += currentPuck.vx * (deltaTime / 16);
+    currentPuck.y += currentPuck.vy * (deltaTime / 16);
+    currentPuck.rotation += currentPuck.vx * 0.02 * (deltaTime / 16);
+    
+    // Air resistance
+    currentPuck.vx *= 0.998;
+    currentPuck.vy *= 0.998;
+    
+    // Wall collisions with energy loss
+    if (currentPuck.x - PUCK_RADIUS < 0) {
+      currentPuck.x = PUCK_RADIUS;
+      currentPuck.vx = Math.abs(currentPuck.vx) * 0.7;
+    } else if (currentPuck.x + PUCK_RADIUS > W) {
+      currentPuck.x = W - PUCK_RADIUS;
+      currentPuck.vx = -Math.abs(currentPuck.vx) * 0.7;
+    }
+    
+    // Enhanced peg collisions with cooldown
+    const currentTime = Date.now();
+    pegs.forEach(peg => {
+      if (currentTime - peg.lastHit < 100) return; // Collision cooldown
+      
+      const dx = currentPuck.x - peg.x;
+      const dy = currentPuck.y - peg.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const minDistance = PUCK_RADIUS + PEG_RADIUS;
+      
+      if (distance < minDistance) {
+        peg.lastHit = currentTime;
         
-        const touch = e.touches[0];
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const x = (touch.clientX - rect.left) * scaleX;
-        const y = (touch.clientY - rect.top) * scaleY;
+        // Normalize collision vector
+        const nx = dx / distance;
+        const ny = dy / distance;
         
-        if (isDragging && currentPuck) {
-            currentPuck.x = Math.max(PUCK_RADIUS, Math.min(W - PUCK_RADIUS, x));
-            currentPuck.y = Math.max(PUCK_RADIUS, Math.min(DROP_ZONE_HEIGHT - PUCK_RADIUS, y));
-            drawBoard();
+        // Separate the puck from the peg
+        const overlap = minDistance - distance;
+        currentPuck.x += nx * overlap * 0.5;
+        currentPuck.y += ny * overlap * 0.5;
+        
+        // Calculate reflection with energy loss and randomness
+        const dot = currentPuck.vx * nx + currentPuck.vy * ny;
+        currentPuck.vx -= 1.8 * dot * nx;
+        currentPuck.vy -= 1.8 * dot * ny;
+        
+        // Add realistic randomness
+        currentPuck.vx += (Math.random() - 0.5) * 2;
+        currentPuck.vy += (Math.random() - 0.5) * 1;
+        
+        // Rotation based on collision
+        currentPuck.rotation += currentPuck.vx * 0.05;
+        
+        // Collision particles
+        for (let i = 0; i < 3; i++) {
+          particles.push({
+            x: currentPuck.x,
+            y: currentPuck.y,
+            vx: (Math.random() - 0.5) * 8,
+            vy: (Math.random() - 0.5) * 8,
+            life: 30,
+            maxLife: 30,
+            size: Math.random() * 2 + 1,
+            color: '#FFD700'
+          });
         }
+      }
     });
-
-    canvas.addEventListener('touchstart', (e) => {
-        if (!gameActive || currentPuck || gameState.pucksRemaining === 0) return;
-        e.preventDefault();
-        
-        const touch = e.touches[0];
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const x = (touch.clientX - rect.left) * scaleX;
-        const y = (touch.clientY - rect.top) * scaleY;
-        
-        const distance = Math.sqrt(Math.pow(x - hoverPuck.x, 2) + Math.pow(y - hoverPuck.y, 2));
-        
-        if (distance < PUCK_RADIUS * 2) {
-            isDragging = true;
-            currentPuck = { x, y, vx: 0, vy: 0, rotation: 0 };
-            gameState.lastActivity = Date.now();
-            saveState();
-            drawBoard();
-        }
-    });
-
-    canvas.addEventListener('touchend', (e) => {
-        if (!gameActive || !isDragging || !currentPuck) return;
-        e.preventDefault();
-        
-        isDragging = false;
-        
-        if (currentPuck.y > DROP_ZONE_HEIGHT) {
-            const warning = document.getElementById('releaseWarning');
-            warning.classList.add('show');
-            setTimeout(() => warning.classList.remove('show'), 2000);
-            currentPuck = null;
-            drawBoard();
-            return;
-        }
-        
-        const centerX = W / 2;
-        currentPuck.vx = (currentPuck.x - centerX) * 0.8;
-        currentPuck.vy = 3 + Math.random() * 2;
-        
-        lastTime = performance.now();
-        animationId = requestAnimationFrame(updatePhysics);
-        saveState();
-    });
-
-    // Initialize game
-    initPegs();
-    updateDisplay();
+    
+    // Check if puck reached bottom slots
+    if (currentPuck.y + PUCK_RADIUS > H - 100) {
+      handlePuckLanding();
+      return;
+    }
+    
+    // Continue animation
     drawBoard();
-    animateHoverPuck();
+    animationId = requestAnimationFrame(updatePhysics);
+  }
+
+  function handlePuckLanding() {
+    const slotWidth = W / NUM_SLOTS;
+    const slotIndex = Math.min(NUM_SLOTS - 1, Math.max(0, Math.floor(currentPuck.x / slotWidth)));
+    const currentBoardConfig = BOARD_CONFIGS[gameState.currentBoard];
+    const prize = currentBoardConfig.prizes[slotIndex];
+    
+    // Record result
+    if (!gameState.results) gameState.results = [];
+    gameState.results.push({
+      board: gameState.currentBoard,
+      slot: slotIndex,
+      prize: prize.name,
+      value: prize.value,
+      timestamp: Date.now()
+    });
+    
+    // Create celebration particles
+    for (let i = 0; i < 80; i++) {
+      particles.push({
+        x: currentPuck.x,
+        y: H - 50,
+        vx: (Math.random() - 0.5) * 15,
+        vy: -Math.random() * 20,
+        life: 120,
+        maxLife: 120,
+        size: Math.random() * 6 + 2,
+        color: prize.color
+      });
+    }
+    
+    // Jackpot celebration
+    if (slotIndex === 4) {
+      const winElement = document.createElement('div');
+      winElement.className = 'bigwin';
+      winElement.textContent = 'JACKPOT!';
+      document.body.appendChild(winElement);
+      setTimeout(() => winElement.remove(), 2500);
+      
+      // Extra particles for jackpot
+      for (let i = 0; i < 50; i++) {
+        particles.push({
+          x: W / 2,
+          y: H / 2,
+          vx: (Math.random() - 0.5) * 25,
+          vy: (Math.random() - 0.5) * 25,
+          life: 180,
+          maxLife: 180,
+          size: Math.random() * 8 + 3,
+          color: '#FFD700'
+        });
+      }
+    }
+    
+    // Update game state
+    gameState.pucksRemaining--;
+    gameState.lastUpdated = new Date().toISOString();
+    
+    // Save state immediately
+    saveState();
+    
+    // Check for board switch
+    if (gameState.boardConfig === 'BOTH' && gameState.currentBoard === 'A' && 
+        gameState.pucksRemaining <= gameState.puckCountB) {
+      gameState.currentBoard = 'B';
+      initPegs(); // Reinitialize pegs for new board
+    }
+    
+    // Check for game completion
+    if (gameState.pucksRemaining <= 0) {
+      gameActive = false;
+      setTimeout(() => {
+        document.getElementById('gameOverScreen').style.display = 'block';
+      }, 2000);
+    }
+    
+    currentPuck = null;
+    updateDisplay();
+    
+    cancelAnimationFrame(animationId);
+    drawBoard();
+  }
+
+  function animateHoverPuck() {
+    if (!gameActive) return;
+    
+    if (currentPuck || gameState.pucksRemaining === 0) {
+      requestAnimationFrame(animateHoverPuck);
+      return;
+    }
+    
+    // Smooth hovering motion
+    const time = Date.now() * 0.002;
+    hoverPuck.x = W/2 + Math.sin(time) * (W/2 - PUCK_RADIUS - 60);
+    hoverPuck.y = DROP_ZONE_HEIGHT/2 + Math.cos(time * 0.7) * 10;
+    
+    drawBoard();
+    requestAnimationFrame(animateHoverPuck);
+  }
+
+  function updateDisplay() {
+    document.getElementById('puckCounter').textContent = gameState.pucksRemaining;
+    document.getElementById('currentBoard').textContent = `BOARD ${gameState.currentBoard}`;
+    
+    // Update puck counter color based on remaining count
+    const puckCounter = document.getElementById('puckCounter');
+    if (gameState.pucksRemaining <= 2) {
+      puckCounter.style.color = '#FF6B6B';
+    } else if (gameState.pucksRemaining <= 5) {
+      puckCounter.style.color = '#FFA726';
+    } else {
+      puckCounter.style.color = '#69BE28';
+    }
+  }
+
+  async function saveState() {
+    try {
+      await updateGameBin(binId, gameState);
+    } catch (error) {
+      console.error('Failed to save game state:', error);
+    }
+  }
+
+  // Enhanced event handlers
+  canvas.addEventListener('mousemove', (e) => {
+    if (!gameActive) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    
+    if (isDragging && currentPuck) {
+      // Constrain to drop zone during drag
+      currentPuck.x = Math.max(PUCK_RADIUS, Math.min(W - PUCK_RADIUS, x));
+      currentPuck.y = Math.max(PUCK_RADIUS, Math.min(DROP_ZONE_HEIGHT - PUCK_RADIUS, y));
+      drawBoard();
+    } else if (gameState.pucksRemaining > 0 && !currentPuck) {
+      hoverPuck.x = x;
+      hoverPuck.y = y;
+    }
+  });
+
+  canvas.addEventListener('mousedown', (e) => {
+    if (!gameActive || currentPuck || gameState.pucksRemaining === 0) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    
+    // Check if clicking near hover puck
+    const distance = Math.sqrt(Math.pow(x - hoverPuck.x, 2) + Math.pow(y - hoverPuck.y, 2));
+    
+    if (distance < PUCK_RADIUS * 2) {
+      isDragging = true;
+      currentPuck = { 
+        x: x, 
+        y: y, 
+        vx: 0, 
+        vy: 0, 
+        rotation: 0 
+      };
+      gameState.lastUpdated = new Date().toISOString();
+      saveState();
+      drawBoard();
+    }
+  });
+
+  canvas.addEventListener('mouseup', () => {
+    if (!gameActive || !isDragging || !currentPuck) return;
+    
+    isDragging = false;
+    
+    // Enhanced release validation
+    if (currentPuck.y > DROP_ZONE_HEIGHT) {
+      const warning = document.getElementById('releaseWarning');
+      warning.classList.add('show');
+      setTimeout(() => warning.classList.remove('show'), 2000);
+      currentPuck = null;
+      drawBoard();
+      return;
+    }
+    
+    // Calculate initial velocity based on release position
+    const centerX = W / 2;
+    currentPuck.vx = (currentPuck.x - centerX) * 0.8;
+    currentPuck.vy = 3 + Math.random() * 2;
+    
+    lastTime = performance.now();
+    animationId = requestAnimationFrame(updatePhysics);
+    saveState();
+  });
+
+  // Touch support for mobile devices
+  canvas.addEventListener('touchmove', (e) => {
+    if (!gameActive) return;
+    e.preventDefault();
+    
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (touch.clientX - rect.left) * scaleX;
+    const y = (touch.clientY - rect.top) * scaleY;
+    
+    if (isDragging && currentPuck) {
+      currentPuck.x = Math.max(PUCK_RADIUS, Math.min(W - PUCK_RADIUS, x));
+      currentPuck.y = Math.max(PUCK_RADIUS, Math.min(DROP_ZONE_HEIGHT - PUCK_RADIUS, y));
+      drawBoard();
+    }
+  });
+
+  canvas.addEventListener('touchstart', (e) => {
+    if (!gameActive || currentPuck || gameState.pucksRemaining === 0) return;
+    e.preventDefault();
+    
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (touch.clientX - rect.left) * scaleX;
+    const y = (touch.clientY - rect.top) * scaleY;
+    
+    const distance = Math.sqrt(Math.pow(x - hoverPuck.x, 2) + Math.pow(y - hoverPuck.y, 2));
+    
+    if (distance < PUCK_RADIUS * 2) {
+      isDragging = true;
+      currentPuck = { x, y, vx: 0, vy: 0, rotation: 0 };
+      gameState.lastUpdated = new Date().toISOString();
+      saveState();
+      drawBoard();
+    }
+  });
+
+  canvas.addEventListener('touchend', (e) => {
+    if (!gameActive || !isDragging || !currentPuck) return;
+    e.preventDefault();
+    
+    isDragging = false;
+    
+    if (currentPuck.y > DROP_ZONE_HEIGHT) {
+      const warning = document.getElementById('releaseWarning');
+      warning.classList.add('show');
+      setTimeout(() => warning.classList.remove('show'), 2000);
+      currentPuck = null;
+      drawBoard();
+      return;
+    }
+    
+    const centerX = W / 2;
+    currentPuck.vx = (currentPuck.x - centerX) * 0.8;
+    currentPuck.vy = 3 + Math.random() * 2;
+    
+    lastTime = performance.now();
+    animationId = requestAnimationFrame(updatePhysics);
+    saveState();
+  });
+
+  // Initialize game
+  initPegs();
+  updateDisplay();
+  drawBoard();
+  animateHoverPuck();
 }
 </script>
 </body>
