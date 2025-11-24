@@ -622,6 +622,9 @@
         elements.boardOptions.forEach(opt => opt.classList.remove('selected'));
         this.classList.add('selected');
         currentGameState.boardConfig = this.dataset.board;
+        
+        // Update puck configuration visibility based on board selection
+        updatePuckConfigVisibility();
       });
     });
 
@@ -642,32 +645,66 @@
     setInterval(checkGameState, 2000);
   }
 
+  function updatePuckConfigVisibility() {
+    const puckConfigA = elements.puckCountA.closest('.puck-config-item');
+    const puckConfigB = elements.puckCountB.closest('.puck-config-item');
+    
+    switch(currentGameState.boardConfig) {
+      case 'A':
+        puckConfigA.style.display = 'block';
+        puckConfigB.style.display = 'none';
+        break;
+      case 'B':
+        puckConfigA.style.display = 'none';
+        puckConfigB.style.display = 'block';
+        break;
+      case 'BOTH':
+        puckConfigA.style.display = 'block';
+        puckConfigB.style.display = 'block';
+        break;
+    }
+  }
+
   function createGame() {
     const playerName = elements.playerName.value.trim();
     
     if (!playerName) {
-      alert('Please enter a player name!');
+      showAlert('Please enter a player name!');
       elements.playerName.focus();
       return;
     }
 
     const sessionId = generateSessionId();
     
+    // Calculate initial puck counts based on board configuration
+    let initialPucksRemaining = 0;
+    let puckCountA = parseInt(elements.puckCountA.value);
+    let puckCountB = parseInt(elements.puckCountB.value);
+    
+    switch(currentGameState.boardConfig) {
+      case 'A':
+        initialPucksRemaining = puckCountA;
+        break;
+      case 'B':
+        initialPucksRemaining = puckCountB;
+        break;
+      case 'BOTH':
+        initialPucksRemaining = puckCountA + puckCountB;
+        break;
+    }
+
     currentGameState = {
       sessionId: sessionId,
       playerName: playerName,
       boardConfig: currentGameState.boardConfig,
-      puckCountA: parseInt(elements.puckCountA.value),
-      puckCountB: parseInt(elements.puckCountB.value),
+      puckCountA: puckCountA,
+      puckCountB: puckCountB,
       currentBoard: currentGameState.boardConfig === 'BOTH' ? 'A' : currentGameState.boardConfig,
-      pucksRemaining: currentGameState.boardConfig === 'BOTH' ? 
-        parseInt(elements.puckCountA.value) + parseInt(elements.puckCountB.value) :
-        currentGameState.boardConfig === 'A' ? 
-          parseInt(elements.puckCountA.value) : 
-          parseInt(elements.puckCountB.value),
+      pucksRemaining: initialPucksRemaining,
       gameActive: true,
       results: [],
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      totalPucks: initialPucksRemaining // Track total for percentage calculations
     };
 
     saveGameState();
@@ -699,15 +736,15 @@
   }
 
   function generatePlayerUrl(sessionId) {
-    const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
-    return `${baseUrl}${CONFIG.GAME_PAGE}?session=${sessionId}`;
+    const baseUrl = window.location.origin + window.location.pathname;
+    return baseUrl.replace('index.html', CONFIG.GAME_PAGE) + '?session=' + sessionId;
   }
 
   function copyGameLink() {
     elements.gameLink.select();
     elements.gameLink.setSelectionRange(0, 99999);
     
-    if (navigator.clipboard) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(elements.gameLink.value)
         .then(() => showCopySuccess())
         .catch(() => fallbackCopy());
@@ -718,21 +755,30 @@
   
   function fallbackCopy() {
     try {
-      document.execCommand('copy');
-      showCopySuccess();
+      const successful = document.execCommand('copy');
+      if (successful) {
+        showCopySuccess();
+      } else {
+        showAlert('Please manually copy: ' + elements.gameLink.value);
+      }
     } catch (err) {
-      alert('Please manually copy: ' + elements.gameLink.value);
+      showAlert('Please manually copy: ' + elements.gameLink.value);
     }
   }
   
   function showCopySuccess() {
+    const originalText = elements.copyGameLink.textContent;
     elements.copyGameLink.textContent = '✅ COPIED!';
     elements.copyGameLink.style.background = '#69BE28';
     setTimeout(() => {
-      elements.copyGameLink.textContent = '📋 COPY';
+      elements.copyGameLink.textContent = originalText;
       elements.copyGameLink.style.background = '';
     }, 2000);
-    addNotification('Link copied!', 'success');
+    addNotification('Link copied to clipboard!', 'success');
+  }
+
+  function showAlert(message) {
+    alert(message);
   }
 
   function saveGameState() {
@@ -740,7 +786,8 @@
       localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(currentGameState));
       localStorage.setItem(CONFIG.SESSION_KEY, currentGameState.sessionId);
     } catch (e) {
-      console.error('Failed to save:', e);
+      console.error('Failed to save game state:', e);
+      addNotification('❌ Failed to save game state', 'error');
     }
   }
 
@@ -749,46 +796,74 @@
       const savedState = localStorage.getItem(CONFIG.STORAGE_KEY);
       if (savedState) {
         const parsedState = JSON.parse(savedState);
-        if (parsedState.gameActive) {
+        if (parsedState.gameActive && parsedState.sessionId) {
           currentGameState = parsedState;
+          
+          // Restore UI state
+          elements.playerName.value = currentGameState.playerName;
+          document.querySelector(`[data-board="${currentGameState.boardConfig}"]`).click();
+          elements.puckCountA.value = currentGameState.puckCountA;
+          elements.puckCountB.value = currentGameState.puckCountB;
+          
           elements.gameLinkSection.style.display = 'block';
           elements.gameLink.value = generatePlayerUrl(currentGameState.sessionId);
           updateStatusDisplay();
-          addNotification('Existing game loaded', 'info');
+          addNotification('🔄 Existing game loaded from storage', 'info');
           elements.createGameBtn.disabled = true;
           elements.createGameBtn.textContent = '✅ GAME ACTIVE';
         }
       }
     } catch (e) {
-      console.error('Failed to load:', e);
+      console.error('Failed to load existing game:', e);
     }
   }
 
   function checkGameState() {
-    if (!currentGameState.gameActive) return;
+    if (!currentGameState.gameActive || !currentGameState.sessionId) return;
 
     try {
       const savedState = localStorage.getItem(CONFIG.STORAGE_KEY);
       if (savedState) {
         const parsedState = JSON.parse(savedState);
         
-        if (parsedState.pucksRemaining !== currentGameState.pucksRemaining) {
-          if (parsedState.results && parsedState.results.length > currentGameState.results.length) {
-            const latestResult = parsedState.results[parsedState.results.length - 1];
-            addNotification(`Puck landed in slot ${latestResult.slot + 1} on Board ${latestResult.board}`, 'game');
+        // Only process if it's the same session
+        if (parsedState.sessionId === currentGameState.sessionId) {
+          
+          // Check for puck count changes
+          if (parsedState.pucksRemaining !== currentGameState.pucksRemaining) {
+            const puckDiff = currentGameState.pucksRemaining - parsedState.pucksRemaining;
+            if (puckDiff > 0) {
+              addNotification(`🎯 Puck dropped! ${puckDiff} puck(s) used`, 'game');
+            }
+            currentGameState.pucksRemaining = parsedState.pucksRemaining;
           }
-          currentGameState = parsedState;
+          
+          // Check for new results
+          if (parsedState.results && parsedState.results.length > currentGameState.results.length) {
+            const newResults = parsedState.results.slice(currentGameState.results.length);
+            newResults.forEach(result => {
+              addNotification(`🎯 Puck landed in slot ${result.slot + 1} on Board ${result.board}`, 'game');
+            });
+            currentGameState.results = parsedState.results;
+          }
+          
+          // Update current board if changed
+          if (parsedState.currentBoard !== currentGameState.currentBoard) {
+            currentGameState.currentBoard = parsedState.currentBoard;
+            addNotification(`🔄 Switched to Board ${currentGameState.currentBoard}`, 'info');
+          }
+          
+          // Check for game completion
+          if (parsedState.pucksRemaining === 0 && currentGameState.pucksRemaining > 0) {
+            currentGameState.gameActive = false;
+            addNotification('🎉 Game completed! All pucks used.', 'success');
+          }
+          
           updateStatusDisplay();
-        }
-        
-        if (parsedState.pucksRemaining === 0 && currentGameState.pucksRemaining > 0) {
-          currentGameState = parsedState;
-          updateStatusDisplay();
-          addNotification('Game completed!', 'success');
         }
       }
     } catch (e) {
-      console.error('Error checking state:', e);
+      console.error('Error checking game state:', e);
     }
   }
 
@@ -799,13 +874,28 @@
   }
 
   function updateStatusDisplay() {
-    elements.playerStatus.textContent = currentGameState.gameActive ? 'Active' : 'Waiting';
+    elements.playerStatus.textContent = currentGameState.gameActive ? 'Active' : 'Completed';
+    elements.playerStatus.style.color = currentGameState.gameActive ? '#69BE28' : '#FF6B6B';
     elements.currentBoard.textContent = currentGameState.currentBoard || '-';
     elements.pucksRemaining.textContent = currentGameState.pucksRemaining || '0';
+    
+    // Update puck remaining color based on percentage
+    if (currentGameState.totalPucks > 0) {
+      const percentage = (currentGameState.pucksRemaining / currentGameState.totalPucks) * 100;
+      if (percentage < 25) {
+        elements.pucksRemaining.style.color = '#FF6B6B';
+      } else if (percentage < 50) {
+        elements.pucksRemaining.style.color = '#FFA726';
+      } else {
+        elements.pucksRemaining.style.color = '#69BE28';
+      }
+    }
   }
 
   function resetGame() {
-    if (!confirm('Reset game? This clears all progress.')) return;
+    if (currentGameState.gameActive && !confirm('Are you sure you want to reset the current game? All progress will be lost.')) {
+      return;
+    }
 
     currentGameState = {
       sessionId: null,
@@ -817,31 +907,48 @@
       pucksRemaining: 0,
       gameActive: false,
       results: [],
-      createdAt: null
+      createdAt: null,
+      totalPucks: 0
     };
 
-    localStorage.removeItem(CONFIG.STORAGE_KEY);
-    localStorage.removeItem(CONFIG.SESSION_KEY);
+    try {
+      localStorage.removeItem(CONFIG.STORAGE_KEY);
+      localStorage.removeItem(CONFIG.SESSION_KEY);
+    } catch (e) {
+      console.error('Failed to clear storage:', e);
+    }
 
+    // Reset UI
     elements.gameLinkSection.style.display = 'none';
     elements.createGameBtn.disabled = false;
     elements.createGameBtn.textContent = '🚀 CREATE GAME & GENERATE LINK';
     elements.playerName.value = '';
-    updateStatusDisplay();
+    document.querySelector('[data-board="A"]').click();
+    elements.puckCountA.value = 3;
+    elements.puckCountB.value = 3;
     
-    addNotification('Game reset', 'success');
+    updateStatusDisplay();
+    updatePuckConfigVisibility();
+    
+    addNotification('🔄 Game reset successfully', 'success');
   }
 
   function addPuck() {
     if (!currentGameState.gameActive) {
-      alert('No active game!');
+      showAlert('No active game! Please create a game first.');
+      return;
+    }
+
+    if (currentGameState.pucksRemaining >= 50) {
+      showAlert('Maximum puck limit reached (50 pucks)');
       return;
     }
 
     currentGameState.pucksRemaining++;
+    currentGameState.totalPucks = Math.max(currentGameState.totalPucks, currentGameState.pucksRemaining);
     saveGameState();
     updateStatusDisplay();
-    addNotification('Added 1 puck', 'success');
+    addNotification('➕ Added 1 puck to current game', 'success');
   }
 
   function addNotification(message, type = 'info') {
@@ -862,12 +969,17 @@
     
     elements.notificationList.insertBefore(notification, elements.notificationList.firstChild);
     
+    // Limit notifications to prevent memory issues
     while (elements.notificationList.children.length > 50) {
       elements.notificationList.removeChild(elements.notificationList.lastChild);
     }
+    
+    // Auto-scroll to top
+    elements.notificationList.scrollTop = 0;
   }
 
-  init();
+  // Initialize on load
+  document.addEventListener('DOMContentLoaded', init);
 })();
 </script>
 </body>
