@@ -765,12 +765,13 @@ const JSONBIN_CONFIG = {
     return 'plinko_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   }
 
+  // In the admin panel, update the generatePlayerUrl function:
   function generatePlayerUrl(binId) {
-    const baseUrl = window.location.origin + window.location.pathname;
-    // FIXED: Generate URL with ?game= parameter instead of ?session=
-    return baseUrl.replace('index.html', CONFIG.GAME_PAGE) + '?game=' + binId;
+      const baseUrl = window.location.origin + window.location.pathname;
+      // Make sure we're generating the correct game.html path
+      return baseUrl.replace('index.html', '') + 'game.html?game=' + binId;
   }
-
+ 
   function copyGameLink() {
     elements.gameLink.select();
     elements.gameLink.setSelectionRange(0, 99999);
