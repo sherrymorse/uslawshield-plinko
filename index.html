@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>U.S. LawShield PLINKO</title>
+<title>U.S. LawShield PLINKO - Admin</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
@@ -29,10 +29,10 @@
   }
 
   .container {
-    max-width: 1400px;
+    max-width: 1200px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 1fr 400px;
+    grid-template-columns: 1fr 1fr;
     gap: 25px;
   }
 
@@ -79,99 +79,18 @@
     font-weight: 800;
   }
 
-  .game-section {
-    background: linear-gradient(135deg, rgba(0, 34, 68, 0.9) 0%, rgba(36, 89, 152, 0.9) 100%);
-    border-radius: 25px;
-    padding: 25px;
-    border: 4px solid var(--accent-gold);
-    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
-    position: relative;
-  }
-
-  .canvas-wrapper {
-    position: relative;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 
-      0 0 80px rgba(105, 190, 40, 0.6),
-      inset 0 0 60px rgba(0, 0, 0, 0.8);
-    border: 8px solid var(--seahawks-navy);
-    background: linear-gradient(135deg, #001933 0%, #003366 100%);
-    margin-bottom: 25px;
-  }
-
-  #plinkoCanvas {
-    display: block;
-    background: linear-gradient(135deg, #001933 0%, #003366 100%);
-    width: 100%;
-  }
-
-  .drop-zone {
-    background: linear-gradient(135deg, var(--seahawks-green) 0%, #4A8A1F 100%);
-    padding: 20px 40px;
-    border-radius: 20px;
-    font-size: 24px;
-    font-weight: 800;
-    box-shadow: 0 12px 35px rgba(105, 190, 40, 0.8);
-    border: 4px solid var(--accent-gold);
-    color: var(--seahawks-navy);
-    text-align: center;
-    position: relative;
-    animation: pulse-glow 2s infinite;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-  }
-
-  @keyframes pulse-glow {
-    0%, 100% { 
-      box-shadow: 0 12px 35px rgba(105, 190, 40, 0.8);
-      transform: scale(1);
-    }
-    50% { 
-      box-shadow: 0 18px 45px rgba(105, 190, 40, 1);
-      transform: scale(1.02);
-    }
-  }
-
-  .prompt {
-    position: absolute;
-    top: -35px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--seahawks-navy);
-    padding: 10px 20px;
-    border-radius: 15px;
-    font-size: 14px;
-    white-space: nowrap;
-    font-weight: 700;
-    border: 3px solid var(--accent-gold);
-    color: var(--accent-gold);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  }
-
-  .control-section {
-    background: linear-gradient(135deg, rgba(0, 34, 68, 0.9) 0%, rgba(36, 89, 152, 0.9) 100%);
-    border-radius: 25px;
-    padding: 25px;
-    border: 4px solid var(--accent-gold);
-    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
   .setup-panel {
-    background: linear-gradient(135deg, rgba(0, 34, 68, 0.95) 0%, rgba(41, 128, 185, 0.9) 100%);
-    padding: 25px;
-    border-radius: 20px;
-    border: 3px solid var(--accent-gold);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    background: linear-gradient(135deg, rgba(0, 34, 68, 0.9) 0%, rgba(36, 89, 152, 0.9) 100%);
+    border-radius: 25px;
+    padding: 30px;
+    border: 4px solid var(--accent-gold);
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
   }
 
   .panel-title {
     color: var(--accent-gold);
     font-size: 28px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     text-align: center;
     font-family: 'Bebas Neue', sans-serif;
     letter-spacing: 3px;
@@ -180,7 +99,7 @@
   }
 
   .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
   }
 
   label {
@@ -248,6 +167,35 @@
     box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
   }
 
+  .puck-config {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .puck-config-item {
+    text-align: center;
+    padding: 15px;
+    background: rgba(0, 25, 51, 0.8);
+    border-radius: 12px;
+    border: 2px solid var(--accent-gold);
+  }
+
+  .puck-config-title {
+    color: var(--accent-gold);
+    font-weight: 700;
+    margin-bottom: 10px;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  .puck-config-value {
+    color: white;
+    font-weight: 800;
+    font-size: 20px;
+  }
+
   .btn {
     background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-orange) 100%);
     color: var(--seahawks-navy);
@@ -284,375 +232,13 @@
     background: linear-gradient(135deg, #7ACF32 0%, #5A9A2F 100%);
   }
 
-  .game-info {
-    background: linear-gradient(135deg, rgba(0, 34, 68, 0.95) 0%, rgba(41, 128, 185, 0.9) 100%);
-    padding: 25px;
-    border-radius: 20px;
-    border: 3px solid var(--accent-gold);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-  }
-
-  .info-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-    padding: 12px 0;
-    border-bottom: 2px solid rgba(255, 215, 0, 0.3);
-  }
-
-  .info-label {
-    color: var(--accent-gold);
-    font-weight: 700;
-    font-size: 16px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .info-value {
-    color: white;
-    font-weight: 800;
-    font-size: 18px;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-  }
-
-  .prize-legend {
-    background: linear-gradient(135deg, rgba(0, 34, 68, 0.95) 0%, rgba(41, 128, 185, 0.9) 100%);
-    padding: 25px;
-    border-radius: 20px;
-    border: 3px solid var(--accent-gold);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-    max-height: 350px;
-    overflow-y: auto;
-  }
-
-  .legend-title {
-    color: var(--accent-gold);
-    font-size: 24px;
-    margin-bottom: 20px;
-    text-align: center;
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-    padding: 12px;
-    background: rgba(0, 25, 51, 0.7);
-    border-radius: 12px;
-    border: 2px solid rgba(255, 215, 0, 0.3);
-    transition: all 0.3s;
-  }
-
-  .legend-item:hover {
-    transform: translateX(5px);
-    border-color: var(--accent-gold);
-    background: rgba(0, 25, 51, 0.9);
-  }
-
-  .legend-symbol {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    margin-right: 15px;
-    flex-shrink: 0;
-    border: 3px solid white;
-    font-size: 18px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  }
-
-  .legend-text {
-    color: white;
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1.4;
-  }
-
-  .current-board {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background: linear-gradient(135deg, var(--seahawks-navy) 0%, var(--seahawks-blue) 100%);
-    padding: 12px 25px;
-    border-radius: 25px;
-    border: 3px solid var(--accent-gold);
-    color: var(--accent-gold);
-    font-weight: 800;
-    z-index: 10;
-    font-size: 18px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-  }
-
-  .puck-counter {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: linear-gradient(135deg, var(--seahawks-navy) 0%, var(--seahawks-blue) 100%);
-    padding: 12px 25px;
-    border-radius: 25px;
-    border: 3px solid var(--accent-gold);
-    color: var(--accent-gold);
-    font-weight: 800;
-    z-index: 10;
-    font-size: 18px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-  }
-
-  .connection-status {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, var(--seahawks-navy) 0%, var(--seahawks-blue) 100%);
-    padding: 10px 20px;
-    border-radius: 25px;
-    border: 3px solid var(--accent-gold);
-    color: var(--accent-gold);
-    font-weight: 700;
-    font-size: 14px;
-    z-index: 10;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-  }
-
-  .bigwin {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    font-size: 8em;
-    color: var(--accent-gold);
-    text-shadow: 0 0 50px var(--accent-gold), 0 0 100px var(--accent-orange);
-    z-index: 9999;
-    pointer-events: none;
-    animation: win 2s forwards;
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 8px;
-    text-align: center;
-  }
-
-  @keyframes win {
-    0% { transform: translate(-50%, -50%) scale(0) rotate(-180deg); opacity: 0; }
-    50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-  }
-
-  .admin-panel {
-    grid-column: 1 / -1;
-    background: linear-gradient(135deg, rgba(0, 34, 68, 0.95) 0%, rgba(36, 89, 152, 0.9) 100%);
-    border-radius: 25px;
-    padding: 30px;
-    border: 4px solid var(--accent-gold);
-    margin-top: 25px;
-    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
-  }
-
-  .admin-controls {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 15px;
-    margin-bottom: 25px;
-  }
-
-  .admin-btn {
-    background: linear-gradient(135deg, var(--accent-red) 0%, #ee5a52 100%);
-    color: white;
-    padding: 15px 25px;
-    border: none;
-    border-radius: 12px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: all 0.3s;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-size: 16px;
-    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-  }
-
-  .admin-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
-  }
-
-  .prize-display {
-    background: linear-gradient(135deg, rgba(0, 34, 68, 0.95) 0%, rgba(41, 128, 185, 0.9) 100%);
-    padding: 25px;
-    border-radius: 20px;
-    border: 3px solid var(--accent-gold);
-    margin-top: 25px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-  }
-
-  .prize-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 15px;
-  }
-
-  .prize-item {
-    background: rgba(0, 25, 51, 0.7);
-    padding: 20px;
-    border-radius: 15px;
-    border: 3px solid var(--accent-gold);
-    text-align: center;
-    transition: all 0.3s;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-  }
-
-  .prize-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    border-color: var(--seahawks-green);
-  }
-
-  .prize-symbol {
-    font-size: 2.5em;
-    margin-bottom: 12px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-  }
-
-  .prize-name {
-    color: var(--accent-gold);
-    font-weight: 800;
-    font-size: 16px;
-    line-height: 1.4;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .board-b {
-    background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
-    border-color: var(--accent-gold);
-  }
-
-  .board-b .legend-symbol {
-    border-color: var(--accent-gold);
-  }
-
-  .notification-panel {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 350px;
-    background: linear-gradient(135deg, var(--seahawks-navy) 0%, var(--seahawks-blue) 100%);
-    border: 3px solid var(--accent-gold);
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-    z-index: 10000;
-    transform: translateX(400px);
-    transition: transform 0.5s ease;
-  }
-
-  .notification-panel.show {
-    transform: translateX(0);
-  }
-
-  .notification-title {
-    color: var(--accent-gold);
-    font-size: 20px;
-    margin-bottom: 15px;
-    text-align: center;
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
-  .notification-list {
-    max-height: 300px;
-    overflow-y: auto;
-  }
-
-  .notification-item {
-    background: rgba(0, 25, 51, 0.7);
-    padding: 12px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    border-left: 4px solid var(--accent-gold);
-    font-size: 14px;
-    line-height: 1.4;
-  }
-
-  .notification-time {
-    color: var(--accent-gold);
-    font-size: 12px;
-    font-weight: 700;
-    margin-top: 5px;
-  }
-
-  .player-status {
-    background: linear-gradient(135deg, rgba(0, 34, 68, 0.95) 0%, rgba(41, 128, 185, 0.9) 100%);
-    padding: 20px;
-    border-radius: 20px;
-    border: 3px solid var(--accent-gold);
-    margin-top: 20px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-  }
-
-  .status-title {
-    color: var(--accent-gold);
-    font-size: 20px;
-    margin-bottom: 15px;
-    text-align: center;
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
-  .status-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
-  }
-
-  .status-label {
-    color: var(--accent-gold);
-    font-weight: 700;
-    font-size: 14px;
-  }
-
-  .status-value {
-    color: white;
-    font-weight: 800;
-    font-size: 14px;
-  }
-
-  .locked-field {
-    background: rgba(0, 25, 51, 0.5) !important;
-    color: var(--accent-gold) !important;
-    border-color: var(--accent-gold) !important;
-    cursor: not-allowed !important;
-  }
-
-  .locked-field::placeholder {
-    color: rgba(255, 215, 0, 0.6) !important;
-  }
-
-  .hidden {
-    display: none;
-  }
-
   .game-link-section {
-    margin-top: 20px;
+    margin-top: 25px;
     padding: 20px;
     background: rgba(0, 25, 51, 0.7);
     border-radius: 15px;
     border: 2px solid var(--accent-gold);
+    display: none;
   }
 
   .link-display {
@@ -667,8 +253,9 @@
     color: var(--accent-gold);
     border: 2px solid var(--accent-gold);
     border-radius: 8px;
-    padding: 10px;
+    padding: 12px;
     font-weight: 600;
+    font-size: 14px;
   }
 
   .link-display button {
@@ -676,149 +263,295 @@
     color: var(--seahawks-navy);
     border: none;
     border-radius: 8px;
-    padding: 10px 15px;
+    padding: 12px 20px;
     font-weight: 800;
     cursor: pointer;
     transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
   .link-display button:hover {
     background: #FFE55C;
     transform: translateY(-2px);
   }
+
+  .notification-panel {
+    background: linear-gradient(135deg, rgba(0, 34, 68, 0.9) 0%, rgba(36, 89, 152, 0.9) 100%);
+    border-radius: 25px;
+    padding: 30px;
+    border: 4px solid var(--accent-gold);
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .notification-list {
+    flex: 1;
+    overflow-y: auto;
+    background: rgba(0, 25, 51, 0.7);
+    border-radius: 15px;
+    padding: 15px;
+    border: 2px solid var(--accent-gold);
+  }
+
+  .notification-item {
+    background: rgba(0, 34, 68, 0.9);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--accent-gold);
+    font-size: 14px;
+    line-height: 1.4;
+    animation: fadeIn 0.5s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .notification-time {
+    color: var(--accent-gold);
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 5px;
+  }
+
+  .prize-summary {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(0, 25, 51, 0.7);
+    border-radius: 15px;
+    border: 2px solid var(--accent-gold);
+  }
+
+  .prize-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  .prize-item {
+    background: rgba(0, 34, 68, 0.9);
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid var(--accent-gold);
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .prize-item:hover {
+    transform: translateY(-3px);
+    border-color: var(--seahawks-green);
+  }
+
+  .prize-symbol {
+    font-size: 2em;
+    margin-bottom: 8px;
+  }
+
+  .prize-name {
+    color: var(--accent-gold);
+    font-weight: 800;
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .status-indicators {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .status-item {
+    background: rgba(0, 25, 51, 0.8);
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    border: 2px solid var(--accent-gold);
+  }
+
+  .status-label {
+    color: var(--accent-gold);
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .status-value {
+    color: white;
+    font-weight: 800;
+    font-size: 18px;
+  }
+
+  .status-value.connected {
+    color: var(--seahawks-green);
+  }
+
+  .status-value.waiting {
+    color: var(--accent-orange);
+  }
+
+  .status-value.playing {
+    color: var(--accent-gold);
+  }
+
+  .status-value.completed {
+    color: var(--accent-teal);
+  }
+
+  .admin-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .admin-btn {
+    background: linear-gradient(135deg, var(--accent-red) 0%, #ee5a52 100%);
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 14px;
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .admin-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
+  }
+
+  .admin-btn.reset {
+    background: linear-gradient(135deg, #FF6B6B 0%, #ee5a52 100%);
+  }
+
+  .admin-btn.add {
+    background: linear-gradient(135deg, var(--seahawks-green) 0%, #4A8A1F 100%);
+  }
+
+  .expiration-notice {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 12px;
+    color: var(--accent-gold);
+    font-weight: 700;
+  }
 </style>
 </head>
 <body>
-<div class="notification-panel" id="notificationPanel">
-  <h3 class="notification-title">🔔 ADMIN NOTIFICATIONS</h3>
-  <div class="notification-list" id="notificationList">
-    <div class="notification-item">
-      System initialized and ready
-      <div class="notification-time">Just now</div>
-    </div>
-  </div>
-</div>
-
 <div class="container">
   <div class="header">
     <h1 class="title">U.S. LAWSHIELD PLINKO</h1>
-    <p class="subtitle">LEGAL DEFENSE FOR SELF DEFENSE®</p>
+    <p class="subtitle">ADMIN CONTROL PANEL</p>
   </div>
 
-  <div class="game-section">
-    <div class="canvas-wrapper">
-      <div class="current-board" id="currentBoard">BOARD A</div>
-      <div class="puck-counter">PUCKS: <span id="puckCounter">0</span></div>
-      <div class="connection-status" id="connectionStatus">🔴 OFFLINE</div>
-      <canvas id="plinkoCanvas" width="800" height="1000"></canvas>
-    </div>
-    <div class="drop-zone">
-      DROP ZONE
-      <div class="prompt">Hover puck → Click & hold → Position → Release to drop!</div>
-    </div>
-  </div>
-
-  <div class="control-section">
-    <div class="setup-panel" id="adminSetup">
-      <h3 class="panel-title">GAME SETUP</h3>
-      <div class="form-group">
-        <label for="playerName">Player Name:</label>
-        <input type="text" id="playerName" placeholder="Enter player name">
-      </div>
-      <div class="form-group">
-        <label>Select Board(s):</label>
-        <div class="board-selection">
-          <div class="board-option" data-board="A">Board A</div>
-          <div class="board-option" data-board="B">Board B</div>
-          <div class="board-option" data-board="BOTH">Both</div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="puckCount">Number of Pucks:</label>
-        <select id="puckCount">
-          <option value="1">1 Puck</option>
-          <option value="2">2 Pucks</option>
-          <option value="3">3 Pucks</option>
-          <option value="5">5 Pucks</option>
-        </select>
-      </div>
-      <button class="btn btn-cta" id="startGame">CREATE GAME</button>
-      
-      <div class="game-link-section" id="gameLinkSection" style="display: none;">
-        <h3 class="panel-title">PLAYER LINK</h3>
-        <p>Share this link with the player:</p>
-        <div class="link-display">
-          <input type="text" id="gameLink" readonly>
-          <button id="copyGameLink">COPY</button>
-        </div>
-        <p style="margin-top: 10px; font-size: 12px; color: var(--accent-gold);">
-          Link expires in 5 minutes
-        </p>
-      </div>
-    </div>
-
-    <div class="game-info">
-      <h3 class="panel-title">GAME INFO</h3>
-      <div class="info-item">
-        <span class="info-label">Game ID:</span>
-        <span class="info-value" id="gameId">-</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Player:</span>
-        <span class="info-value" id="playerDisplay">-</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Pucks Remaining:</span>
-        <span class="info-value" id="pucksRemaining">0</span>
-      </div>
-      <div class="info-item">
-        <span class="info-label">Total Won:</span>
-        <span class="info-value" id="totalWon">0 prizes</span>
-      </div>
-    </div>
-
-    <div class="player-status" id="playerStatus" style="display: none;">
-      <h3 class="status-title">PLAYER STATUS</h3>
-      <div class="status-item">
-        <span class="status-label">Current Action:</span>
-        <span class="status-value" id="currentAction">Waiting to start</span>
-      </div>
-      <div class="status-item">
-        <span class="status-label">Last Activity:</span>
-        <span class="status-value" id="lastActivity">-</span>
-      </div>
-      <div class="status-item">
-        <span class="status-label">Connection:</span>
-        <span class="status-value" id="playerConnection">Not connected</span>
-      </div>
-    </div>
-
-    <div class="prize-legend" id="legendA">
-      <h3 class="legend-title">BOARD A PRIZES</h3>
-      <!-- Legend items will be populated by JavaScript -->
-    </div>
-
-    <div class="prize-legend board-b" id="legendB" style="display: none;">
-      <h3 class="legend-title">BOARD B PRIZES</h3>
-      <!-- Legend items will be populated by JavaScript -->
-    </div>
-  </div>
-
-  <div class="admin-panel">
-    <h3 class="panel-title">ADMIN CONTROLS</h3>
-    <div class="admin-controls">
-      <button class="admin-btn" id="resetGame">Reset Game</button>
-      <button class="admin-btn" id="addPuck">Add Puck</button>
-      <button class="admin-btn" id="manualPrize">Add Manual Prize</button>
-      <button class="admin-btn" id="switchBoard">Switch Board</button>
-      <button class="admin-btn" id="showNotifications">Show Notifications</button>
+  <div class="setup-panel">
+    <h2 class="panel-title">GAME SETUP</h2>
+    
+    <div class="form-group">
+      <label for="playerName">Player Name:</label>
+      <input type="text" id="playerName" placeholder="Enter player name">
     </div>
     
-    <div class="prize-display">
+    <div class="form-group">
+      <label>Board Configuration:</label>
+      <div class="board-selection">
+        <div class="board-option" data-board="A">Board A Only</div>
+        <div class="board-option" data-board="B">Board B Only</div>
+        <div class="board-option selected" data-board="BOTH">Both Boards</div>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label>Puck Configuration:</label>
+      <div class="puck-config">
+        <div class="puck-config-item">
+          <div class="puck-config-title">Board A Pucks</div>
+          <div class="puck-config-value">
+            <select id="puckCountA">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+        </div>
+        <div class="puck-config-item">
+          <div class="puck-config-title">Board B Pucks</div>
+          <div class="puck-config-value">
+            <select id="puckCountB">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <button class="btn btn-cta" id="createGame">CREATE GAME & GENERATE LINK</button>
+    
+    <div class="game-link-section" id="gameLinkSection">
+      <h3 class="panel-title">PLAYER GAME LINK</h3>
+      <p>Copy and share this link with the player:</p>
+      <div class="link-display">
+        <input type="text" id="gameLink" readonly>
+        <button id="copyGameLink">COPY</button>
+      </div>
+      <div class="expiration-notice">
+        ⏰ This link will expire in 5 minutes
+      </div>
+    </div>
+  </div>
+
+  <div class="notification-panel">
+    <h2 class="panel-title">GAME STATUS & NOTIFICATIONS</h2>
+    
+    <div class="status-indicators">
+      <div class="status-item">
+        <div class="status-label">Player Status</div>
+        <div class="status-value waiting" id="playerStatus">Waiting</div>
+      </div>
+      <div class="status-item">
+        <div class="status-label">Current Board</div>
+        <div class="status-value" id="currentBoard">-</div>
+      </div>
+      <div class="status-item">
+        <div class="status-label">Pucks Remaining</div>
+        <div class="status-value" id="pucksRemaining">0</div>
+      </div>
+    </div>
+    
+    <div class="notification-list" id="notificationList">
+      <div class="notification-item">
+        Admin panel initialized and ready
+        <div class="notification-time">Just now</div>
+      </div>
+    </div>
+    
+    <div class="prize-summary">
       <h3 class="panel-title">PRIZES WON</h3>
       <div class="prize-list" id="wonPrizes">
-        <!-- Won prizes will appear here -->
+        <!-- Prizes will appear here as they're won -->
       </div>
+    </div>
+    
+    <div class="admin-controls">
+      <button class="admin-btn reset" id="resetGame">RESET GAME</button>
+      <button class="admin-btn add" id="addPuck">ADD PUCK</button>
     </div>
   </div>
 </div>
@@ -839,50 +572,44 @@ const JSONBIN_CONFIG = {
 const gameState = {
   gameId: null,
   playerName: '',
-  boardType: 'A',
-  pucksTotal: 1,
-  pucksUsed: 0,
+  boardType: 'BOTH',
+  pucksA: 1,
+  pucksB: 1,
   pucksRemaining: 0,
   currentBoard: 'A',
   prizesWon: [],
   isActive: false,
-  currentPuck: null,
-  isAdmin: false,
-  connected: false,
+  playerConnected: false,
   binId: null,
   lastUpdated: 0,
-  playerStatus: 'waiting',
-  lastActivity: null,
   expirationTime: null,
   boards: {
     A: {
       name: "Board A",
-      color: '#69BE28',
       prizes: [
         { symbol: '🎁', name: '$25 Gift Card', color: '#667eea' },
-        { symbol: '⏰', name: '1 Hour Campaign of Your Choice', color: '#f093fb' },
-        { symbol: '👥', name: 'Shadow an Agent for 1 Hour', color: '#4facfe' },
-        { symbol: '🚪', name: 'Leave 15min Early / Come in 15min Late', color: '#ff6b6b' },
-        { symbol: '☕', name: 'Extra 15 Minute Break', color: '#f6d365' },
-        { symbol: '📊', name: 'Replace QA Score with Call of Your Choice', color: '#4facfe' },
+        { symbol: '⏰', name: '1 Hour Campaign', color: '#f093fb' },
+        { symbol: '👥', name: 'Shadow an Agent', color: '#4facfe' },
+        { symbol: '🚪', name: 'Leave 15min Early', color: '#ff6b6b' },
+        { symbol: '☕', name: 'Extra 15min Break', color: '#f6d365' },
+        { symbol: '📊', name: 'Replace QA Score', color: '#4facfe' },
         { symbol: '💼', name: 'Coffee with Leadership', color: '#f093fb' },
-        { symbol: '⏰', name: '1 Hour Campaign of Your Choice', color: '#f093fb' },
+        { symbol: '⏰', name: '1 Hour Campaign', color: '#f093fb' },
         { symbol: '🎁', name: '$25 Gift Card', color: '#667eea' }
       ]
     },
     B: {
       name: "Board B",
-      color: '#FFD700',
       prizes: [
-        { symbol: '🕑', name: '2 Hours Campaign of Your Choice', color: '#9b59b6' },
+        { symbol: '🕑', name: '2 Hours Campaign', color: '#9b59b6' },
         { symbol: '💰', name: '$50 Gift Card', color: '#e74c3c' },
-        { symbol: '⏱️', name: 'Leave 30 Minutes Early', color: '#3498db' },
-        { symbol: '💯', name: 'Replace Lowest QA Score with 100', color: '#2ecc71' },
-        { symbol: '🕓', name: '4 Hours Campaign of Your Choice', color: '#f1c40f' },
-        { symbol: '🍽️', name: 'Lunch on Leadership', color: '#e67e22' },
+        { symbol: '⏱️', name: 'Leave 30min Early', color: '#3498db' },
+        { symbol: '💯', name: 'Replace Lowest QA', color: '#2ecc71' },
+        { symbol: '🕓', name: '4 Hours Campaign', color: '#f1c40f' },
+        { symbol: '🍽️', name: 'Lunch with Leadership', color: '#e67e22' },
         { symbol: '🎴', name: 'Wild Card', color: '#1abc9c' },
         { symbol: '💰', name: '$50 Gift Card', color: '#e74c3c' },
-        { symbol: '🕑', name: '2 Hours Campaign of Your Choice', color: '#9b59b6' }
+        { symbol: '🕑', name: '2 Hours Campaign', color: '#9b59b6' }
       ]
     }
   }
@@ -905,11 +632,6 @@ function addNotification(message) {
   }
   
   updateNotificationDisplay();
-  
-  // Show notification panel if admin
-  if (gameState.isAdmin) {
-    document.getElementById('notificationPanel').classList.add('show');
-  }
 }
 
 function updateNotificationDisplay() {
@@ -927,21 +649,19 @@ function updateNotificationDisplay() {
   });
 }
 
-function updatePlayerStatus(status, activity) {
-  gameState.playerStatus = status;
-  gameState.lastActivity = activity || new Date().toLocaleTimeString();
+function updatePlayerStatus(status) {
+  const statusElement = document.getElementById('playerStatus');
+  statusElement.textContent = status;
+  statusElement.className = `status-value ${status.toLowerCase()}`;
   
-  document.getElementById('currentAction').textContent = status;
-  document.getElementById('lastActivity').textContent = gameState.lastActivity;
-  
-  if (gameState.isAdmin) {
-    addNotification(`Player ${status.toLowerCase()}: ${activity || status}`);
+  if (status === 'Connected') {
+    gameState.playerConnected = true;
+    addNotification(`🎮 Player "${gameState.playerName}" has joined the game`);
   }
 }
 
 // ==================== JSONBIN.IO REAL-TIME SYNC ====================
 let syncInterval = null;
-let isConnected = false;
 
 async function createGameBin(gameState) {
   try {
@@ -1016,28 +736,50 @@ function startSyncInterval(binId) {
         return;
       }
       
+      // Store previous state for comparison
+      const prevPrizesWon = [...gameState.prizesWon];
+      const prevPucksRemaining = gameState.pucksRemaining;
+      const prevCurrentBoard = gameState.currentBoard;
+      const prevPlayerConnected = gameState.playerConnected;
+      
       // Update from remote state
       Object.keys(remoteState).forEach(key => {
-        if (key !== 'currentPuck' || !gameState.currentPuck) {
-          gameState[key] = remoteState[key];
-        }
+        gameState[key] = remoteState[key];
       });
       
+      // Update UI based on changes
       updateGameDisplay();
-      updateBoardDisplay();
-      drawBoard();
       
-      // Update connection status
-      isConnected = true;
-      updateConnectionStatus();
+      // Check for new notifications based on state changes
+      if (!prevPlayerConnected && gameState.playerConnected) {
+        updatePlayerStatus('Connected');
+      }
       
-      // Update player status for admin
-      if (gameState.isAdmin) {
-        document.getElementById('playerConnection').textContent = 'Connected';
-        document.getElementById('playerStatus').style.display = 'block';
+      if (prevCurrentBoard !== gameState.currentBoard) {
+        document.getElementById('currentBoard').textContent = `Board ${gameState.currentBoard}`;
+        addNotification(`🔄 Player switched to Board ${gameState.currentBoard}`);
+      }
+      
+      if (prevPucksRemaining !== gameState.pucksRemaining) {
+        if (prevPucksRemaining > gameState.pucksRemaining) {
+          updatePlayerStatus('Playing');
+          addNotification('🎲 Player dropped a puck');
+        }
+      }
+      
+      if (prevPrizesWon.length < gameState.prizesWon.length) {
+        const newPrize = gameState.prizesWon[gameState.prizesWon.length - 1];
+        addNotification(`🎉 Player won: ${newPrize.prize} (Board ${newPrize.board})`);
+        updatePlayerStatus('Won Prize');
+        
+        // If all pucks used, game is complete
+        if (gameState.pucksRemaining === 0) {
+          updatePlayerStatus('Completed');
+          addNotification('🏁 Player completed the game!');
+        }
       }
     }
-  }, 2000); // Sync every 2 seconds to stay within rate limits
+  }, 2000);
 }
 
 function stopSyncInterval() {
@@ -1047,429 +789,36 @@ function stopSyncInterval() {
   }
 }
 
-function updateConnectionStatus() {
-  const statusElement = document.getElementById('connectionStatus');
-  if (isConnected) {
-    statusElement.textContent = '🟢 SYNCED';
-    statusElement.style.borderColor = '#69BE28';
-  } else {
-    statusElement.textContent = '🔴 OFFLINE';
-    statusElement.style.borderColor = '#ff6b6b';
-  }
-}
-
 async function saveGameStateToCloud() {
   if (!gameState.binId) return false;
   
   gameState.lastUpdated = Date.now();
   const success = await updateGameBin(gameState.binId, gameState);
-  isConnected = success;
-  updateConnectionStatus();
   return success;
 }
 
-async function loadGameStateFromCloud(binId) {
-  const remoteState = await readGameBin(binId);
-  if (remoteState) {
-    Object.assign(gameState, remoteState);
-    gameState.binId = binId;
-    isConnected = true;
-    updateConnectionStatus();
-    updateGameDisplay();
-    updateBoardDisplay();
-    drawBoard();
-    startSyncInterval(binId);
-    
-    // Lock player fields if not admin
-    if (!gameState.isAdmin) {
-      lockPlayerFields();
-    }
-    
-    // Add notification for admin
-    if (gameState.isAdmin) {
-      addNotification(`Connected to game: ${gameState.gameId}`);
-      updatePlayerStatus('Connected', 'Player joined the game');
-    } else {
-      updatePlayerStatus('Ready to play', 'Game loaded successfully');
-    }
-    
-    return true;
-  }
-  return false;
-}
-
-function lockPlayerFields() {
-  document.getElementById('playerName').classList.add('locked-field');
-  document.getElementById('playerName').readOnly = true;
-  document.getElementById('puckCount').classList.add('locked-field');
-  document.getElementById('puckCount').disabled = true;
-  
-  document.querySelectorAll('.board-option').forEach(option => {
-    option.classList.add('locked-field');
-    option.style.cursor = 'not-allowed';
-    option.onclick = null;
-  });
-  
-  document.getElementById('startGame').style.display = 'none';
-  document.getElementById('gameLinkSection').style.display = 'none';
-}
-
-// ==================== PLINKO PHYSICS ====================
-const canvas = document.getElementById('plinkoCanvas');
-const ctx = canvas.getContext('2d');
-const W = canvas.width, H = canvas.height;
-const DROP_ZONE_HEIGHT = 120;
-const PUCK_RADIUS = 18;
-const PEG_RADIUS = 6;
-const NUM_ROWS = 20; // Increased rows for better physics
-const NUM_SLOTS = 9;
-
-let pegs = [];
-let currentPuck = null;
-let dragging = false;
-let hoverPuck = { x: W/2, y: DROP_ZONE_HEIGHT/2 };
-let animationId = null;
-let particles = [];
-
-// Initialize pegs with better spacing
-function initPegs() {
-  pegs = [];
-  const startY = DROP_ZONE_HEIGHT + 60; // Reduced initial gap
-  const rowHeight = (H - 160 - startY) / NUM_ROWS; // Adjusted for more rows
-  const colSpacing = W / 8;
-  
-  for (let row = 0; row < NUM_ROWS; row++) {
-    const numCols = row % 2 === 0 ? 9 : 8;
-    const offset = row % 2 === 0 ? 0 : colSpacing / 2;
-    
-    for (let col = 0; col < numCols; col++) {
-      pegs.push({
-        x: offset + col * colSpacing,
-        y: startY + row * rowHeight
-      });
-    }
-  }
-}
-
-// Draw the board with enhanced visuals
-function drawBoard() {
-  // Clear canvas with gradient
-  const bgGradient = ctx.createLinearGradient(0, 0, 0, H);
-  bgGradient.addColorStop(0, '#001933');
-  bgGradient.addColorStop(1, '#003366');
-  ctx.fillStyle = bgGradient;
-  ctx.fillRect(0, 0, W, H);
-  
-  // Draw drop zone with enhanced gradient
-  const dropGradient = ctx.createLinearGradient(0, 0, 0, DROP_ZONE_HEIGHT);
-  dropGradient.addColorStop(0, '#69BE28');
-  dropGradient.addColorStop(0.5, '#4A8A1F');
-  dropGradient.addColorStop(1, '#2D5F1D');
-  ctx.fillStyle = dropGradient;
-  ctx.fillRect(0, 0, W, DROP_ZONE_HEIGHT);
-  
-  ctx.strokeStyle = '#002244';
-  ctx.lineWidth = 6;
-  ctx.strokeRect(0, 0, W, DROP_ZONE_HEIGHT);
-  
-  // Drop zone text with glow
-  ctx.shadowColor = '#69BE28';
-  ctx.shadowBlur = 10;
-  ctx.fillStyle = '#002244';
-  ctx.font = 'bold 28px Montserrat';
-  ctx.textAlign = 'center';
-  ctx.fillText('DROP ZONE', W/2, DROP_ZONE_HEIGHT/2 + 10);
-  ctx.shadowBlur = 0;
-  
-  // Draw pegs with glow effect
-  pegs.forEach(peg => {
-    const pegGradient = ctx.createRadialGradient(
-      peg.x - 3, peg.y - 3, 0, peg.x, peg.y, PEG_RADIUS
-    );
-    pegGradient.addColorStop(0, '#FFD700');
-    pegGradient.addColorStop(0.7, '#FFA500');
-    pegGradient.addColorStop(1, '#CC8400');
-    
-    ctx.fillStyle = pegGradient;
-    ctx.beginPath();
-    ctx.arc(peg.x, peg.y, PEG_RADIUS, 0, Math.PI * 2);
-    ctx.fill();
-    
-    ctx.shadowColor = '#FFD700';
-    ctx.shadowBlur = 8;
-    ctx.fill();
-    ctx.shadowBlur = 0;
-  });
-  
-  // Draw slots with enhanced visuals
-  const currentBoard = gameState.boards[gameState.currentBoard];
-  const slotHeight = 80;
-  const slotWidth = W / NUM_SLOTS;
-  
-  currentBoard.prizes.forEach((prize, index) => {
-    // Slot background with gradient
-    const slotGradient = ctx.createLinearGradient(
-      index * slotWidth, H - slotHeight,
-      index * slotWidth, H
-    );
-    slotGradient.addColorStop(0, prize.color);
-    slotGradient.addColorStop(1, darkenColor(prize.color, 30));
-    
-    ctx.fillStyle = slotGradient;
-    ctx.fillRect(index * slotWidth, H - slotHeight, slotWidth, slotHeight);
-    
-    // Slot border with glow for center slot
-    ctx.strokeStyle = index === 4 ? '#FFD700' : currentBoard.color;
-    ctx.lineWidth = index === 4 ? 5 : 3;
-    ctx.strokeRect(index * slotWidth, H - slotHeight, slotWidth, slotHeight);
-    
-    // Prize symbol (rotated) with enhanced styling
-    ctx.save();
-    ctx.translate(index * slotWidth + slotWidth/2, H - slotHeight/2);
-    ctx.rotate(-Math.PI/2);
-    
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 22px Montserrat';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    
-    if (index === 4) {
-      ctx.shadowColor = '#FFD700';
-      ctx.shadowBlur = 10;
-    }
-    
-    ctx.fillText(prize.symbol, 0, 0);
-    ctx.shadowBlur = 0;
-    
-    ctx.restore();
-  });
-  
-  // Draw hover puck (if available and not dragging)
-  if (gameState.pucksRemaining > 0 && !currentPuck && !dragging && !gameState.isAdmin) {
-    drawPuck(hoverPuck.x, hoverPuck.y);
-  }
-  
-  // Draw current puck
-  if (currentPuck) {
-    drawPuck(currentPuck.x, currentPuck.y, currentPuck.rotation);
-  }
-  
-  // Draw particles
-  particles.forEach((particle, index) => {
-    particle.life--;
-    if (particle.life <= 0) {
-      particles.splice(index, 1);
-      return;
-    }
-    
-    ctx.globalAlpha = particle.life / 60;
-    ctx.fillStyle = particle.color;
-    ctx.beginPath();
-    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-    ctx.fill();
-  });
-  ctx.globalAlpha = 1;
-}
-
-function darkenColor(color, percent) {
-  const num = parseInt(color.replace("#", ""), 16);
-  const amt = Math.round(2.55 * percent);
-  const R = (num >> 16) - amt;
-  const G = (num >> 8 & 0x00FF) - amt;
-  const B = (num & 0x0000FF) - amt;
-  return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
-                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
-                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
-}
-
-function drawPuck(x, y, rotation = 0) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(rotation);
-  
-  const puckGradient = ctx.createRadialGradient(-6, -6, 0, 0, 0, PUCK_RADIUS);
-  puckGradient.addColorStop(0, '#FF6B6B');
-  puckGradient.addColorStop(0.5, '#EE5A52');
-  puckGradient.addColorStop(1, '#CC0000');
-  
-  ctx.fillStyle = puckGradient;
-  ctx.beginPath();
-  ctx.arc(0, 0, PUCK_RADIUS, 0, Math.PI * 2);
-  ctx.fill();
-  
-  ctx.strokeStyle = '#002244';
-  ctx.lineWidth = 3;
-  ctx.stroke();
-  
-  // Puck details
-  ctx.fillStyle = '#002244';
-  ctx.beginPath();
-  ctx.arc(-6, -6, PUCK_RADIUS * 0.3, 0, Math.PI * 2);
-  ctx.fill();
-  
-  ctx.fillStyle = 'white';
-  ctx.font = 'bold 16px Montserrat';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('USL', 0, 0);
-  
-  ctx.restore();
-}
-
-// Enhanced physics simulation
-function updatePhysics() {
-  if (!currentPuck) return;
-  
-  // Apply gravity with slight variation for realism
-  currentPuck.vy += 0.5 + (Math.random() * 0.1);
-  
-  // Update position
-  currentPuck.x += currentPuck.vx;
-  currentPuck.y += currentPuck.vy;
-  
-  // Update rotation based on velocity
-  currentPuck.rotation += currentPuck.vx * 0.02;
-  
-  // Save puck position to cloud for real-time sync
-  if (gameState.binId) {
-    gameState.currentPuck = currentPuck;
-    saveGameStateToCloud();
-  }
-  
-  // Wall collisions with energy loss
-  if (currentPuck.x - PUCK_RADIUS < 0) {
-    currentPuck.x = PUCK_RADIUS;
-    currentPuck.vx = Math.abs(currentPuck.vx) * 0.75;
-  } else if (currentPuck.x + PUCK_RADIUS > W) {
-    currentPuck.x = W - PUCK_RADIUS;
-    currentPuck.vx = -Math.abs(currentPuck.vx) * 0.75;
-  }
-  
-  // Peg collisions with improved physics
-  pegs.forEach(peg => {
-    const dx = currentPuck.x - peg.x;
-    const dy = currentPuck.y - peg.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    const minDistance = PUCK_RADIUS + PEG_RADIUS;
-    
-    if (distance < minDistance) {
-      // Collision response with energy conservation
-      const angle = Math.atan2(dy, dx);
-      const targetX = peg.x + Math.cos(angle) * minDistance;
-      const targetY = peg.y + Math.sin(angle) * minDistance;
-      
-      currentPuck.x = targetX;
-      currentPuck.y = targetY;
-      
-      // Reflect velocity with realistic energy loss
-      const dot = currentPuck.vx * dx + currentPuck.vy * dy;
-      currentPuck.vx -= 1.8 * dot * dx / (distance * distance);
-      currentPuck.vy -= 1.8 * dot * dy / (distance * distance);
-      
-      // Add realistic randomness for authentic Plinko behavior
-      currentPuck.vx += (Math.random() - 0.5) * 1.5;
-      currentPuck.vy += (Math.random() - 0.5) * 1.5;
-      
-      // Add spin effect
-      currentPuck.rotation += currentPuck.vx * 0.05;
-    }
-  });
-  
-  // Check if puck reached bottom slots with improved detection
-  if (currentPuck.y + PUCK_RADIUS > H - 80) {
-    const slotIndex = Math.floor(currentPuck.x / (W / NUM_SLOTS));
-    const currentBoard = gameState.boards[gameState.currentBoard];
-    const prize = currentBoard.prizes[slotIndex];
-    
-    // Award prize
-    gameState.prizesWon.push({
-      board: gameState.currentBoard,
-      prize: prize.name,
-      symbol: prize.symbol,
-      timestamp: Date.now()
-    });
-    
-    // Create enhanced celebration particles
-    for (let i = 0; i < 50; i++) {
-      particles.push({
-        x: currentPuck.x,
-        y: H - 40,
-        vx: (Math.random() - 0.5) * 12,
-        vy: -Math.random() * 18,
-        life: 80,
-        size: Math.random() * 5 + 3,
-        color: prize.color
-      });
-    }
-    
-    // Show enhanced win animation for special prizes
-    if (slotIndex === 4) { // Middle slot - biggest prize
-      const winElement = document.createElement('div');
-      winElement.className = 'bigwin';
-      winElement.textContent = 'JACKPOT!';
-      document.body.appendChild(winElement);
-      setTimeout(() => winElement.remove(), 2500);
-      
-      addNotification(`🎉 Player won JACKPOT: ${prize.name}`);
-    } else {
-      addNotification(`🎯 Player won: ${prize.name}`);
-    }
-    
-    // Update game state
-    gameState.pucksUsed++;
-    gameState.pucksRemaining--;
-    gameState.currentPuck = null;
-    currentPuck = null;
-    
-    // Update player status
-    updatePlayerStatus('Won prize', `Won: ${prize.name}`);
-    
-    // Check if should switch boards
-    if (gameState.boardType === 'BOTH' && gameState.currentBoard === 'A') {
-      gameState.currentBoard = 'B';
-      updateBoardDisplay();
-      initPegs();
-      updatePlayerStatus('Board switched', 'Now playing on Board B');
-    } else if (gameState.pucksRemaining === 0) {
-      // Game over
-      gameState.isActive = false;
-      updatePlayerStatus('Game completed', 'All pucks used');
-      addNotification('🎊 Player completed the game!');
-    }
-    
-    // Save final state to cloud
-    saveGameStateToCloud();
-    updateGameDisplay();
-    
-    cancelAnimationFrame(animationId);
-    drawBoard();
-    return;
-  }
-  
-  drawBoard();
-  animationId = requestAnimationFrame(updatePhysics);
-}
-
 // ==================== GAME CONTROLS ====================
-async function startGame() {
+async function createGame() {
   const playerName = document.getElementById('playerName').value.trim();
-  const puckCount = parseInt(document.getElementById('puckCount').value);
-  const selectedBoard = document.querySelector('.board-option.selected').dataset.board;
+  const boardType = document.querySelector('.board-option.selected').dataset.board;
+  const pucksA = parseInt(document.getElementById('puckCountA').value);
+  const pucksB = parseInt(document.getElementById('puckCountB').value);
   
   if (!playerName) {
     alert('Please enter a player name');
     return;
   }
   
+  // Update game state
   gameState.playerName = playerName;
-  gameState.boardType = selectedBoard;
-  gameState.pucksTotal = puckCount;
-  gameState.pucksRemaining = puckCount;
-  gameState.pucksUsed = 0;
-  gameState.currentBoard = selectedBoard === 'B' ? 'B' : 'A';
+  gameState.boardType = boardType;
+  gameState.pucksA = pucksA;
+  gameState.pucksB = pucksB;
+  gameState.pucksRemaining = boardType === 'BOTH' ? pucksA : (boardType === 'A' ? pucksA : pucksB);
+  gameState.currentBoard = boardType === 'B' ? 'B' : 'A';
   gameState.prizesWon = [];
   gameState.isActive = true;
-  gameState.isAdmin = true; // Creator is admin
+  gameState.playerConnected = false;
   gameState.gameId = 'G' + Date.now().toString().slice(-6);
   gameState.lastUpdated = Date.now();
   gameState.expirationTime = Date.now() + 5 * 60 * 1000; // 5 minutes from now
@@ -1477,66 +826,36 @@ async function startGame() {
   try {
     // Create cloud storage
     gameState.binId = await createGameBin(gameState);
-    isConnected = true;
-    updateConnectionStatus();
     
     // Start synchronization
     startSyncInterval(gameState.binId);
-    
-    // Add notification
-    addNotification(`🎮 New game created: ${playerName}`);
-    updatePlayerStatus('Game created', 'Waiting for player');
     
     // Generate and show game link
     const gameLink = `${window.location.origin}${window.location.pathname}?game=${gameState.binId}`;
     document.getElementById('gameLink').value = gameLink;
     document.getElementById('gameLinkSection').style.display = 'block';
     
+    // Update UI
+    updateGameDisplay();
+    updatePlayerStatus('Waiting');
+    
+    // Add notification
+    addNotification(`🎮 Game created for "${playerName}"`);
+    addNotification(`📋 Board configuration: ${boardType === 'BOTH' ? 'Both Boards' : `Board ${boardType}`}`);
+    addNotification(`🎯 Pucks: ${pucksA} for Board A, ${pucksB} for Board B`);
+    addNotification('🔗 Game link generated - share with player');
+    
   } catch (error) {
     console.error('Failed to create cloud game:', error);
-    alert('Failed to create cloud game. Using local mode only.');
-    isConnected = false;
-    updateConnectionStatus();
+    alert('Failed to create cloud game. Please try again.');
   }
-  
-  // Update displays
-  updateGameDisplay();
-  updateBoardDisplay();
-  
-  // Initialize board with improved physics
-  initPegs();
-  drawBoard();
-  
-  // Animate hover puck
-  if (!gameState.isAdmin) {
-    animateHoverPuck();
-  }
-}
-
-function updateBoardDisplay() {
-  document.getElementById('currentBoard').textContent = `BOARD ${gameState.currentBoard}`;
-  
-  // Show appropriate legend
-  document.getElementById('legendA').style.display = 
-    gameState.currentBoard === 'A' || gameState.boardType === 'BOTH' ? 'block' : 'none';
-  document.getElementById('legendB').style.display = 
-    gameState.currentBoard === 'B' ? 'block' : 'none';
-}
-
-function animateHoverPuck() {
-  if (!gameState.isActive || currentPuck || gameState.pucksRemaining === 0 || gameState.isAdmin) return;
-  
-  hoverPuck.x = W/2 + Math.sin(Date.now() * 0.002) * (W/2 - PUCK_RADIUS - 50);
-  drawBoard();
-  requestAnimationFrame(animateHoverPuck);
 }
 
 function updateGameDisplay() {
   document.getElementById('gameId').textContent = gameState.gameId || '-';
   document.getElementById('playerDisplay').textContent = gameState.playerName || '-';
-  document.getElementById('puckCounter').textContent = gameState.pucksRemaining;
   document.getElementById('pucksRemaining').textContent = gameState.pucksRemaining;
-  document.getElementById('totalWon').textContent = `${gameState.prizesWon.length} prizes`;
+  document.getElementById('currentBoard').textContent = `Board ${gameState.currentBoard}`;
   
   // Update won prizes display
   const wonPrizesElement = document.getElementById('wonPrizes');
@@ -1548,246 +867,59 @@ function updateGameDisplay() {
     prizeElement.innerHTML = `
       <div class="prize-symbol">${prize.symbol}</div>
       <div class="prize-name">${prize.prize}</div>
-      <div style="font-size: 12px; color: #A5ACAF; margin-top: 5px;">Board ${prize.board}</div>
     `;
     wonPrizesElement.appendChild(prizeElement);
   });
 }
 
 // ==================== EVENT HANDLERS ====================
-canvas.addEventListener('mousemove', (e) => {
-  if (gameState.isAdmin) return; // Admins can't interact with the board
-  
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  
-  if (dragging && currentPuck) {
-    currentPuck.x = Math.max(PUCK_RADIUS, Math.min(W - PUCK_RADIUS, x));
-    currentPuck.y = Math.max(PUCK_RADIUS, Math.min(DROP_ZONE_HEIGHT - PUCK_RADIUS, y));
-    drawBoard();
-    updatePlayerStatus('Positioning puck', 'Adjusting drop position');
-  } else if (gameState.pucksRemaining > 0 && !currentPuck) {
-    hoverPuck.x = x;
-    hoverPuck.y = y;
-  }
-});
-
-canvas.addEventListener('mousedown', (e) => {
-  if (gameState.isAdmin || !gameState.isActive || currentPuck || gameState.pucksRemaining === 0) return;
-  
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  
-  // Check if clicking near hover puck
-  const distance = Math.sqrt(
-    Math.pow(x - hoverPuck.x, 2) + Math.pow(y - hoverPuck.y, 2)
-  );
-  
-  if (distance < PUCK_RADIUS * 1.5) {
-    dragging = true;
-    currentPuck = {
-      x: x,
-      y: y,
-      vx: 0,
-      vy: 0,
-      rotation: 0
-    };
-    drawBoard();
-    updatePlayerStatus('Holding puck', 'Ready to drop');
-    addNotification('🎯 Player picked up a puck');
-  }
-});
-
-canvas.addEventListener('mouseup', () => {
-  if (gameState.isAdmin) return;
-  
-  if (dragging && currentPuck) {
-    dragging = false;
-    
-    // Add initial velocity based on drop position for more realistic physics
-    const centerX = W / 2;
-    currentPuck.vx = (currentPuck.x - centerX) * 0.5;
-    currentPuck.vy = 2;
-    
-    updatePlayerStatus('Puck dropping', 'Watching physics in action');
-    addNotification('🎲 Player dropped the puck!');
-    
-    animationId = requestAnimationFrame(updatePhysics);
-  }
-});
-
-// Board selection
-document.querySelectorAll('.board-option').forEach(option => {
-  option.addEventListener('click', () => {
-    if (gameState.isActive) return;
-    
-    document.querySelectorAll('.board-option').forEach(opt => opt.classList.remove('selected'));
-    option.classList.add('selected');
-  });
-});
-
-// Start game button
-document.getElementById('startGame').addEventListener('click', startGame);
-
-// Copy game link button
-document.getElementById('copyGameLink').addEventListener('click', () => {
-  const gameLink = document.getElementById('gameLink');
-  gameLink.select();
-  document.execCommand('copy');
-  addNotification('📋 Game link copied to clipboard');
-});
-
-// Admin controls
-document.getElementById('resetGame').addEventListener('click', async () => {
-  if (confirm('Reset the game? This will clear all progress.')) {
-    gameState.isActive = false;
-    currentPuck = null;
-    gameState.currentPuck = null;
-    gameState.prizesWon = [];
-    gameState.pucksRemaining = gameState.pucksTotal;
-    gameState.pucksUsed = 0;
-    gameState.currentBoard = gameState.boardType === 'B' ? 'B' : 'A';
-    updateGameDisplay();
-    updateBoardDisplay();
-    await saveGameStateToCloud();
-    drawBoard();
-    addNotification('🔄 Game reset by admin');
-    updatePlayerStatus('Game reset', 'Ready for new game');
-  }
-});
-
-document.getElementById('addPuck').addEventListener('click', async () => {
-  gameState.pucksRemaining++;
-  gameState.pucksTotal++;
-  updateGameDisplay();
-  await saveGameStateToCloud();
-  addNotification('➕ Admin added a puck');
-  updatePlayerStatus('Puck added', 'Extra puck granted');
-});
-
-document.getElementById('manualPrize').addEventListener('click', async () => {
-  const prizeName = prompt('Enter prize name:');
-  if (prizeName) {
-    gameState.prizesWon.push({
-      board: gameState.currentBoard,
-      prize: prizeName,
-      symbol: '🎁',
-      timestamp: Date.now(),
-      manual: true
+document.addEventListener('DOMContentLoaded', function() {
+  // Board selection
+  document.querySelectorAll('.board-option').forEach(option => {
+    option.addEventListener('click', () => {
+      document.querySelectorAll('.board-option').forEach(opt => opt.classList.remove('selected'));
+      option.classList.add('selected');
     });
-    updateGameDisplay();
+  });
+  
+  // Create game button
+  document.getElementById('createGame').addEventListener('click', createGame);
+  
+  // Copy game link button
+  document.getElementById('copyGameLink').addEventListener('click', () => {
+    const gameLink = document.getElementById('gameLink');
+    gameLink.select();
+    document.execCommand('copy');
+    addNotification('📋 Game link copied to clipboard');
+  });
+  
+  // Reset game button
+  document.getElementById('resetGame').addEventListener('click', async () => {
+    if (confirm('Reset the game? This will clear all progress and prizes.')) {
+      gameState.prizesWon = [];
+      gameState.pucksRemaining = gameState.boardType === 'BOTH' ? gameState.pucksA : 
+                                (gameState.boardType === 'A' ? gameState.pucksA : gameState.pucksB);
+      gameState.currentBoard = gameState.boardType === 'B' ? 'B' : 'A';
+      gameState.playerConnected = false;
+      
+      await saveGameStateToCloud();
+      updateGameDisplay();
+      updatePlayerStatus('Waiting');
+      addNotification('🔄 Game reset by admin');
+    }
+  });
+  
+  // Add puck button
+  document.getElementById('addPuck').addEventListener('click', async () => {
+    gameState.pucksRemaining++;
     await saveGameStateToCloud();
-    addNotification(`🎁 Manual prize added: ${prizeName}`);
-    updatePlayerStatus('Prize awarded', `Manual: ${prizeName}`);
-  }
-});
-
-document.getElementById('switchBoard').addEventListener('click', async () => {
-  gameState.currentBoard = gameState.currentBoard === 'A' ? 'B' : 'A';
-  updateBoardDisplay();
-  initPegs();
-  await saveGameStateToCloud();
-  drawBoard();
-  addNotification(`🔄 Board switched to ${gameState.currentBoard}`);
-  updatePlayerStatus('Board switched', `Now on Board ${gameState.currentBoard}`);
-});
-
-document.getElementById('showNotifications').addEventListener('click', () => {
-  const panel = document.getElementById('notificationPanel');
-  panel.classList.toggle('show');
-});
-
-// ==================== INITIALIZE LEGENDS ====================
-function initializeLegends() {
-  // Board A legend
-  const legendA = document.getElementById('legendA');
-  const uniquePrizesA = [];
-  
-  gameState.boards.A.prizes.forEach(prize => {
-    if (!uniquePrizesA.find(p => p.symbol === prize.symbol)) {
-      uniquePrizesA.push(prize);
-    }
+    updateGameDisplay();
+    addNotification('➕ Admin added an extra puck');
   });
   
-  uniquePrizesA.forEach(prize => {
-    const item = document.createElement('div');
-    item.className = 'legend-item';
-    item.innerHTML = `
-      <div class="legend-symbol" style="background: ${prize.color}">${prize.symbol}</div>
-      <div class="legend-text">${prize.name}</div>
-    `;
-    legendA.appendChild(item);
-  });
-  
-  // Board B legend
-  const legendB = document.getElementById('legendB');
-  const uniquePrizesB = [];
-  
-  gameState.boards.B.prizes.forEach(prize => {
-    if (!uniquePrizesB.find(p => p.symbol === prize.symbol)) {
-      uniquePrizesB.push(prize);
-    }
-  });
-  
-  uniquePrizesB.forEach(prize => {
-    const item = document.createElement('div');
-    item.className = 'legend-item';
-    item.innerHTML = `
-      <div class="legend-symbol" style="background: ${prize.color}">${prize.symbol}</div>
-      <div class="legend-text">${prize.name}</div>
-    `;
-    legendB.appendChild(item);
-  });
-}
-
-// ==================== URL PARAMETERS ====================
-function checkUrlParameters() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const gameId = urlParams.get('game');
-  
-  if (gameId) {
-    // Auto-connect as player
-    gameState.gameId = gameId;
-    gameState.isAdmin = false;
-    loadGameStateFromCloud(gameId);
-    
-    // Check if the game has expired (5 minutes)
-    setTimeout(() => {
-      if (gameState.expirationTime && Date.now() > gameState.expirationTime) {
-        alert('This game link has expired. Please ask the admin for a new link.');
-        // Optionally redirect or disable the game
-      }
-    }, 100);
-  } else {
-    // No game parameter, so we're in admin mode
-    gameState.isAdmin = true;
-    document.getElementById('playerStatus').style.display = 'block';
-  }
-}
-
-// ==================== INITIALIZATION ====================
-initializeLegends();
-initPegs();
-drawBoard();
-checkUrlParameters();
-updateConnectionStatus();
-
-// Set default board selection
-document.querySelector('.board-option[data-board="A"]').classList.add('selected');
-
-// Cleanup on page unload
-window.addEventListener('beforeunload', () => {
-  stopSyncInterval();
+  // Initial notification
+  addNotification('Admin panel initialized and ready');
 });
-
-// Show notification panel after a delay for admin
-setTimeout(() => {
-  if (gameState.isAdmin) {
-    document.getElementById('notificationPanel').classList.add('show');
-  }
-}, 1000);
 </script>
 </body>
 </html>
