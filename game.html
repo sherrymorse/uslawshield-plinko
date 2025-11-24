@@ -2,991 +2,501 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>U.S. LawShield PLINKO - Game</title>
+<title>U.S. LawShield PLINKO - Admin</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   
   :root {
-    --plinko-red: #FF0000;
-    --plinko-blue: #0047AB;
-    --plinko-yellow: #FFD700;
-    --plinko-green: #228B22;
-    --plinko-purple: #800080;
-    --plinko-orange: #FF8C00;
-    --plinko-dark-blue: #002244;
-    --plinko-light-blue: #1E90FF;
-    --plinko-bg: #1a1a2e;
+    --seahawks-navy: #002244;
+    --seahawks-green: #69BE28;
+    --seahawks-blue: #245998;
+    --accent-gold: #FFD700;
+    --accent-orange: #FF8C00;
   }
   
   body {
     font-family: 'Montserrat', sans-serif;
-    background: linear-gradient(135deg, var(--plinko-dark-blue) 0%, #00008B 50%, var(--plinko-dark-blue) 100%);
+    background: linear-gradient(135deg, var(--seahawks-navy) 0%, var(--seahawks-blue) 50%, var(--seahawks-navy) 100%);
     min-height: 100vh;
     color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     padding: 20px;
-    overflow: hidden;
   }
 
-  .game-container {
+  .container {
     max-width: 900px;
-    width: 100%;
+    margin: 0 auto;
   }
 
   .header {
     text-align: center;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 25px;
+    background: linear-gradient(180deg, rgba(0, 34, 68, 0.95) 0%, rgba(41, 128, 185, 0.8) 100%);
+    border-bottom: 6px solid var(--accent-gold);
+    border-radius: 20px;
+    margin-bottom: 25px;
   }
 
   .title {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 4em;
+    font-size: 4.5em;
     letter-spacing: 8px;
-    text-shadow: 0 0 30px var(--plinko-yellow), 3px 3px 0 #000;
+    text-shadow: 0 0 40px var(--accent-gold), 4px 4px 0 #000;
     color: white;
-    margin-bottom: 5px;
-    background: linear-gradient(45deg, #FF0000, #FFD700, #0047AB, #228B22);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    margin-bottom: 10px;
   }
 
   .subtitle {
     font-size: 1.4em;
     letter-spacing: 4px;
-    color: var(--plinko-yellow);
+    color: var(--accent-gold);
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     font-weight: 800;
   }
 
-  .canvas-wrapper {
-    position: relative;
-    border-radius: 25px;
-    overflow: hidden;
-    box-shadow: 0 0 80px rgba(255, 215, 0, 0.8);
-    border: 8px solid var(--plinko-yellow);
-    background: linear-gradient(160deg, #000428 0%, #004e92 100%);
-  }
-
-  #plinkoCanvas {
-    display: block;
-    width: 100%;
-    background: linear-gradient(160deg, #000428 0%, #004e92 100%);
-    cursor: pointer;
-  }
-
-  .game-info {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
-    display: flex;
-    justify-content: space-between;
-    z-index: 10;
-    pointer-events: none;
-  }
-
-  .info-badge {
-    background: linear-gradient(135deg, #8B0000 0%, #FF0000 100%);
-    padding: 12px 25px;
-    border-radius: 25px;
-    border: 3px solid var(--plinko-yellow);
-    color: white;
-    font-weight: 800;
-    font-size: 18px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.6);
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-  }
-
-  .drop-zone {
-    position: absolute;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 120px;
-    height: 60px;
-    background: linear-gradient(135deg, #FF0000 0%, #8B0000 100%);
-    border: 4px solid var(--plinko-yellow);
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 800;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 8px 25px rgba(255, 0, 0, 0.6);
-    z-index: 5;
-  }
-
-  .instruction {
-    text-align: center;
-    color: var(--plinko-yellow);
-    font-weight: 700;
-    font-size: 16px;
-    margin-top: 15px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-  }
-
-  .error-screen {
-    text-align: center;
-    padding: 40px;
+  .setup-panel {
     background: linear-gradient(135deg, rgba(0, 34, 68, 0.9) 0%, rgba(36, 89, 152, 0.9) 100%);
     border-radius: 25px;
-    border: 4px solid var(--plinko-yellow);
+    padding: 30px;
+    border: 4px solid var(--accent-gold);
     box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+    margin-bottom: 25px;
   }
 
-  .error-icon {
-    font-size: 4em;
-    margin-bottom: 20px;
-  }
-
-  .error-title {
+  .panel-title {
+    color: var(--accent-gold);
+    font-size: 28px;
+    margin-bottom: 25px;
+    text-align: center;
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 2.5em;
-    color: var(--plinko-yellow);
-    margin-bottom: 15px;
     letter-spacing: 3px;
+    text-transform: uppercase;
   }
 
-  .error-message {
-    font-size: 1.2em;
-    color: white;
-    line-height: 1.6;
+  .form-group {
+    margin-bottom: 25px;
   }
 
-  .release-warning {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(139, 0, 0, 0.95);
-    padding: 20px 30px;
-    border-radius: 15px;
-    border: 3px solid var(--plinko-yellow);
-    color: white;
+  label {
+    display: block;
+    color: var(--accent-gold);
+    margin-bottom: 10px;
     font-weight: 700;
-    font-size: 18px;
-    text-align: center;
-    z-index: 100;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
-  .release-warning.show {
-    opacity: 1;
-  }
-
-  .bigwin {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    font-size: 8em;
-    color: var(--plinko-yellow);
-    text-shadow: 0 0 50px var(--plinko-yellow), 0 0 100px #FF0000;
-    z-index: 9999;
-    pointer-events: none;
-    animation: win 3s forwards;
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 8px;
-    background: linear-gradient(45deg, #FF0000, #FFD700, #FFFFFF);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  @keyframes win {
-    0% { transform: translate(-50%, -50%) scale(0) rotate(-180deg); opacity: 0; }
-    20% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
-    40% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
-    60% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-    80% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
-    100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-  }
-
-  .game-over {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: linear-gradient(135deg, #8B0000 0%, #FF0000 100%);
-    padding: 40px;
-    border-radius: 25px;
-    border: 6px solid var(--plinko-yellow);
+  input[type="text"], select {
+    width: 100%;
+    padding: 15px;
+    border: 3px solid var(--accent-gold);
+    border-radius: 12px;
+    background: rgba(0, 25, 51, 0.8);
     color: white;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .board-selection {
+    display: flex;
+    gap: 12px;
+  }
+
+  .board-option {
+    flex: 1;
     text-align: center;
-    z-index: 100;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    padding: 15px;
+    background: rgba(0, 25, 51, 0.8);
+    border: 3px solid var(--accent-gold);
+    border-radius: 12px;
+    cursor: pointer;
+    color: var(--accent-gold);
+    font-weight: 700;
+    font-size: 16px;
+    text-transform: uppercase;
+    transition: all 0.3s;
+  }
+
+  .board-option.selected {
+    background: var(--accent-gold);
+    color: var(--seahawks-navy);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+  }
+
+  .puck-config {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .puck-config-item {
+    text-align: center;
+    padding: 15px;
+    background: rgba(0, 25, 51, 0.8);
+    border-radius: 12px;
+    border: 2px solid var(--accent-gold);
+  }
+
+  .puck-config-title {
+    color: var(--accent-gold);
+    font-weight: 700;
+    margin-bottom: 10px;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  .btn-cta {
+    background: linear-gradient(135deg, var(--seahawks-green) 0%, #4A8A1F 100%);
+    color: var(--seahawks-navy);
+    padding: 20px;
+    border: none;
+    border-radius: 50px;
+    font-size: 20px;
+    font-weight: 800;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    width: 100%;
+    border: 3px solid var(--accent-gold);
+    box-shadow: 0 10px 30px rgba(105, 190, 40, 0.6);
+  }
+
+  .btn-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(105, 190, 40, 0.9);
+  }
+
+  .game-link-section {
+    margin-top: 25px;
+    padding: 20px;
+    background: rgba(0, 25, 51, 0.7);
+    border-radius: 15px;
+    border: 2px solid var(--accent-gold);
     display: none;
   }
 
-  .game-over h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 4em;
-    margin-bottom: 20px;
-    letter-spacing: 4px;
-    color: var(--plinko-yellow);
-    text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+  .link-display {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
   }
 
-  .puck {
-    position: absolute;
-    width: 36px;
-    height: 36px;
-    background: radial-gradient(circle at 30% 30%, #FFFFFF, #FF0000 70%, #8B0000);
-    border-radius: 50%;
-    border: 3px solid #FFD700;
-    box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
-    transition: all 0.3s ease;
-    z-index: 20;
+  .link-display input {
+    flex: 1;
+    background: rgba(0, 34, 68, 0.9);
+    color: var(--accent-gold);
+    border: 2px solid var(--accent-gold);
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: 600;
   }
 
-  .puck.hover {
-    animation: hoverGlow 2s infinite alternate;
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.9);
-  }
-
-  @keyframes hoverGlow {
-    0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 215, 0, 0.7); }
-    100% { transform: scale(1.1); box-shadow: 0 0 40px rgba(255, 215, 0, 1); }
-  }
-
-  .slot-value {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 24px;
+  .link-display button {
+    background: var(--accent-gold);
+    color: var(--seahawks-navy);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
     font-weight: 800;
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+
+  .link-display button:hover {
+    background: #FFE55C;
+    transform: translateY(-2px);
+  }
+
+  .notification-panel {
+    background: linear-gradient(135deg, rgba(0, 34, 68, 0.9) 0%, rgba(36, 89, 152, 0.9) 100%);
+    border-radius: 25px;
+    padding: 30px;
+    border: 4px solid var(--accent-gold);
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+  }
+
+  .notification-list {
+    height: 500px;
+    overflow-y: auto;
+    background: rgba(0, 25, 51, 0.7);
+    border-radius: 15px;
+    padding: 15px;
+    border: 2px solid var(--accent-gold);
+  }
+
+  .notification-item {
+    background: rgba(0, 34, 68, 0.9);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--accent-gold);
+    font-size: 14px;
+    animation: fadeIn 0.5s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .notification-time {
+    color: var(--accent-gold);
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 5px;
   }
 </style>
 </head>
 <body>
-<div class="game-container" id="gameContainer">
+<div class="container">
   <div class="header">
     <h1 class="title">U.S. LAWSHIELD PLINKO</h1>
-    <p class="subtitle">LEGAL DEFENSE FOR SELF DEFENSE®</p>
+    <p class="subtitle">ADMIN CONTROL PANEL</p>
   </div>
 
-  <div class="canvas-wrapper">
-    <div class="game-info">
-      <div class="info-badge" id="currentBoard">BOARD A</div>
-      <div class="info-badge">PUCKS: <span id="puckCounter">0</span></div>
+  <div class="setup-panel">
+    <h2 class="panel-title">GAME SETUP</h2>
+    
+    <div class="form-group">
+      <label for="playerName">Player Name:</label>
+      <input type="text" id="playerName" placeholder="Enter player name">
     </div>
-    <div class="drop-zone">DROP ZONE</div>
-    <canvas id="plinkoCanvas" width="900" height="1200"></canvas>
-    <div class="release-warning" id="releaseWarning">
-      ⚠️ RETURN TO DROP ZONE TO RELEASE PUCK!
+    
+    <div class="form-group">
+      <label>Select Board(s):</label>
+      <div class="board-selection">
+        <div class="board-option selected" data-board="A">Board A</div>
+        <div class="board-option" data-board="B">Board B</div>
+        <div class="board-option" data-board="BOTH">Both</div>
+      </div>
     </div>
-    <div class="game-over" id="gameOverScreen" style="display: none;">
-      <h2>GAME COMPLETE!</h2>
-      <p style="font-size: 24px; margin-bottom: 10px;">All pucks have been used.</p>
-      <p style="font-size: 20px;">Thank you for playing!</p>
+    
+    <div class="form-group">
+      <label>Puck Configuration:</label>
+      <div class="puck-config">
+        <div class="puck-config-item">
+          <div class="puck-config-title">Board A Pucks</div>
+          <select id="puckCountA">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+        <div class="puck-config-item">
+          <div class="puck-config-title">Board B Pucks</div>
+          <select id="puckCountB">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <button class="btn-cta" id="createGame">CREATE GAME</button>
+    
+    <div class="game-link-section" id="gameLinkSection">
+      <h3 class="panel-title">PLAYER LINK</h3>
+      <p style="color: var(--accent-gold); font-weight: 700; margin-bottom: 10px;">Share this link with the player:</p>
+      <div class="link-display">
+        <input type="text" id="gameLink" readonly>
+        <button id="copyGameLink">COPY</button>
+      </div>
     </div>
   </div>
 
-  <div class="instruction">CLICK AND DRAG PUCK → MOVE TO DROP ZONE → RELEASE TO PLAY!</div>
+  <div class="notification-panel">
+    <h2 class="panel-title">🔔 GAME NOTIFICATIONS</h2>
+    <div class="notification-list" id="notificationList">
+      <div class="notification-item">
+        Admin panel initialized
+        <div class="notification-time">Just now</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
 const JSONBIN_CONFIG = {
+  MASTER_KEY: '$2a$10$NckuWO.y9g8.amyZZWkc8.lKIMS.AVSCyN1qT9/0d5EtRjuV9lmS2',
   BASE_URL: 'https://api.jsonbin.io/v3/b',
   HEADERS: {
     'Content-Type': 'application/json',
-    'X-Master-Key': '$2a$10$NckuWO.y9g8.amyZZWkc8.lKIMS.AVSCyN1qT9/0d5EtRjuV9lmS2',
-    'X-Access-Key': '$2a$10$g6RfQ66H6XQyYy3D848Cfurvs0dXgVt92aV0Rr0UqchZrBZwr7Vpy'
+    'X-Master-Key': '$2a$10$NckuWO.y9g8.amyZZWkc8.lKIMS.AVSCyN1qT9/0d5EtRjuV9lmS2'
   }
 };
 
-// Check for game parameter
-const urlParams = new URLSearchParams(window.location.search);
-const binId = urlParams.get('game');
-
-if (!binId) {
-  showError();
-} else {
-  initGame(binId);
-}
-
-function showError() {
-  document.getElementById('gameContainer').innerHTML = `
-    <div class="error-screen">
-      <div class="error-icon">⚠️</div>
-      <h2 class="error-title">INVALID SESSION</h2>
-      <p class="error-message">
-        This game link is invalid or has expired.<br>
-        Please contact the administrator for a new game link.
-      </p>
-    </div>
-  `;
-}
-
-async function initGame(binId) {
-  try {
-    const gameState = await readGameBin(binId);
-    
-    if (!gameState) {
-      throw new Error('Failed to load game');
-    }
-    
-    // Mark player as connected
-    gameState.playerConnected = true;
-    gameState.lastUpdated = new Date().toISOString();
-    await updateGameBin(binId, gameState);
-    
-    // Start game
-    startPlinko(binId, gameState);
-    
-  } catch (error) {
-    console.error('Error loading game:', error);
-    showError();
+const boards = {
+  A: {
+    name: "Board A",
+    prizes: [
+      { symbol: '🎁', name: '$25 Gift Card' },
+      { symbol: '⏰', name: '1 Hour Campaign of Your Choice' },
+      { symbol: '👥', name: 'Shadow an Agent for 1 Hour' },
+      { symbol: '🚪', name: 'Leave 15min Early / Come in 15min Late' },
+      { symbol: '☕', name: 'Extra 15 Minute Break' },
+      { symbol: '📊', name: 'Replace QA Score with Call of Your Choice' },
+      { symbol: '💼', name: 'Coffee with Leadership' },
+      { symbol: '⏰', name: '1 Hour Campaign of Your Choice' },
+      { symbol: '🎁', name: '$25 Gift Card' }
+    ]
+  },
+  B: {
+    name: "Board B",
+    prizes: [
+      { symbol: '🕑', name: '2 Hours Campaign of Your Choice' },
+      { symbol: '💰', name: '$50 Gift Card' },
+      { symbol: '⏱️', name: 'Leave 30 Minutes Early' },
+      { symbol: '💯', name: 'Replace Lowest QA Score with 100' },
+      { symbol: '🕓', name: '4 Hours Campaign of Your Choice' },
+      { symbol: '🍽️', name: 'Lunch on Leadership' },
+      { symbol: '🎴', name: 'Wild Card' },
+      { symbol: '💰', name: '$50 Gift Card' },
+      { symbol: '🕑', name: '2 Hours Campaign of Your Choice' }
+    ]
   }
+};
+
+const gameState = { binId: null, lastUpdated: 0 };
+const notifications = [];
+let syncInterval = null;
+
+function addNotification(message) {
+  const timestamp = new Date().toLocaleTimeString();
+  notifications.unshift({ message, timestamp });
+  if (notifications.length > 50) notifications.pop();
+  
+  const list = document.getElementById('notificationList');
+  list.innerHTML = '';
+  notifications.forEach(n => {
+    const item = document.createElement('div');
+    item.className = 'notification-item';
+    item.innerHTML = `${n.message}<div class="notification-time">${n.timestamp}</div>`;
+    list.appendChild(item);
+  });
 }
 
-async function updateGameBin(binId, data) {
-  try {
-    const response = await fetch(`${JSONBIN_CONFIG.BASE_URL}/${binId}`, {
-      method: 'PUT',
-      headers: JSONBIN_CONFIG.HEADERS,
-      body: JSON.stringify(data)
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error updating JSONBin:', error);
-    throw error;
-  }
+async function createGameBin(data) {
+  const response = await fetch(JSONBIN_CONFIG.BASE_URL, {
+    method: 'POST',
+    headers: JSONBIN_CONFIG.HEADERS,
+    body: JSON.stringify({ ...data, boards, created: Date.now() })
+  });
+  const result = await response.json();
+  return result.metadata.id;
 }
 
 async function readGameBin(binId) {
-  try {
-    const response = await fetch(`${JSONBIN_CONFIG.BASE_URL}/${binId}/latest`, {
-      headers: {
-        'X-Master-Key': JSONBIN_CONFIG.HEADERS['X-Master-Key'],
-        'X-Access-Key': JSONBIN_CONFIG.HEADERS['X-Access-Key']
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    return data.record;
-  } catch (error) {
-    console.error('Error reading from JSONBin:', error);
-    return null;
-  }
+  const response = await fetch(`${JSONBIN_CONFIG.BASE_URL}/${binId}/latest`, {
+    headers: { 'X-Master-Key': JSONBIN_CONFIG.HEADERS['X-Master-Key'] }
+  });
+  const data = await response.json();
+  return data.record;
 }
 
-function startPlinko(binId, gameState) {
-  const canvas = document.getElementById('plinkoCanvas');
-  const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
+async function createGame() {
+  const playerName = document.getElementById('playerName').value.trim();
+  const boardType = document.querySelector('.board-option.selected').dataset.board;
+  const pucksA = parseInt(document.getElementById('puckCountA').value);
+  const pucksB = parseInt(document.getElementById('puckCountB').value);
   
-  // Authentic Plinko dimensions
-  const DROP_ZONE_Y = 150;
-  const PUCK_RADIUS = 18;
-  const PEG_RADIUS = 6;
-  const NUM_ROWS = 13; // Classic Price is Right has 13 rows
-  const NUM_SLOTS = 9;
-
-  let pegs = [];
-  let currentPuck = null;
-  let isDragging = false;
-  let hoverPuck = { x: W/2, y: DROP_ZONE_Y - 30 };
-  let animationId = null;
-  let particles = [];
-  let lastTime = 0;
-  let gameActive = true;
-
-  // Authentic Price is Right slot values
-  const SLOT_VALUES = {
-    A: [100, 500, 1000, 0, 10000, 0, 1000, 500, 100], // Classic $10,000 center
-    B: [0, 300, 600, 1000, 5000, 1000, 600, 300, 0]   // Alternative layout
+  if (!playerName) {
+    alert('Please enter a player name');
+    return;
+  }
+  
+  const gameData = {
+    playerName,
+    boardType,
+    pucksA,
+    pucksB,
+    pucksRemaining: boardType === 'BOTH' ? pucksA + pucksB : (boardType === 'A' ? pucksA : pucksB),
+    currentBoard: boardType === 'B' ? 'B' : 'A',
+    prizesWon: [],
+    isActive: true,
+    playerConnected: false,
+    puckGrabbed: false,
+    gameId: 'G' + Date.now().toString().slice(-6),
+    lastUpdated: Date.now()
   };
-
-  // Initialize authentic triangular peg layout
-  function initPegs() {
-    pegs = [];
-    const startY = DROP_ZONE_Y + 80;
-    const rowHeight = (H - startY - 200) / NUM_ROWS;
+  
+  try {
+    gameState.binId = await createGameBin(gameData);
     
-    for (let row = 0; row < NUM_ROWS; row++) {
-      const numPegs = row + 1; // Triangular pattern: 1, 2, 3, ..., 13
-      const totalWidth = numPegs * 2 * PEG_RADIUS * 2.5;
-      const startX = (W - totalWidth) / 2 + PEG_RADIUS * 2.5;
-      
-      for (let col = 0; col < numPegs; col++) {
-        pegs.push({
-          x: startX + col * (PEG_RADIUS * 5),
-          y: startY + row * rowHeight,
-          lastHit: 0
-        });
-      }
-    }
+    const gameLink = `${window.location.origin}/game.html?game=${gameState.binId}`;
+    document.getElementById('gameLink').value = gameLink;
+    document.getElementById('gameLinkSection').style.display = 'block';
+    
+    addNotification(`🎮 Game created for "${playerName}"`);
+    addNotification(`📋 Configuration: ${boardType === 'BOTH' ? 'Both Boards' : `Board ${boardType}`}`);
+    addNotification(`🎯 Pucks: Board A=${pucksA}, Board B=${pucksB}`);
+    
+    startMonitoring();
+  } catch (error) {
+    alert('Failed to create game');
   }
-
-  function drawBoard() {
-    // Clear with dark blue gradient background
-    const bgGradient = ctx.createLinearGradient(0, 0, 0, H);
-    bgGradient.addColorStop(0, '#000428');
-    bgGradient.addColorStop(1, '#004e92');
-    ctx.fillStyle = bgGradient;
-    ctx.fillRect(0, 0, W, H);
-    
-    // Draw board border
-    ctx.strokeStyle = '#FFD700';
-    ctx.lineWidth = 8;
-    ctx.strokeRect(20, 20, W - 40, H - 40);
-    
-    // Draw decorative header
-    const headerGradient = ctx.createLinearGradient(0, 0, 0, 100);
-    headerGradient.addColorStop(0, '#8B0000');
-    headerGradient.addColorStop(1, '#FF0000');
-    ctx.fillStyle = headerGradient;
-    ctx.fillRect(40, 40, W - 80, 80);
-    
-    ctx.strokeStyle = '#FFD700';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(40, 40, W - 80, 80);
-    
-    // Draw title in header
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 36px "Bebas Neue"';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('PLINKO', W/2, 80);
-    
-    // Draw pegs with authentic appearance
-    ctx.shadowColor = '#FFD700';
-    ctx.shadowBlur = 10;
-    
-    pegs.forEach(peg => {
-      const pegGradient = ctx.createRadialGradient(
-        peg.x - 2, peg.y - 2, 0, peg.x, peg.y, PEG_RADIUS
-      );
-      pegGradient.addColorStop(0, '#FFFFFF');
-      pegGradient.addColorStop(0.3, '#FFD700');
-      pegGradient.addColorStop(1, '#FF8C00');
-      
-      ctx.fillStyle = pegGradient;
-      ctx.beginPath();
-      ctx.arc(peg.x, peg.y, PEG_RADIUS, 0, Math.PI * 2);
-      ctx.fill();
-      
-      // Inner highlight
-      ctx.fillStyle = '#FFFFFF';
-      ctx.beginPath();
-      ctx.arc(peg.x - 2, peg.y - 2, PEG_RADIUS * 0.3, 0, Math.PI * 2);
-      ctx.fill();
-    });
-    
-    ctx.shadowBlur = 0;
-    
-    // Draw slots with authentic Price is Right styling
-    const slotHeight = 120;
-    const slotWidth = W / NUM_SLOTS;
-    const slotY = H - slotHeight;
-    
-    const currentSlotValues = SLOT_VALUES[gameState.currentBoard] || SLOT_VALUES.A;
-    
-    currentSlotValues.forEach((value, index) => {
-      // Slot background with gradient
-      const slotGradient = ctx.createLinearGradient(
-        index * slotWidth, slotY, index * slotWidth, H
-      );
-      
-      if (value === 10000 || value === 5000) {
-        // Jackpot slot - gold gradient
-        slotGradient.addColorStop(0, '#FFD700');
-        slotGradient.addColorStop(1, '#FF8C00');
-      } else if (value === 0) {
-        // Zero slot - gray
-        slotGradient.addColorStop(0, '#666666');
-        slotGradient.addColorStop(1, '#333333');
-      } else {
-        // Money slots - red gradient
-        slotGradient.addColorStop(0, '#FF0000');
-        slotGradient.addColorStop(1, '#8B0000');
-      }
-      
-      ctx.fillStyle = slotGradient;
-      ctx.fillRect(index * slotWidth, slotY, slotWidth, slotHeight);
-      
-      // Slot border
-      ctx.strokeStyle = '#FFD700';
-      ctx.lineWidth = value === 10000 || value === 5000 ? 6 : 3;
-      ctx.strokeRect(index * slotWidth, slotY, slotWidth, slotHeight);
-      
-      // Slot value
-      ctx.fillStyle = '#FFFFFF';
-      ctx.font = value === 10000 || value === 5000 ? 'bold 28px "Bebas Neue"' : 'bold 24px "Bebas Neue"';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      
-      if (value === 10000 || value === 5000) {
-        ctx.shadowColor = '#FF0000';
-        ctx.shadowBlur = 15;
-      }
-      
-      const displayValue = value === 0 ? '0' : `$${value.toLocaleString()}`;
-      ctx.fillText(displayValue, index * slotWidth + slotWidth/2, slotY + slotHeight/2);
-      
-      ctx.shadowBlur = 0;
-    });
-    
-    // Draw hover puck
-    if (gameState.pucksRemaining > 0 && !currentPuck && !isDragging) {
-      drawPuck(hoverPuck.x, hoverPuck.y, true);
-    }
-    
-    // Draw current puck
-    if (currentPuck) {
-      drawPuck(currentPuck.x, currentPuck.y, false);
-    }
-    
-    // Draw particles
-    particles.forEach((particle, index) => {
-      particle.life--;
-      if (particle.life <= 0) {
-        particles.splice(index, 1);
-        return;
-      }
-      
-      particle.x += particle.vx;
-      particle.y += particle.vy;
-      particle.vy += 0.1; // Gentle gravity
-      
-      ctx.globalAlpha = particle.life / particle.maxLife;
-      ctx.fillStyle = particle.color;
-      ctx.beginPath();
-      ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-      ctx.fill();
-    });
-    ctx.globalAlpha = 1;
-  }
-
-  function drawPuck(x, y, isHover = false) {
-    ctx.save();
-    
-    // Puck shadow
-    ctx.shadowColor = isHover ? '#FF0000' : '#8B0000';
-    ctx.shadowBlur = isHover ? 25 : 15;
-    ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
-    
-    // Puck body with realistic gradient
-    const puckGradient = ctx.createRadialGradient(
-      x - 5, y - 5, 0, x, y, PUCK_RADIUS
-    );
-    
-    if (isHover) {
-      puckGradient.addColorStop(0, '#FFFFFF');
-      puckGradient.addColorStop(0.3, '#FF6B6B');
-      puckGradient.addColorStop(0.7, '#FF0000');
-      puckGradient.addColorStop(1, '#8B0000');
-    } else {
-      puckGradient.addColorStop(0, '#FFFFFF');
-      puckGradient.addColorStop(0.4, '#FF0000');
-      puckGradient.addColorStop(1, '#8B0000');
-    }
-    
-    ctx.fillStyle = puckGradient;
-    ctx.beginPath();
-    ctx.arc(x, y, PUCK_RADIUS, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Puck border
-    ctx.strokeStyle = '#FFD700';
-    ctx.lineWidth = 3;
-    ctx.stroke();
-    
-    // Puck highlight
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-    ctx.beginPath();
-    ctx.arc(x - 4, y - 4, PUCK_RADIUS * 0.3, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // USL text
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 12px Montserrat';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('USL', x, y);
-    
-    ctx.restore();
-  }
-
-  function updatePhysics(timestamp) {
-    if (!currentPuck || !gameActive) return;
-    
-    const deltaTime = Math.min(16, timestamp - lastTime) / 16;
-    lastTime = timestamp;
-    
-    // Realistic physics with proper energy conservation
-    currentPuck.vy += 0.4 * deltaTime; // Gravity
-    currentPuck.x += currentPuck.vx * deltaTime;
-    currentPuck.y += currentPuck.vy * deltaTime;
-    
-    // Air resistance (very slight)
-    currentPuck.vx *= 0.999;
-    currentPuck.vy *= 0.999;
-    
-    // Wall collisions with realistic bounce
-    if (currentPuck.x - PUCK_RADIUS < 40) {
-      currentPuck.x = 40 + PUCK_RADIUS;
-      currentPuck.vx = Math.abs(currentPuck.vx) * 0.8; // Energy loss on wall hit
-    } else if (currentPuck.x + PUCK_RADIUS > W - 40) {
-      currentPuck.x = W - 40 - PUCK_RADIUS;
-      currentPuck.vx = -Math.abs(currentPuck.vx) * 0.8;
-    }
-    
-    // Realistic peg collisions
-    const currentTime = Date.now();
-    let collisionOccurred = false;
-    
-    pegs.forEach(peg => {
-      if (currentTime - peg.lastHit < 50) return; // Collision cooldown
-      
-      const dx = currentPuck.x - peg.x;
-      const dy = currentPuck.y - peg.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      const minDistance = PUCK_RADIUS + PEG_RADIUS;
-      
-      if (distance < minDistance) {
-        collisionOccurred = true;
-        peg.lastHit = currentTime;
-        
-        // Normalize collision vector
-        const nx = dx / distance;
-        const ny = dy / distance;
-        
-        // Separate puck from peg
-        const overlap = minDistance - distance;
-        currentPuck.x += nx * overlap * 0.7;
-        currentPuck.y += ny * overlap * 0.7;
-        
-        // Calculate reflection (realistic bounce)
-        const dotProduct = currentPuck.vx * nx + currentPuck.vy * ny;
-        currentPuck.vx -= 1.8 * dotProduct * nx;
-        currentPuck.vy -= 1.8 * dotProduct * ny;
-        
-        // Add slight randomness for authentic Plinko behavior
-        currentPuck.vx += (Math.random() - 0.5) * 0.8;
-        currentPuck.vy += (Math.random() - 0.5) * 0.4;
-        
-        // Create collision effect
-        for (let i = 0; i < 5; i++) {
-          particles.push({
-            x: currentPuck.x,
-            y: currentPuck.y,
-            vx: (Math.random() - 0.5) * 6,
-            vy: (Math.random() - 0.5) * 6,
-            life: 20,
-            maxLife: 20,
-            size: Math.random() * 2 + 1,
-            color: '#FFD700'
-          });
-        }
-      }
-    });
-    
-    // Check if puck reached slots
-    if (currentPuck.y + PUCK_RADIUS > H - 120) {
-      handlePuckLanding();
-      return;
-    }
-    
-    // Continue animation
-    drawBoard();
-    animationId = requestAnimationFrame(updatePhysics);
-  }
-
-  function handlePuckLanding() {
-    const slotWidth = W / NUM_SLOTS;
-    const slotIndex = Math.min(NUM_SLOTS - 1, Math.max(0, Math.floor(currentPuck.x / slotWidth)));
-    const currentSlotValues = SLOT_VALUES[gameState.currentBoard] || SLOT_VALUES.A;
-    const slotValue = currentSlotValues[slotIndex];
-    
-    // Record result
-    if (!gameState.results) gameState.results = [];
-    gameState.results.push({
-      board: gameState.currentBoard,
-      slot: slotIndex,
-      value: slotValue,
-      timestamp: Date.now()
-    });
-    
-    // Celebration particles based on value
-    const particleCount = slotValue >= 1000 ? 100 : 50;
-    const particleColor = slotValue >= 5000 ? '#FFD700' : slotValue >= 1000 ? '#FF0000' : '#666666';
-    
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
-        x: currentPuck.x,
-        y: H - 60,
-        vx: (Math.random() - 0.5) * 12,
-        vy: -Math.random() * 15,
-        life: 60,
-        maxLife: 60,
-        size: Math.random() * 4 + 2,
-        color: particleColor
-      });
-    }
-    
-    // Big celebration for jackpot
-    if (slotValue === 10000 || slotValue === 5000) {
-      const winElement = document.createElement('div');
-      winElement.className = 'bigwin';
-      winElement.textContent = slotValue === 10000 ? 'JACKPOT!' : 'BIG WIN!';
-      document.body.appendChild(winElement);
-      setTimeout(() => winElement.remove(), 3000);
-      
-      // Extra celebration particles
-      for (let i = 0; i < 80; i++) {
-        particles.push({
-          x: W / 2,
-          y: H / 2,
-          vx: (Math.random() - 0.5) * 20,
-          vy: (Math.random() - 0.5) * 20,
-          life: 120,
-          maxLife: 120,
-          size: Math.random() * 6 + 3,
-          color: '#FFD700'
-        });
-      }
-    }
-    
-    // Update game state
-    gameState.pucksRemaining--;
-    gameState.lastUpdated = new Date().toISOString();
-    
-    // Save state
-    saveState();
-    
-    // Check for board switch (if using both boards)
-    if (gameState.boardConfig === 'BOTH' && gameState.currentBoard === 'A' && 
-        gameState.pucksRemaining <= gameState.puckCountB) {
-      gameState.currentBoard = 'B';
-      document.getElementById('currentBoard').textContent = 'BOARD B';
-      initPegs();
-    }
-    
-    // Check for game completion
-    if (gameState.pucksRemaining <= 0) {
-      gameActive = false;
-      setTimeout(() => {
-        document.getElementById('gameOverScreen').style.display = 'block';
-      }, 2000);
-    }
-    
-    currentPuck = null;
-    updateDisplay();
-    
-    cancelAnimationFrame(animationId);
-    drawBoard();
-  }
-
-  function animateHoverPuck() {
-    if (!gameActive) return;
-    
-    if (currentPuck || gameState.pucksRemaining === 0) {
-      requestAnimationFrame(animateHoverPuck);
-      return;
-    }
-    
-    // Gentle hovering motion
-    const time = Date.now() * 0.001;
-    hoverPuck.x = W/2 + Math.sin(time) * 40;
-    
-    drawBoard();
-    requestAnimationFrame(animateHoverPuck);
-  }
-
-  function updateDisplay() {
-    document.getElementById('puckCounter').textContent = gameState.pucksRemaining;
-    document.getElementById('currentBoard').textContent = `BOARD ${gameState.currentBoard}`;
-    
-    // Visual feedback for low puck count
-    const puckCounter = document.getElementById('puckCounter');
-    if (gameState.pucksRemaining <= 2) {
-      puckCounter.style.color = '#FF6B6B';
-    } else if (gameState.pucksRemaining <= 5) {
-      puckCounter.style.color = '#FFA726';
-    } else {
-      puckCounter.style.color = '#FFFFFF';
-    }
-  }
-
-  async function saveState() {
-    try {
-      await updateGameBin(binId, gameState);
-    } catch (error) {
-      console.error('Failed to save game state:', error);
-    }
-  }
-
-  // Event handlers
-  canvas.addEventListener('mousemove', (e) => {
-    if (!gameActive) return;
-    
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const x = (e.clientX - rect.left) * scaleX;
-    const y = (e.clientY - rect.top) * scaleY;
-    
-    if (isDragging && currentPuck) {
-      // Smooth dragging with constraints
-      currentPuck.x = Math.max(PUCK_RADIUS + 40, Math.min(W - PUCK_RADIUS - 40, x));
-      currentPuck.y = Math.max(PUCK_RADIUS + 40, Math.min(DROP_ZONE_Y - PUCK_RADIUS, y));
-      drawBoard();
-    } else if (gameState.pucksRemaining > 0 && !currentPuck) {
-      hoverPuck.x = x;
-      hoverPuck.y = Math.max(DROP_ZONE_Y - 50, Math.min(DROP_ZONE_Y - 10, y));
-    }
-  });
-
-  canvas.addEventListener('mousedown', (e) => {
-    if (!gameActive || currentPuck || gameState.pucksRemaining === 0) return;
-    
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const x = (e.clientX - rect.left) * scaleX;
-    const y = (e.clientY - rect.top) * scaleY;
-    
-    // Check if clicking near hover puck
-    const distance = Math.sqrt(Math.pow(x - hoverPuck.x, 2) + Math.pow(y - hoverPuck.y, 2));
-    
-    if (distance < PUCK_RADIUS * 1.5) {
-      isDragging = true;
-      currentPuck = { 
-        x: x, 
-        y: y, 
-        vx: 0, 
-        vy: 0
-      };
-      gameState.lastUpdated = new Date().toISOString();
-      saveState();
-      drawBoard();
-    }
-  });
-
-  canvas.addEventListener('mouseup', () => {
-    if (!gameActive || !isDragging || !currentPuck) return;
-    
-    isDragging = false;
-    
-    // Must be in drop zone to release
-    if (currentPuck.y > DROP_ZONE_Y) {
-      const warning = document.getElementById('releaseWarning');
-      warning.classList.add('show');
-      setTimeout(() => warning.classList.remove('show'), 2000);
-      currentPuck = null;
-      drawBoard();
-      return;
-    }
-    
-    // Realistic initial velocity based on drop position
-    const centerX = W / 2;
-    currentPuck.vx = (currentPuck.x - centerX) * 0.3; // Reduced for more control
-    currentPuck.vy = 2 + Math.random() * 1; // Consistent downward velocity
-    
-    lastTime = performance.now();
-    animationId = requestAnimationFrame(updatePhysics);
-    saveState();
-  });
-
-  // Touch support
-  canvas.addEventListener('touchmove', (e) => {
-    if (!gameActive) return;
-    e.preventDefault();
-    
-    const touch = e.touches[0];
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const x = (touch.clientX - rect.left) * scaleX;
-    const y = (touch.clientY - rect.top) * scaleY;
-    
-    if (isDragging && currentPuck) {
-      currentPuck.x = Math.max(PUCK_RADIUS + 40, Math.min(W - PUCK_RADIUS - 40, x));
-      currentPuck.y = Math.max(PUCK_RADIUS + 40, Math.min(DROP_ZONE_Y - PUCK_RADIUS, y));
-      drawBoard();
-    }
-  });
-
-  canvas.addEventListener('touchstart', (e) => {
-    if (!gameActive || currentPuck || gameState.pucksRemaining === 0) return;
-    e.preventDefault();
-    
-    const touch = e.touches[0];
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const x = (touch.clientX - rect.left) * scaleX;
-    const y = (touch.clientY - rect.top) * scaleY;
-    
-    const distance = Math.sqrt(Math.pow(x - hoverPuck.x, 2) + Math.pow(y - hoverPuck.y, 2));
-    
-    if (distance < PUCK_RADIUS * 1.5) {
-      isDragging = true;
-      currentPuck = { x, y, vx: 0, vy: 0 };
-      gameState.lastUpdated = new Date().toISOString();
-      saveState();
-      drawBoard();
-    }
-  });
-
-  canvas.addEventListener('touchend', (e) => {
-    if (!gameActive || !isDragging || !currentPuck) return;
-    e.preventDefault();
-    
-    isDragging = false;
-    
-    if (currentPuck.y > DROP_ZONE_Y) {
-      const warning = document.getElementById('releaseWarning');
-      warning.classList.add('show');
-      setTimeout(() => warning.classList.remove('show'), 2000);
-      currentPuck = null;
-      drawBoard();
-      return;
-    }
-    
-    const centerX = W / 2;
-    currentPuck.vx = (currentPuck.x - centerX) * 0.3;
-    currentPuck.vy = 2 + Math.random() * 1;
-    
-    lastTime = performance.now();
-    animationId = requestAnimationFrame(updatePhysics);
-    saveState();
-  });
-
-  // Initialize game
-  initPegs();
-  updateDisplay();
-  drawBoard();
-  animateHoverPuck();
 }
+
+function startMonitoring() {
+  if (syncInterval) clearInterval(syncInterval);
+  
+  let prevState = {};
+  
+  syncInterval = setInterval(async () => {
+    const remote = await readGameBin(gameState.binId);
+    if (!remote || remote.lastUpdated <= gameState.lastUpdated) return;
+    
+    if (!prevState.playerConnected && remote.playerConnected) {
+      addNotification(`🟢 Player "${remote.playerName}" connected to game`);
+    }
+    
+    if (!prevState.puckGrabbed && remote.puckGrabbed) {
+      addNotification(`🎯 Player grabbed the puck`);
+    }
+    
+    if (prevState.pucksRemaining > remote.pucksRemaining) {
+      addNotification(`🎲 Player dropped puck on Board ${remote.currentBoard}`);
+    }
+    
+    if (remote.prizesWon?.length > (prevState.prizesWon?.length || 0)) {
+      const newPrize = remote.prizesWon[remote.prizesWon.length - 1];
+      addNotification(`🎉 WON: ${newPrize.prize} (Board ${newPrize.board})`);
+    }
+    
+    if (prevState.currentBoard && prevState.currentBoard !== remote.currentBoard) {
+      addNotification(`🔄 Switched to Board ${remote.currentBoard}`);
+    }
+    
+    if (remote.pucksRemaining === 0 && prevState.pucksRemaining > 0) {
+      addNotification(`🏁 Game completed! Total prizes won: ${remote.prizesWon.length}`);
+    }
+    
+    prevState = { ...remote };
+    gameState.lastUpdated = remote.lastUpdated;
+  }, 2000);
+}
+
+document.querySelectorAll('.board-option').forEach(option => {
+  option.addEventListener('click', () => {
+    document.querySelectorAll('.board-option').forEach(opt => opt.classList.remove('selected'));
+    option.classList.add('selected');
+  });
+});
+
+document.getElementById('createGame').addEventListener('click', createGame);
+
+document.getElementById('copyGameLink').addEventListener('click', () => {
+  const link = document.getElementById('gameLink');
+  link.select();
+  document.execCommand('copy');
+  addNotification('📋 Link copied to clipboard');
+});
 </script>
 </body>
 </html>
