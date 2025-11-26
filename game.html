@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>U.S. LawShield PLINKO</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
 <style>
   * { 
@@ -22,6 +22,11 @@
     justify-content: center;
     padding: 20px;
     gap: 30px;
+  }
+
+  body.loading {
+    opacity: 0.7;
+    pointer-events: none;
   }
 
   .side-panel {
@@ -75,10 +80,27 @@
 
   .puck-holder-canvas {
     cursor: grab;
+    transition: transform 0.2s ease;
   }
 
   .puck-holder-canvas:active {
     cursor: grabbing;
+    transform: scale(0.95);
+  }
+
+  .puck-holder-canvas:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .has-pucks {
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
   }
 
   .info-badge {
@@ -223,6 +245,13 @@
     color: white;
   }
 
+  .win-stats {
+    font-size: 1em;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #00BCD4;
+  }
+
   .win-close {
     background: #00BCD4;
     color: white;
@@ -292,6 +321,28 @@
     font-size: 1.3em;
     line-height: 1.6;
   }
+
+  @media (max-width: 768px) {
+    body {
+      flex-direction: column;
+      padding: 10px;
+      gap: 15px;
+    }
+    
+    .side-panel {
+      width: 100%;
+      max-width: 400px;
+    }
+    
+    .game-container {
+      width: 95vw;
+      height: 60vh;
+    }
+    
+    .title {
+      font-size: 2em;
+    }
+  }
 </style>
 </head>
 <body>
@@ -332,6 +383,7 @@
   <div class="win-symbol" id="winSymbol"></div>
   <div class="win-title">YOU WON!</div>
   <div class="win-prize" id="winPrize"></div>
+  <div class="win-stats" id="winStats"></div>
   <button class="win-close" onclick="closeWinAnnouncement()">CONTINUE</button>
 </div>
 
@@ -401,22 +453,38 @@ class AudioSystem {
     const ctx = this.audioContext;
     const now = ctx.currentTime;
     
-    const osc = ctx.createOscillator();
+    // More authentic Plinko sound with multiple frequencies
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
     const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
     
-    const baseFreq = 400 + (intensity * 600);
-    osc.frequency.setValueAtTime(baseFreq, now);
-    osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.3, now + 0.08);
+    // Main frequency - wood/metal impact sound
+    osc1.frequency.setValueAtTime(180 + (intensity * 120), now);
+    osc1.frequency.exponentialRampToValueAtTime(80, now + 0.1);
     
+    // Secondary frequency for richer sound
+    osc2.frequency.setValueAtTime(320 + (intensity * 80), now);
+    osc2.frequency.exponentialRampToValueAtTime(120, now + 0.08);
+    
+    // Filter to make it sound more like plastic/wood
+    filter.frequency.setValueAtTime(800, now);
+    filter.type = 'lowpass';
+    
+    // Envelope with quick attack and decay
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.1 * intensity, now + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+    gain.gain.linearRampToValueAtTime(0.15 * intensity, now + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
     
-    osc.connect(gain);
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(gain);
     gain.connect(ctx.destination);
     
-    osc.start(now);
-    osc.stop(now + 0.08);
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 0.15);
+    osc2.stop(now + 0.15);
   }
 
   playWin() {
@@ -425,23 +493,48 @@ class AudioSystem {
     const ctx = this.audioContext;
     const now = ctx.currentTime;
     
-    for (let i = 0; i < 5; i++) {
+    // Festive win sound with ascending tones
+    for (let i = 0; i < 6; i++) {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       
-      const freq = 300 + (i * 100);
-      osc.frequency.setValueAtTime(freq, now + i * 0.1);
+      const freq = 200 + (i * 80);
+      osc.frequency.setValueAtTime(freq, now + i * 0.08);
       
-      gain.gain.setValueAtTime(0, now + i * 0.1);
-      gain.gain.linearRampToValueAtTime(0.15, now + i * 0.1 + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.2);
+      gain.gain.setValueAtTime(0, now + i * 0.08);
+      gain.gain.linearRampToValueAtTime(0.12, now + i * 0.08 + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.3);
       
       osc.connect(gain);
       gain.connect(ctx.destination);
       
-      osc.start(now + i * 0.1);
-      osc.stop(now + i * 0.1 + 0.2);
+      osc.start(now + i * 0.08);
+      osc.stop(now + i * 0.08 + 0.3);
     }
+  }
+
+  playDropSound() {
+    if (!this.initialized) return;
+    
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+    
+    // Sound for when puck is dropped
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.exponentialRampToValueAtTime(80, now + 0.2);
+    
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.1, now + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    osc.start(now);
+    osc.stop(now + 0.3);
   }
 }
 
@@ -475,17 +568,18 @@ function showError(message) {
 async function initGame(binId) {
   try {
     console.log('Loading game with ID:', binId);
-    const gameState = await readGameBin(binId);
     
-    console.log('Game state loaded:', gameState);
+    // Show loading state
+    document.body.classList.add('loading');
+    
+    const gameState = await readGameBin(binId);
     
     if (!gameState) {
       throw new Error('Game state is null - bin may not exist or API keys may be invalid');
     }
     
-    // Validate game state has required fields
+    // Validate required fields with defaults
     if (!gameState.currentBoard) {
-      console.warn('Missing currentBoard, defaulting to A');
       gameState.currentBoard = 'A';
     }
     
@@ -493,17 +587,24 @@ async function initGame(binId) {
       throw new Error('Invalid game state - pucksRemaining is not a number');
     }
     
+    // Ensure results array exists
+    if (!gameState.results) {
+      gameState.results = [];
+    }
+    
     gameState.playerConnected = true;
     gameState.lastUpdated = new Date().toISOString();
     
-    console.log('Updating game state...');
     await updateGameBin(binId, gameState);
     
-    console.log('Starting game...');
+    // Remove loading state
+    document.body.classList.remove('loading');
+    
     startPlinko(binId, gameState);
     
   } catch (error) {
     console.error('Error in initGame:', error);
+    document.body.classList.remove('loading');
     showError(error.message);
   }
 }
@@ -573,6 +674,31 @@ function closeWinAnnouncement() {
   document.getElementById('winAnnouncement').classList.remove('show');
 }
 
+function showTemporaryMessage(message, duration = 2000) {
+  const messageEl = document.createElement('div');
+  messageEl.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px 40px;
+    border-radius: 10px;
+    z-index: 10000;
+    font-weight: bold;
+    font-size: 1.2em;
+  `;
+  messageEl.textContent = message;
+  document.body.appendChild(messageEl);
+  
+  setTimeout(() => {
+    if (messageEl.parentNode) {
+      document.body.removeChild(messageEl);
+    }
+  }, duration);
+}
+
 // ==================== MAIN PLINKO GAME ====================
 function startPlinko(binId, gameState) {
   const canvas = document.getElementById('plinkoCanvas');
@@ -600,6 +726,8 @@ function startPlinko(binId, gameState) {
   let lastTime = 0;
   let gameActive = true;
   let W, H;
+  let canDragPuck = true;
+  let needsRedraw = true;
   
   // Resize canvas
   const resizeCanvas = () => {
@@ -621,15 +749,17 @@ function startPlinko(binId, gameState) {
     pegs = [];
     const startY = H * 0.15;
     const endY = H * 0.75;
+    
+    // Optimized vertical spacing - increased for better clearance
     const verticalSpacing = (endY - startY) / (NUM_ROWS - 1);
     
-    // Horizontal spacing - creates the triangular lattice
-    const horizontalSpacing = W / 6.5; // Base spacing for 9 pegs
+    // Optimized horizontal spacing - significantly increased for proper clearance
+    const horizontalSpacing = W / 6.5; // Much wider spacing
     
     for (let row = 0; row < NUM_ROWS; row++) {
       // Alternating rows have offset for triangular pattern
       const isOffsetRow = row % 2 === 1;
-      const numPegs = isOffsetRow ? 7 : 8;
+      const numPegs = isOffsetRow ? 7 : 8; // Further reduced peg count
       
       // Calculate offset for centered triangular pattern
       const totalWidth = (numPegs - 1) * horizontalSpacing;
@@ -659,6 +789,9 @@ function startPlinko(binId, gameState) {
 
   // ==================== DRAWING FUNCTIONS ====================
   function drawBoard() {
+    // Only redraw if necessary
+    if (!needsRedraw && !currentPuck && particles.length === 0) return;
+    
     // Cream/beige background
     ctx.fillStyle = '#F5E6D3';
     ctx.fillRect(0, 0, W, H);
@@ -697,6 +830,14 @@ function startPlinko(binId, gameState) {
     if (currentPuck) {
       drawPuck(currentPuck.x, currentPuck.y);
     }
+    
+    needsRedraw = false;
+  }
+
+  function requestRedraw() {
+    needsRedraw = true;
+    drawBoard();
+    needsRedraw = false;
   }
 
   function drawTrianglePattern() {
@@ -814,6 +955,13 @@ function startPlinko(binId, gameState) {
       const centerX = 60;
       const centerY = 60;
       
+      // Add pulse animation if pucks are available
+      if (gameState.pucksRemaining > 0) {
+        holderCanvas.classList.add('has-pucks');
+      } else {
+        holderCanvas.classList.remove('has-pucks');
+      }
+      
       // Shadow
       holderCtx.fillStyle = 'rgba(0, 0, 0, 0.3)';
       holderCtx.beginPath();
@@ -843,6 +991,8 @@ function startPlinko(binId, gameState) {
       holderCtx.textAlign = 'center';
       holderCtx.textBaseline = 'middle';
       holderCtx.fillText('USL', centerX, centerY);
+    } else {
+      holderCanvas.classList.remove('has-pucks');
     }
   }
 
@@ -875,23 +1025,23 @@ function startPlinko(binId, gameState) {
     const deltaTime = Math.min(16, timestamp - lastTime) / 16;
     lastTime = timestamp;
     
-    // Gravity
+    // More realistic gravity with frame-rate independence
     currentPuck.vy += 0.5 * deltaTime;
     currentPuck.x += currentPuck.vx * deltaTime;
     currentPuck.y += currentPuck.vy * deltaTime;
     
-    // Air resistance
-    currentPuck.vx *= 0.998;
-    currentPuck.vy *= 0.999;
+    // Improved air resistance
+    currentPuck.vx *= 0.995;
+    currentPuck.vy *= 0.996;
     
-    // Wall collisions
+    // Wall collisions with energy loss
     const wallMargin = PUCK_RADIUS + 5;
     if (currentPuck.x < wallMargin) {
       currentPuck.x = wallMargin;
-      currentPuck.vx = Math.abs(currentPuck.vx) * 0.6;
+      currentPuck.vx = Math.abs(currentPuck.vx) * 0.7;
     } else if (currentPuck.x > W - wallMargin) {
       currentPuck.x = W - wallMargin;
-      currentPuck.vx = -Math.abs(currentPuck.vx) * 0.6;
+      currentPuck.vx = -Math.abs(currentPuck.vx) * 0.7;
     }
     
     // Peg collisions
@@ -964,9 +1114,15 @@ function startPlinko(binId, gameState) {
     // Play win sound
     audioSystem.playWin();
     
+    // Calculate statistics
+    const totalPucks = gameState.results.length + 1; // +1 for current puck
+    const currentBoardWins = gameState.results.filter(r => r.board === gameState.currentBoard).length + 1;
+    const statsText = `Win ${currentBoardWins} of ${totalPucks} pucks`;
+    
     // Show win announcement
     document.getElementById('winSymbol').textContent = prize.symbol;
     document.getElementById('winPrize').textContent = prize.name;
+    document.getElementById('winStats').textContent = statsText;
     document.getElementById('winAnnouncement').classList.add('show');
     
     // Celebration particles
@@ -1009,6 +1165,7 @@ function startPlinko(binId, gameState) {
       gameState.currentBoard = 'B';
       updateLegend('B');
       initPegs();
+      showTemporaryMessage('Switching to Board B!', 2000);
     }
     
     // Game completion
@@ -1020,6 +1177,12 @@ function startPlinko(binId, gameState) {
     }
     
     currentPuck = null;
+    
+    // Re-enable dragging after a short delay
+    setTimeout(() => {
+      canDragPuck = true;
+    }, 500);
+    
     updateDisplay();
     drawPuckInHolder();
     
@@ -1039,6 +1202,7 @@ function startPlinko(binId, gameState) {
       console.log('Game state saved successfully');
     } catch (error) {
       console.error('Failed to save game state:', error);
+      showTemporaryMessage('Failed to save progress', 2000);
     }
   }
 
@@ -1064,7 +1228,7 @@ function startPlinko(binId, gameState) {
   }
 
   function handleHolderMouseDown(e) {
-    if (!gameActive || currentPuck || gameState.pucksRemaining === 0) return;
+    if (!gameActive || currentPuck || gameState.pucksRemaining === 0 || !canDragPuck) return;
     
     audioSystem.init();
     
@@ -1073,10 +1237,13 @@ function startPlinko(binId, gameState) {
     
     if (distance < 35) {
       isDragging = true;
+      canDragPuck = false;
       
-      // Convert holder coords to canvas coords
-      const canvasRect = canvas.getBoundingClientRect();
-      const holderRect = holderCanvas.getBoundingClientRect();
+      // Add holder feedback
+      holderCanvas.style.transform = 'scale(0.9)';
+      
+      // Play drop sound
+      audioSystem.playDropSound();
       
       currentPuck = {
         x: W / 2,
@@ -1103,6 +1270,7 @@ function startPlinko(binId, gameState) {
     if (!isDragging || !currentPuck) return;
     
     isDragging = false;
+    holderCanvas.style.transform = 'scale(1)';
     
     // Check if at top of board and not over pegs
     const topThreshold = H * 0.15;
@@ -1110,6 +1278,7 @@ function startPlinko(binId, gameState) {
     if (currentPuck.y > topThreshold) {
       // Too low - reset
       currentPuck = null;
+      canDragPuck = true;
       drawPuckInHolder();
       drawBoard();
       return;
