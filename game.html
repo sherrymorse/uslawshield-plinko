@@ -769,19 +769,18 @@ function startPlinko(binId, gameState) {
     const startX = playAreaLeft;
     const endX = playAreaRight;
     
-    // Calculate normalized spacing - INCREASED spacing to ensure puck fits between pegs
+    // Calculate normalized spacing - OPTIMIZED for 1-4 bounces per row
     const normalizedVerticalSpacing = (endY - startY) / (NUM_ROWS - 1);
-    // Significantly increase horizontal spacing to ensure puck can pass between pegs
-    // Puck diameter is 64px, so we need gap > 64px between peg centers
-    const minRequiredSpacing = (PUCK_RADIUS * 2 + 10) / W; // Add 10px buffer
-    const normalizedHorizontalSpacing = Math.max(normalizedVerticalSpacing * 2 / Math.sqrt(3), minRequiredSpacing);
+    // Increase horizontal spacing significantly to allow puck to descend faster
+    // This creates wider gaps that the puck can fall through more easily
+    const normalizedHorizontalSpacing = normalizedVerticalSpacing * 1.8; // Increased from triangular ratio
     
     for (let row = 0; row < NUM_ROWS; row++) {
       // Every row is offset for triangular pattern
       const isOffsetRow = row % 2 === 1;
       const rowY = startY + row * normalizedVerticalSpacing;
       
-      // Calculate how many pegs fit in this row with the increased spacing
+      // Calculate how many pegs fit in this row with the optimized spacing
       const availableWidth = endX - startX;
       const numPegs = Math.floor(availableWidth / normalizedHorizontalSpacing) + 1;
       
