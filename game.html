@@ -772,10 +772,13 @@ function startPlinko(binId, gameState) {
     // Calculate vertical spacing in normalized coordinates
     const normalizedVerticalSpacing = (endY - startY) / (NUM_ROWS - 1);
     
-    // CORRECTED HORIZONTAL SPACING CALCULATION
-    // For diamonds that are 1.7x taller than wide:
-    // horizontalSpacing = (2 × verticalSpacing) / 1.7 ≈ 1.18 × verticalSpacing
-    const normalizedHorizontalSpacing = normalizedVerticalSpacing * 1.18;
+    // DYNAMIC HORIZONTAL SPACING CALCULATION
+    // Calculate horizontal spacing to fit 8 pegs (widest row) across the full available width
+    const availableWidth = endX - startX;
+    const maxPegsPerRow = 8;
+    
+    // With 8 pegs spanning the full width, there are 7 gaps between them
+    const normalizedHorizontalSpacing = availableWidth / (maxPegsPerRow - 1);
     
     for (let row = 0; row < NUM_ROWS; row++) {
       // FIXED PEG COUNT: alternates between 8 and 7 pegs
@@ -785,29 +788,42 @@ function startPlinko(binId, gameState) {
       const numPegs = isOffsetRow ? 7 : 8;
       const rowY = startY + row * normalizedVerticalSpacing;
       
-      // Calculate the total width needed for this row's pegs
-      const totalRowWidth = (numPegs - 1) * normalizedHorizontalSpacing;
-      const availableWidth = endX - startX;
-      
-      // Center the row
-      const rowStartX = startX + (availableWidth - totalRowWidth) / 2;
-      
-      // Apply horizontal offset for staggered rows (odd rows shift right by half spacing)
-      const horizontalOffset = isOffsetRow ? normalizedHorizontalSpacing / 2 : 0;
-      
-      for (let col = 0; col < numPegs; col++) {
-        const normalizedX = rowStartX + col * normalizedHorizontalSpacing + horizontalOffset;
-        const normalizedY = rowY;
+      if (isOffsetRow) {
+        // Odd rows: 7 pegs, offset by half spacing
+        const rowStartX = startX + normalizedHorizontalSpacing / 2;
         
-        // Convert normalized coordinates to actual pixel positions
-        const x = normalizedX * W;
-        const y = normalizedY * H;
+        for (let col = 0; col < numPegs; col++) {
+          const normalizedX = rowStartX + col * normalizedHorizontalSpacing;
+          const normalizedY = rowY;
+          
+          // Convert normalized coordinates to actual pixel positions
+          const x = normalizedX * W;
+          const y = normalizedY * H;
+          
+          pegs.push({
+            x: x,
+            y: y,
+            lastHit: 0
+          });
+        }
+      } else {
+        // Even rows: 8 pegs, spanning full width from startX to endX
+        const rowStartX = startX;
         
-        pegs.push({
-          x: x,
-          y: y,
-          lastHit: 0
-        });
+        for (let col = 0; col < numPegs; col++) {
+          const normalizedX = rowStartX + col * normalizedHorizontalSpacing;
+          const normalizedY = rowY;
+          
+          // Convert normalized coordinates to actual pixel positions
+          const x = normalizedX * W;
+          const y = normalizedY * H;
+          
+          pegs.push({
+            x: x,
+            y: y,
+            lastHit: 0
+          });
+        }
       }
     }
   }
