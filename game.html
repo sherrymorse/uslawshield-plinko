@@ -158,9 +158,9 @@
   .game-container {
     position: relative;
     width: 70vw;
-    height: 85vh;
+    height: 100vh;
     max-width: 900px;
-    max-height: 1200px;
+    max-height: 1600px;
   }
 
   .canvas-wrapper {
@@ -759,8 +759,8 @@ function startPlinko(binId, gameState) {
     pegs = [];
     lastRowPegPositions = [];
     
-    // EXPANDED vertical play area with much larger drop zone at top
-    const playAreaTop = 0.20;
+    // Play area bounds (same as original)
+    const playAreaTop = 0.05;
     const playAreaBottom = 0.80;
     const playAreaLeft = 0.02;
     const playAreaRight = 0.98;
@@ -774,31 +774,27 @@ function startPlinko(binId, gameState) {
     // Calculate vertical spacing in normalized coordinates
     const normalizedVerticalSpacing = (endY - startY) / (NUM_ROWS - 1);
     
-    // DYNAMIC HORIZONTAL SPACING CALCULATION
-    // Calculate horizontal spacing to fit 8 pegs (widest row) across the full available width
+    // DYNAMIC HORIZONTAL SPACING based on number of prize slots
+    const numSlots = getCurrentPrizes().length;
     const availableWidth = endX - startX;
-    const maxPegsPerRow = 8;
     
-    // With 8 pegs spanning the full width, there are 7 gaps between them
-    const normalizedHorizontalSpacing = availableWidth / (maxPegsPerRow - 1);
+    // Spacing between pegs to create equal-width slots
+    const normalizedHorizontalSpacing = availableWidth / numSlots;
     
     for (let row = 0; row < NUM_ROWS; row++) {
-      // FIXED PEG COUNT: alternates between 8 and 7 pegs
-      // Even rows (0, 2, 4, 6, 8, 10, 12) = 8 pegs
-      // Odd rows (1, 3, 5, 7, 9, 11) = 7 pegs
+      // Alternates between 8 and 7 pegs
       const isOffsetRow = row % 2 === 1;
       const numPegs = isOffsetRow ? 7 : 8;
       const rowY = startY + row * normalizedVerticalSpacing;
       
       if (isOffsetRow) {
         // Odd rows: 7 pegs, offset by half spacing
-        const rowStartX = startX + normalizedHorizontalSpacing / 2;
+        const rowStartX = startX + normalizedHorizontalSpacing * 0.5;
         
         for (let col = 0; col < numPegs; col++) {
-          const normalizedX = rowStartX + col * normalizedHorizontalSpacing;
+          const normalizedX = rowStartX + (col + 1) * normalizedHorizontalSpacing;
           const normalizedY = rowY;
           
-          // Convert normalized coordinates to actual pixel positions
           const x = normalizedX * W;
           const y = normalizedY * H;
           
@@ -809,14 +805,11 @@ function startPlinko(binId, gameState) {
           });
         }
       } else {
-        // Even rows: 8 pegs, spanning full width from startX to endX
-        const rowStartX = startX;
-        
+        // Even rows: 8 pegs at slot boundaries
         for (let col = 0; col < numPegs; col++) {
-          const normalizedX = rowStartX + col * normalizedHorizontalSpacing;
+          const normalizedX = startX + (col + 1) * normalizedHorizontalSpacing;
           const normalizedY = rowY;
           
-          // Convert normalized coordinates to actual pixel positions
           const x = normalizedX * W;
           const y = normalizedY * H;
           
@@ -905,7 +898,7 @@ function startPlinko(binId, gameState) {
 
   function drawSidewallTeeth() {
     // Define the playable area (matching initPegs)
-    const playAreaTop = 0.20;
+    const playAreaTop = 0.05;
     const playAreaBottom = 0.80;
     const playAreaLeft = 0.02;
     const playAreaRight = 0.98;
@@ -987,17 +980,13 @@ function startPlinko(binId, gameState) {
     const slotHeight = H * 0.18;
     const bottomY = H - slotHeight;
     
-    // Calculate slot boundaries based on last row peg positions
-    // With 8 pegs, we have 9 regions:
-    // [0 to midpoint(peg0,peg1)], [midpoint(peg0,peg1) to midpoint(peg1,peg2)], ..., [midpoint(peg6,peg7) to W]
-    
+    // Calculate slot boundaries: left edge, 8 pegs as boundaries, right edge
     const slotBoundaries = [0];
     
-    // Add boundaries at midpoints between consecutive pegs
-    for (let i = 0; i < lastRowPegPositions.length - 1; i++) {
-      const midpoint = (lastRowPegPositions[i] + lastRowPegPositions[i + 1]) / 2;
-      slotBoundaries.push(midpoint);
-    }
+    // Add peg positions as boundaries
+    lastRowPegPositions.forEach(pegX => {
+      slotBoundaries.push(pegX);
+    });
     
     // Add right edge
     slotBoundaries.push(W);
@@ -1217,12 +1206,11 @@ function startPlinko(binId, gameState) {
   async function handlePuckLanding() {
     const prizes = getCurrentPrizes();
     
-    // Calculate slot boundaries based on last row peg positions
+    // Calculate slot boundaries: left edge, 8 pegs, right edge = 9 slots
     const slotBoundaries = [0];
-    for (let i = 0; i < lastRowPegPositions.length - 1; i++) {
-      const midpoint = (lastRowPegPositions[i] + lastRowPegPositions[i + 1]) / 2;
-      slotBoundaries.push(midpoint);
-    }
+    lastRowPegPositions.forEach(pegX => {
+      slotBoundaries.push(pegX);
+    });
     slotBoundaries.push(W);
     
     // Determine which slot the puck landed in
@@ -1405,8 +1393,8 @@ function startPlinko(binId, gameState) {
     isDragging = false;
     holderCanvas.style.transform = 'scale(1)';
     
-    // Check if at top of board - updated to match new larger drop zone
-    const topThreshold = H * 0.20;
+    // Check if at top of board
+    const topThreshold = H * 0.05;
     
     if (currentPuck.y > topThreshold) {
       // Too low - reset
