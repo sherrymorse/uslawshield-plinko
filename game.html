@@ -758,8 +758,8 @@ function startPlinko(binId, gameState) {
     pegs = [];
     
     // EXPANDED vertical play area with larger drop zone at top
-    const playAreaTop = 0.05;    // Increased drop zone (was 0.10)
-    const playAreaBottom = 0.80; // Extended bottom (was 0.78)
+    const playAreaTop = 0.05;
+    const playAreaBottom = 0.80;
     const playAreaLeft = 0.02;
     const playAreaRight = 0.98;
     
@@ -774,45 +774,40 @@ function startPlinko(binId, gameState) {
     
     // CORRECTED HORIZONTAL SPACING CALCULATION
     // For diamonds that are 1.7x taller than wide:
-    // Diamond height = 2 × verticalSpacing
-    // Diamond width = horizontalSpacing
-    // height/width = 1.7
-    // Therefore: (2 × verticalSpacing) / horizontalSpacing = 1.7
     // horizontalSpacing = (2 × verticalSpacing) / 1.7 ≈ 1.18 × verticalSpacing
     const normalizedHorizontalSpacing = normalizedVerticalSpacing * 1.18;
     
     for (let row = 0; row < NUM_ROWS; row++) {
-      // Alternate rows for triangular staggered pattern
+      // FIXED PEG COUNT: alternates between 8 and 7 pegs
+      // Even rows (0, 2, 4, 6, 8, 10, 12) = 8 pegs
+      // Odd rows (1, 3, 5, 7, 9, 11) = 7 pegs
       const isOffsetRow = row % 2 === 1;
+      const numPegs = isOffsetRow ? 7 : 8;
       const rowY = startY + row * normalizedVerticalSpacing;
       
-      // Calculate how many pegs fit in this row
-      const availableWidth = endX - startX;
-      const numPegs = Math.floor(availableWidth / normalizedHorizontalSpacing) + 1;
-      
-      // Center the row to ensure symmetrical margins
+      // Calculate the total width needed for this row's pegs
       const totalRowWidth = (numPegs - 1) * normalizedHorizontalSpacing;
+      const availableWidth = endX - startX;
+      
+      // Center the row
       const rowStartX = startX + (availableWidth - totalRowWidth) / 2;
       
-      // Apply horizontal offset for staggered rows
+      // Apply horizontal offset for staggered rows (odd rows shift right by half spacing)
       const horizontalOffset = isOffsetRow ? normalizedHorizontalSpacing / 2 : 0;
       
       for (let col = 0; col < numPegs; col++) {
         const normalizedX = rowStartX + col * normalizedHorizontalSpacing + horizontalOffset;
         const normalizedY = rowY;
         
-        // Only create peg if it fits within the play area
-        if (normalizedX <= endX && normalizedX >= startX) {
-          // Convert normalized coordinates to actual pixel positions
-          const x = normalizedX * W;
-          const y = normalizedY * H;
-          
-          pegs.push({
-            x: x,
-            y: y,
-            lastHit: 0
-          });
-        }
+        // Convert normalized coordinates to actual pixel positions
+        const x = normalizedX * W;
+        const y = normalizedY * H;
+        
+        pegs.push({
+          x: x,
+          y: y,
+          lastHit: 0
+        });
       }
     }
   }
