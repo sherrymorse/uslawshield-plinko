@@ -771,9 +771,9 @@ function startPlinko(binId, gameState) {
     
     // Calculate normalized spacing - OPTIMIZED for 1-4 bounces per row
     const normalizedVerticalSpacing = (endY - startY) / (NUM_ROWS - 1);
-    // Increase horizontal spacing significantly to allow puck to descend faster
-    // This creates wider gaps that the puck can fall through more easily
-    const normalizedHorizontalSpacing = normalizedVerticalSpacing * 1.8; // Increased from triangular ratio
+    // Increase both horizontal and vertical spacing proportionally to maintain symmetry
+    const spacingMultiplier = 1.4; // Increased spacing while maintaining proportions
+    const normalizedHorizontalSpacing = normalizedVerticalSpacing * spacingMultiplier;
     
     for (let row = 0; row < NUM_ROWS; row++) {
       // Every row is offset for triangular pattern
@@ -784,8 +784,9 @@ function startPlinko(binId, gameState) {
       const availableWidth = endX - startX;
       const numPegs = Math.floor(availableWidth / normalizedHorizontalSpacing) + 1;
       
-      // Start the row at the very left edge to eliminate left gap
-      const rowStartX = startX;
+      // Center the row to ensure symmetrical left and right margins
+      const totalRowWidth = (numPegs - 1) * normalizedHorizontalSpacing;
+      const rowStartX = startX + (availableWidth - totalRowWidth) / 2;
       
       // Apply horizontal offset for staggered rows
       const horizontalOffset = isOffsetRow ? normalizedHorizontalSpacing / 2 : 0;
@@ -795,7 +796,7 @@ function startPlinko(binId, gameState) {
         const normalizedY = rowY;
         
         // Only create peg if it fits within the play area
-        if (normalizedX <= endX) {
+        if (normalizedX <= endX && normalizedX >= startX) {
           // Convert normalized coordinates to actual pixel positions
           const x = normalizedX * W;
           const y = normalizedY * H;
