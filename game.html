@@ -756,30 +756,47 @@ function startPlinko(binId, gameState) {
   // ==================== PEG INITIALIZATION ====================
   function initPegs() {
     pegs = [];
-    const startY = H * 0.15;
-    const endY = H * 0.75;
     
-    // Increased vertical spacing for better clearance
-    const verticalSpacing = (endY - startY) / (NUM_ROWS - 1);
+    // Define the playable area as percentages of the board
+    const playAreaTop = 0.15;    // 15% from top
+    const playAreaBottom = 0.75; // 75% from top
+    const playAreaLeft = 0.05;   // 5% from left
+    const playAreaRight = 0.95;  // 95% from left
     
-    // Optimized horizontal spacing to utilize full width
-    const horizontalSpacing = W / 8; // Increased peg count to fill space
+    // Calculate normalized positions
+    const startY = playAreaTop;
+    const endY = playAreaBottom;
+    const startX = playAreaLeft;
+    const endX = playAreaRight;
+    
+    // Calculate normalized spacing for perfect triangular grid
+    const normalizedVerticalSpacing = (endY - startY) / (NUM_ROWS - 1);
+    // For equilateral triangles, horizontal spacing = vertical spacing * 2 / √3
+    const normalizedHorizontalSpacing = normalizedVerticalSpacing * 2 / Math.sqrt(3);
     
     for (let row = 0; row < NUM_ROWS; row++) {
-      // Alternating rows have offset for triangular pattern
+      // Every row is offset for triangular pattern
       const isOffsetRow = row % 2 === 1;
-      const numPegs = isOffsetRow ? 9 : 10; // Increased peg count to fill side space
+      const rowY = startY + row * normalizedVerticalSpacing;
       
-      // Calculate offset for centered triangular pattern with minimal margins
-      const totalWidth = (numPegs - 1) * horizontalSpacing;
-      const startX = (W - totalWidth) / 2;
+      // Calculate how many pegs fit in this row
+      const availableWidth = endX - startX;
+      const numPegs = Math.floor(availableWidth / normalizedHorizontalSpacing) + 1;
       
-      // Reduced side margins to utilize full width
-      const margin = horizontalSpacing * 0.3;
+      // Center the row within the playable area
+      const rowWidth = (numPegs - 1) * normalizedHorizontalSpacing;
+      const rowStartX = startX + (availableWidth - rowWidth) / 2;
+      
+      // Apply horizontal offset for staggered rows
+      const horizontalOffset = isOffsetRow ? normalizedHorizontalSpacing / 2 : 0;
       
       for (let col = 0; col < numPegs; col++) {
-        const x = Math.max(margin, Math.min(W - margin, startX + col * horizontalSpacing));
-        const y = Math.max(startY, Math.min(endY, startY + row * verticalSpacing));
+        const normalizedX = rowStartX + col * normalizedHorizontalSpacing + horizontalOffset;
+        const normalizedY = rowY;
+        
+        // Convert normalized coordinates to actual pixel positions
+        const x = normalizedX * W;
+        const y = normalizedY * H;
         
         pegs.push({
           x: x,
