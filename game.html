@@ -621,17 +621,24 @@ function startPlinko(binId, gameState) {
     pegs = [];
     const startY = H * 0.15;
     const endY = H * 0.75;
-    const rowHeight = (endY - startY) / NUM_ROWS;
+    const verticalSpacing = (endY - startY) / (NUM_ROWS - 1);
+    
+    // Horizontal spacing - creates the triangular lattice
+    const horizontalSpacing = W / 10; // Base spacing for 9 pegs
     
     for (let row = 0; row < NUM_ROWS; row++) {
-      const numPegs = 9 + (row % 2);
-      const pegSpacing = W / (numPegs + 1);
-      const offset = row % 2 === 0 ? pegSpacing / 2 : 0;
+      // Alternating rows have offset for triangular pattern
+      const isOffsetRow = row % 2 === 1;
+      const numPegs = isOffsetRow ? 9 : 10;
+      
+      // Calculate offset for centered triangular pattern
+      const totalWidth = (numPegs - 1) * horizontalSpacing;
+      const startX = (W - totalWidth) / 2;
       
       for (let col = 0; col < numPegs; col++) {
         pegs.push({
-          x: offset + (col + 1) * pegSpacing,
-          y: startY + row * rowHeight,
+          x: startX + col * horizontalSpacing,
+          y: startY + row * verticalSpacing,
           lastHit: 0
         });
       }
