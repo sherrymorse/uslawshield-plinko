@@ -722,7 +722,7 @@ function startPlinko(binId, gameState) {
   // ==================== GAME CONSTANTS ====================
   const PUCK_RADIUS = 32;
   const PEG_RADIUS = 7;
-  const NUM_ROWS = 12;
+  const NUM_ROWS = 13;
   
   const getCurrentPrizes = () => PRIZE_CONFIG[gameState.currentBoard].prizes;
   
@@ -773,13 +773,16 @@ function startPlinko(binId, gameState) {
     const normalizedVerticalSpacing = (endY - startY) / (NUM_ROWS - 1);
     
     // Calculate minimum required horizontal spacing based on puck size
-    // Puck needs to fit through: (PUCK_RADIUS * 2) + clearance on each side
-    // Convert to normalized coordinates relative to canvas width
     const minGapPixels = (PUCK_RADIUS * 2) + 20; // Puck diameter + 20px clearance
     const minNormalizedHorizontalSpacing = minGapPixels / W;
     
-    // Use 1.8x the minimum for comfortable bouncing (allows 2-4 bounces per row)
-    const normalizedHorizontalSpacing = Math.max(minNormalizedHorizontalSpacing * 1.8, normalizedVerticalSpacing * 1.2);
+    // CRITICAL FIX: Make horizontal spacing SMALLER than vertical spacing
+    // This creates the tall narrow diamond pattern (vertical orientation)
+    // Use 0.65x of vertical spacing to create proper diamond aspect ratio
+    const normalizedHorizontalSpacing = Math.max(
+      minNormalizedHorizontalSpacing * 1.5,
+      normalizedVerticalSpacing * 0.65
+    );
     
     for (let row = 0; row < NUM_ROWS; row++) {
       // Alternate rows for triangular staggered pattern
@@ -1166,8 +1169,8 @@ function startPlinko(binId, gameState) {
         currentPuck.vy -= 1.6 * dotProduct * ny;
         
         // Increased randomness for more varied paths
-        currentPuck.vx += (Math.random() - 0.5) * 1.2; // Increased from 0.8 to 1.2
-        currentPuck.vy += (Math.random() - 0.5) * 0.6; // Increased from 0.4 to 0.6
+        currentPuck.vx += (Math.random() - 0.5) * 1.2;
+        currentPuck.vy += (Math.random() - 0.5) * 0.6;
       }
     });
     
