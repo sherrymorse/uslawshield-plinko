@@ -373,8 +373,8 @@ const JSONBIN_CONFIG = {
   BASE_URL: 'https://api.jsonbin.io/v3/b',
   HEADERS: {
     'Content-Type': 'application/json',
-    'X-Master-Key': '$2a$10$RKQHusd9D3WIzERQBzwFC.KOpKHvEzT8.MIGGqceg5GyTT.YfIpk6',
-    'X-Access-Key': '$2a$10$sUTX2utrrPnHXKLkvPRrvea57/mv64FybLk3ythIqvzGB9TcGQgS6'
+    'X-Master-Key': '$2a$10$NckuWO.y9g8.amyZZWkc8.lKIMS.AVSCyN1qT9/0d5EtRjuV9lmS2',
+    'X-Access-Key': '$2a$10$g6RfQ66H6XQyYy3D848Cfurvs0dXgVt92aV0Rr0UqchZrBZwr7Vpy'
   }
 };
 
@@ -452,19 +452,21 @@ const urlParams = new URLSearchParams(window.location.search);
 const binId = urlParams.get('game');
 
 if (!binId) {
-  showError();
+  showError('No game ID provided in URL');
 } else {
   initGame(binId);
 }
 
-function showError() {
+function showError(message) {
+  console.error('ERROR:', message);
   document.body.innerHTML = `
     <div class="error-screen">
       <div class="error-icon">⚠️</div>
-      <h2 class="error-title">INVALID SESSION</h2>
+      <h2 class="error-title">GAME ERROR</h2>
       <p class="error-message">
-        This game link is invalid or has expired.<br>
-        Please contact the administrator for a new game link.
+        ${message}<br><br>
+        <strong>Game ID:</strong> ${binId || 'Not provided'}<br>
+        <strong>Check console for details</strong>
       </p>
     </div>
   `;
@@ -472,37 +474,61 @@ function showError() {
 
 async function initGame(binId) {
   try {
+    console.log('Loading game with ID:', binId);
     const gameState = await readGameBin(binId);
     
+    console.log('Game state loaded:', gameState);
+    
     if (!gameState) {
-      throw new Error('Failed to load game');
+      throw new Error('Game state is null - bin may not exist or API keys may be invalid');
+    }
+    
+    // Validate game state has required fields
+    if (!gameState.currentBoard) {
+      console.warn('Missing currentBoard, defaulting to A');
+      gameState.currentBoard = 'A';
+    }
+    
+    if (typeof gameState.pucksRemaining !== 'number') {
+      throw new Error('Invalid game state - pucksRemaining is not a number');
     }
     
     gameState.playerConnected = true;
     gameState.lastUpdated = new Date().toISOString();
+    
+    console.log('Updating game state...');
     await updateGameBin(binId, gameState);
     
+    console.log('Starting game...');
     startPlinko(binId, gameState);
     
   } catch (error) {
-    console.error('Error loading game:', error);
-    showError();
+    console.error('Error in initGame:', error);
+    showError(error.message);
   }
 }
 
 async function updateGameBin(binId, data) {
   try {
+    console.log('Updating bin:', binId, 'with data:', data);
+    
     const response = await fetch(`${JSONBIN_CONFIG.BASE_URL}/${binId}`, {
       method: 'PUT',
       headers: JSONBIN_CONFIG.HEADERS,
       body: JSON.stringify(data)
     });
     
+    console.log('Update response status:', response.status);
+    
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text();
+      console.error('Update error:', errorText);
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
     
-    return await response.json();
+    const result = await response.json();
+    console.log('Update successful:', result);
+    return result;
   } catch (error) {
     console.error('Error updating JSONBin:', error);
     throw error;
@@ -511,6 +537,8 @@ async function updateGameBin(binId, data) {
 
 async function readGameBin(binId) {
   try {
+    console.log('Fetching from JSONBin:', `${JSONBIN_CONFIG.BASE_URL}/${binId}/latest`);
+    
     const response = await fetch(`${JSONBIN_CONFIG.BASE_URL}/${binId}/latest`, {
       headers: {
         'X-Master-Key': JSONBIN_CONFIG.HEADERS['X-Master-Key'],
@@ -518,14 +546,25 @@ async function readGameBin(binId) {
       }
     });
     
+    console.log('Response status:', response.status);
+    
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text();
+      console.error('API Error Response:', errorText);
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
     
     const data = await response.json();
+    console.log('Raw API response:', data);
+    
+    if (!data.record) {
+      console.error('No record field in response');
+      throw new Error('Invalid API response - missing record field');
+    }
+    
     return data.record;
   } catch (error) {
-    console.error('Error reading from JSONBin:', error);
+    console.error('Error in readGameBin:', error);
     return null;
   }
 }
@@ -990,7 +1029,9 @@ function startPlinko(binId, gameState) {
 
   async function saveState() {
     try {
+      console.log('Saving game state...');
       await updateGameBin(binId, gameState);
+      console.log('Game state saved successfully');
     } catch (error) {
       console.error('Failed to save game state:', error);
     }
