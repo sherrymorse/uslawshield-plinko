@@ -157,10 +157,10 @@
 
   .game-container {
     position: relative;
-    width: 70vw;
-    height: 70vh;
-    max-width: 900px;
-    max-height: 900px;
+    width: 800px;
+    height: 800px;
+    max-width: 800px;
+    max-height: 800px;
   }
 
   .canvas-wrapper {
@@ -337,6 +337,8 @@
     .game-container {
       width: 95vw;
       height: 60vh;
+      max-width: none;
+      max-height: none;
     }
     
     .title {
@@ -453,35 +455,35 @@ class AudioSystem {
     const ctx = this.audioContext;
     const now = ctx.currentTime;
     
-    // Create a more hollow, metallic sound with higher frequencies
+    // Aluminum disc hitting aluminum peg - lower frequencies, hollow sound
     const osc1 = ctx.createOscillator();
     const osc2 = ctx.createOscillator();
     const gain = ctx.createGain();
     const filter = ctx.createBiquadFilter();
     
-    // Higher frequencies for a brighter, more metallic sound
-    const baseFreq1 = 350 + (intensity * 150);
-    const baseFreq2 = 450 + (intensity * 100);
+    // Lower frequencies for hollow metallic sound
+    const baseFreq1 = 180 + (intensity * 100);
+    const baseFreq2 = 220 + (intensity * 80);
     
     osc1.frequency.setValueAtTime(baseFreq1, now);
-    osc1.frequency.exponentialRampToValueAtTime(200, now + 0.08);
+    osc1.frequency.exponentialRampToValueAtTime(120, now + 0.1);
     
     osc2.frequency.setValueAtTime(baseFreq2, now);
-    osc2.frequency.exponentialRampToValueAtTime(250, now + 0.06);
+    osc2.frequency.exponentialRampToValueAtTime(150, now + 0.08);
     
-    // Use triangle waves for a hollow metallic quality
-    osc1.type = 'triangle';
+    // Use different wave types for hollow metallic quality
+    osc1.type = 'sine';
     osc2.type = 'triangle';
     
-    // Highpass filter to emphasize the hollow metallic character
-    filter.frequency.setValueAtTime(400, now);
-    filter.type = 'highpass';
-    filter.Q.setValueAtTime(1, now);
+    // Bandpass filter to create hollow aluminum sound
+    filter.frequency.setValueAtTime(300, now);
+    filter.type = 'bandpass';
+    filter.Q.setValueAtTime(2, now);
     
-    // Higher volume with very quick decay for a sharp sound
+    // Lower volume overall with quick decay
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.15 * intensity, now + 0.001);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+    gain.gain.linearRampToValueAtTime(0.08 * intensity, now + 0.001); // Lower peak volume
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
     
     osc1.connect(filter);
     osc2.connect(filter);
@@ -490,8 +492,8 @@ class AudioSystem {
     
     osc1.start(now);
     osc2.start(now);
-    osc1.stop(now + 0.08);
-    osc2.stop(now + 0.08);
+    osc1.stop(now + 0.12);
+    osc2.stop(now + 0.12);
   }
 
   playWin() {
@@ -737,12 +739,24 @@ function startPlinko(binId, gameState) {
   let canDragPuck = true;
   let needsRedraw = true;
   
-  // Resize canvas
+  // Fixed dimensions for consistent peg placement regardless of browser zoom
+  const FIXED_WIDTH = 800;
+  const FIXED_HEIGHT = 800;
+  
+  // Resize canvas with fixed dimensions
   const resizeCanvas = () => {
     const container = canvas.parentElement;
     const rect = container.getBoundingClientRect();
-    canvas.width = W = rect.width;
-    canvas.height = H = rect.height;
+    
+    // Use fixed dimensions for consistent physics
+    canvas.width = W = FIXED_WIDTH;
+    canvas.height = H = FIXED_HEIGHT;
+    
+    // Scale the canvas display to fit container while maintaining aspect ratio
+    const scale = Math.min(rect.width / FIXED_WIDTH, rect.height / FIXED_HEIGHT);
+    canvas.style.width = `${FIXED_WIDTH * scale}px`;
+    canvas.style.height = `${FIXED_HEIGHT * scale}px`;
+    
     if (gameActive) {
       initPegs();
       drawBoard();
@@ -758,16 +772,16 @@ function startPlinko(binId, gameState) {
     const startY = H * 0.15;
     const endY = H * 0.75;
     
-    // Optimized vertical spacing - increased for better clearance
+    // Fixed vertical spacing - consistent across all browsers
     const verticalSpacing = (endY - startY) / (NUM_ROWS - 1);
     
-    // Optimized horizontal spacing - significantly increased for proper clearance
-    const horizontalSpacing = W / 6.5; // Much wider spacing
+    // Fixed horizontal spacing - consistent across all browsers
+    const horizontalSpacing = W / 6.5;
     
     for (let row = 0; row < NUM_ROWS; row++) {
       // Alternating rows have offset for triangular pattern
       const isOffsetRow = row % 2 === 1;
-      const numPegs = isOffsetRow ? 7 : 8; // Further reduced peg count
+      const numPegs = isOffsetRow ? 7 : 8;
       
       // Calculate offset for centered triangular pattern
       const totalWidth = (numPegs - 1) * horizontalSpacing;
@@ -1122,7 +1136,7 @@ function startPlinko(binId, gameState) {
     // Show win announcement
     document.getElementById('winSymbol').textContent = prize.symbol;
     document.getElementById('winPrize').textContent = prize.name;
-    document.getElementById('winStats').innerHTML = `${gameState.playerName || 'Player'}<br>${statsText}`;
+    document.getElementById('winStats').textContent = statsText;
     document.getElementById('winAnnouncement').classList.add('show');
     
     // Celebration particles from the center of the winning slot
