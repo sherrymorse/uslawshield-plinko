@@ -769,22 +769,28 @@ function startPlinko(binId, gameState) {
     const startX = playAreaLeft;
     const endX = playAreaRight;
     
-    // Calculate normalized spacing - OPTIMIZED for 1-4 bounces per row
+    // Calculate vertical spacing in normalized coordinates
     const normalizedVerticalSpacing = (endY - startY) / (NUM_ROWS - 1);
-    // Increase both horizontal and vertical spacing proportionally to maintain symmetry
-    const spacingMultiplier = 1.4; // Increased spacing while maintaining proportions
-    const normalizedHorizontalSpacing = normalizedVerticalSpacing * spacingMultiplier;
+    
+    // Calculate minimum required horizontal spacing based on puck size
+    // Puck needs to fit through: (PUCK_RADIUS * 2) + clearance on each side
+    // Convert to normalized coordinates relative to canvas width
+    const minGapPixels = (PUCK_RADIUS * 2) + 20; // Puck diameter + 20px clearance
+    const minNormalizedHorizontalSpacing = minGapPixels / W;
+    
+    // Use 1.8x the minimum for comfortable bouncing (allows 2-4 bounces per row)
+    const normalizedHorizontalSpacing = Math.max(minNormalizedHorizontalSpacing * 1.8, normalizedVerticalSpacing * 1.2);
     
     for (let row = 0; row < NUM_ROWS; row++) {
-      // Every row is offset for triangular pattern
+      // Alternate rows for triangular staggered pattern
       const isOffsetRow = row % 2 === 1;
       const rowY = startY + row * normalizedVerticalSpacing;
       
-      // Calculate how many pegs fit in this row with the optimized spacing
+      // Calculate how many pegs fit in this row
       const availableWidth = endX - startX;
       const numPegs = Math.floor(availableWidth / normalizedHorizontalSpacing) + 1;
       
-      // Center the row to ensure symmetrical left and right margins
+      // Center the row to ensure symmetrical margins
       const totalRowWidth = (numPegs - 1) * normalizedHorizontalSpacing;
       const rowStartX = startX + (availableWidth - totalRowWidth) / 2;
       
