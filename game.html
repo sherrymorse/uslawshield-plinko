@@ -1122,7 +1122,7 @@ function startPlinko(binId, gameState) {
     // Show win announcement
     document.getElementById('winSymbol').textContent = prize.symbol;
     document.getElementById('winPrize').textContent = prize.name;
-    document.getElementById('winStats').textContent = statsText;
+    document.getElementById('winStats').innerHTML = `${gameState.playerName || 'Player'}<br>${statsText}`;
     document.getElementById('winAnnouncement').classList.add('show');
     
     // Celebration particles from the center of the winning slot
