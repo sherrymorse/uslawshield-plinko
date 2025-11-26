@@ -759,11 +759,11 @@ function startPlinko(binId, gameState) {
     pegs = [];
     lastRowPegPositions = [];
     
-    // Play area bounds - INCREASED TOP AREA, DECREASED BOTTOM AREA
+    // Play area bounds - NARROWED HORIZONTAL AREA to prevent straight drops
     const playAreaTop = 0.10;  // Increased from 0.05 to 0.10
     const playAreaBottom = 0.85; // Increased from 0.80 to 0.85
-    const playAreaLeft = 0.02;
-    const playAreaRight = 0.98;
+    const playAreaLeft = 0.08;   // NARROWED from 0.02 to 0.08
+    const playAreaRight = 0.92;  // NARROWED from 0.98 to 0.92
     
     // Calculate normalized positions
     const startY = playAreaTop;
@@ -900,8 +900,8 @@ function startPlinko(binId, gameState) {
     // Define the playable area (matching initPegs)
     const playAreaTop = 0.10;  // Increased from 0.05 to 0.10
     const playAreaBottom = 0.85; // Increased from 0.80 to 0.85
-    const playAreaLeft = 0.02;
-    const playAreaRight = 0.98;
+    const playAreaLeft = 0.08;   // NARROWED from 0.02 to 0.08
+    const playAreaRight = 0.92;  // NARROWED from 0.98 to 0.92
     
     const startY = playAreaTop;
     const endY = playAreaBottom;
@@ -1146,13 +1146,16 @@ function startPlinko(binId, gameState) {
     currentPuck.vx *= 0.995;
     currentPuck.vy *= 0.996;
     
-    // Wall collisions with energy loss
+    // Wall collisions with energy loss - USING NARROWER BOUNDARIES
     const wallMargin = PUCK_RADIUS + 5;
-    if (currentPuck.x < wallMargin) {
-      currentPuck.x = wallMargin;
+    const leftBoundary = W * 0.08;   // NARROWED from 0 to W * 0.08
+    const rightBoundary = W * 0.92;  // NARROWED from W to W * 0.92
+    
+    if (currentPuck.x < leftBoundary + wallMargin) {
+      currentPuck.x = leftBoundary + wallMargin;
       currentPuck.vx = Math.abs(currentPuck.vx) * 0.7;
-    } else if (currentPuck.x > W - wallMargin) {
-      currentPuck.x = W - wallMargin;
+    } else if (currentPuck.x > rightBoundary - wallMargin) {
+      currentPuck.x = rightBoundary - wallMargin;
       currentPuck.vx = -Math.abs(currentPuck.vx) * 0.7;
     }
     
