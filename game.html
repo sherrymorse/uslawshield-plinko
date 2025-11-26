@@ -728,6 +728,7 @@ function startPlinko(binId, gameState) {
   
   // ==================== GAME STATE - DECLARE BEFORE FUNCTIONS ====================
   let pegs = [];
+  let lastRowPegPositions = [];
   let currentPuck = null;
   let isDragging = false;
   let animationId = null;
@@ -756,9 +757,10 @@ function startPlinko(binId, gameState) {
   // ==================== PEG INITIALIZATION ====================
   function initPegs() {
     pegs = [];
+    lastRowPegPositions = [];
     
-    // EXPANDED vertical play area with larger drop zone at top
-    const playAreaTop = 0.05;
+    // EXPANDED vertical play area with much larger drop zone at top
+    const playAreaTop = 0.20;
     const playAreaBottom = 0.80;
     const playAreaLeft = 0.02;
     const playAreaRight = 0.98;
@@ -823,6 +825,11 @@ function startPlinko(binId, gameState) {
             y: y,
             lastHit: 0
           });
+          
+          // Store last row peg positions for drop slot alignment
+          if (row === NUM_ROWS - 1) {
+            lastRowPegPositions.push(x);
+          }
         }
       }
     }
@@ -898,7 +905,7 @@ function startPlinko(binId, gameState) {
 
   function drawSidewallTeeth() {
     // Define the playable area (matching initPegs)
-    const playAreaTop = 0.05;
+    const playAreaTop = 0.20;
     const playAreaBottom = 0.80;
     const playAreaLeft = 0.02;
     const playAreaRight = 0.98;
@@ -979,11 +986,26 @@ function startPlinko(binId, gameState) {
     const slotCount = prizes.length;
     const slotHeight = H * 0.18;
     const bottomY = H - slotHeight;
-    const slotWidth = W / slotCount;
+    
+    // Calculate slot boundaries based on last row peg positions
+    // With 8 pegs, we have 9 regions:
+    // [0 to midpoint(peg0,peg1)], [midpoint(peg0,peg1) to midpoint(peg1,peg2)], ..., [midpoint(peg6,peg7) to W]
+    
+    const slotBoundaries = [0];
+    
+    // Add boundaries at midpoints between consecutive pegs
+    for (let i = 0; i < lastRowPegPositions.length - 1; i++) {
+      const midpoint = (lastRowPegPositions[i] + lastRowPegPositions[i + 1]) / 2;
+      slotBoundaries.push(midpoint);
+    }
+    
+    // Add right edge
+    slotBoundaries.push(W);
     
     prizes.forEach((prize, index) => {
-      const leftX = index * slotWidth;
-      const rightX = (index + 1) * slotWidth;
+      const leftX = slotBoundaries[index];
+      const rightX = slotBoundaries[index + 1];
+      const slotWidth = rightX - leftX;
       
       // Draw slot
       ctx.fillStyle = prize.color;
@@ -1194,17 +1216,32 @@ function startPlinko(binId, gameState) {
 
   async function handlePuckLanding() {
     const prizes = getCurrentPrizes();
-    const slotCount = prizes.length;
-    const slotWidth = W / slotCount;
     
-    // Ensure puck always lands in a valid slot
-    let slotIndex = Math.floor(currentPuck.x / slotWidth);
-    slotIndex = Math.max(0, Math.min(slotCount - 1, slotIndex));
+    // Calculate slot boundaries based on last row peg positions
+    const slotBoundaries = [0];
+    for (let i = 0; i < lastRowPegPositions.length - 1; i++) {
+      const midpoint = (lastRowPegPositions[i] + lastRowPegPositions[i + 1]) / 2;
+      slotBoundaries.push(midpoint);
+    }
+    slotBoundaries.push(W);
+    
+    // Determine which slot the puck landed in
+    let slotIndex = 0;
+    for (let i = 0; i < slotBoundaries.length - 1; i++) {
+      if (currentPuck.x >= slotBoundaries[i] && currentPuck.x < slotBoundaries[i + 1]) {
+        slotIndex = i;
+        break;
+      }
+    }
+    
+    // Ensure valid slot index
+    slotIndex = Math.max(0, Math.min(prizes.length - 1, slotIndex));
     
     const prize = prizes[slotIndex];
     
     // Snap puck to center of the winning slot
-    currentPuck.x = (slotIndex * slotWidth) + (slotWidth / 2);
+    const slotCenterX = (slotBoundaries[slotIndex] + slotBoundaries[slotIndex + 1]) / 2;
+    currentPuck.x = slotCenterX;
     currentPuck.y = H - (H * 0.18) + (PUCK_RADIUS / 2);
     
     // Play win sound
@@ -1222,7 +1259,6 @@ function startPlinko(binId, gameState) {
     document.getElementById('winAnnouncement').classList.add('show');
     
     // Celebration particles
-    const slotCenterX = (slotIndex * slotWidth) + (slotWidth / 2);
     for (let i = 0; i < 80; i++) {
       const angle = (Math.PI * 2 * i) / 80;
       const speed = Math.random() * 8 + 4;
@@ -1370,7 +1406,7 @@ function startPlinko(binId, gameState) {
     holderCanvas.style.transform = 'scale(1)';
     
     // Check if at top of board - updated to match new larger drop zone
-    const topThreshold = H * 0.05;
+    const topThreshold = H * 0.20;
     
     if (currentPuck.y > topThreshold) {
       // Too low - reset
