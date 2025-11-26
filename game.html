@@ -453,64 +453,45 @@ class AudioSystem {
     const ctx = this.audioContext;
     const now = ctx.currentTime;
     
-    // Higher frequency, softer metallic sound with reverb
+    // Aluminum disc hitting aluminum peg - lower frequencies, hollow sound
     const osc1 = ctx.createOscillator();
     const osc2 = ctx.createOscillator();
     const gain = ctx.createGain();
     const filter = ctx.createBiquadFilter();
     
-    // Higher frequencies for more treble (soft metallic sound)
-    const baseFreq1 = 480 + (intensity * 200); // Higher base frequency
-    const baseFreq2 = 650 + (intensity * 150); // Even higher for metallic quality
+    // Lower frequencies for hollow metallic sound
+    const baseFreq1 = 180 + (intensity * 100);
+    const baseFreq2 = 220 + (intensity * 80);
     
     osc1.frequency.setValueAtTime(baseFreq1, now);
-    osc1.frequency.exponentialRampToValueAtTime(220, now + 0.15);
+    osc1.frequency.exponentialRampToValueAtTime(120, now + 0.1);
     
     osc2.frequency.setValueAtTime(baseFreq2, now);
-    osc2.frequency.exponentialRampToValueAtTime(280, now + 0.12);
+    osc2.frequency.exponentialRampToValueAtTime(150, now + 0.08);
     
-    // Use triangle wave for softer metallic sound
-    osc1.type = 'triangle';
-    osc2.type = 'sine';
+    // Use different wave types for hollow metallic quality
+    osc1.type = 'sine';
+    osc2.type = 'triangle';
     
-    // High-pass filter to emphasize treble
-    filter.frequency.setValueAtTime(400, now);
-    filter.type = 'highpass';
+    // Bandpass filter to create hollow aluminum sound
+    filter.frequency.setValueAtTime(300, now);
+    filter.type = 'bandpass';
+    filter.Q.setValueAtTime(2, now);
     
-    // Quick attack, slightly longer decay with reverb effect
+    // Lower volume overall with quick decay
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.12 * intensity, now + 0.002);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+    gain.gain.linearRampToValueAtTime(0.08 * intensity, now + 0.001); // Lower peak volume
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
     
-    // Create reverb using delay
-    const delay = ctx.createDelay();
-    delay.delayTime.setValueAtTime(0.08, now);
-    
-    const feedback = ctx.createGain();
-    feedback.gain.setValueAtTime(0.3, now);
-    
-    const reverbGain = ctx.createGain();
-    reverbGain.gain.setValueAtTime(0.4, now);
-    
-    // Connect nodes for reverb effect
     osc1.connect(filter);
     osc2.connect(filter);
     filter.connect(gain);
-    
-    // Add reverb path
-    gain.connect(delay);
-    delay.connect(feedback);
-    feedback.connect(delay);
-    delay.connect(reverbGain);
-    reverbGain.connect(ctx.destination);
-    
-    // Main path
     gain.connect(ctx.destination);
     
     osc1.start(now);
     osc2.start(now);
-    osc1.stop(now + 0.25);
-    osc2.stop(now + 0.25);
+    osc1.stop(now + 0.12);
+    osc2.stop(now + 0.12);
   }
 
   playWin() {
@@ -519,12 +500,11 @@ class AudioSystem {
     const ctx = this.audioContext;
     const now = ctx.currentTime;
     
-    // Festive win sound with ascending tones and reverb
+    // Festive win sound with ascending tones
     for (let i = 0; i < 6; i++) {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       
-      // Higher frequencies for brighter win sound
       const freq = 300 + (i * 120);
       osc.frequency.setValueAtTime(freq, now + i * 0.08);
       osc.type = 'sine';
@@ -547,23 +527,22 @@ class AudioSystem {
     const ctx = this.audioContext;
     const now = ctx.currentTime;
     
-    // Sound for when puck is dropped - higher frequency
+    // Sound for when puck is dropped
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     
-    osc.frequency.setValueAtTime(320, now); // Higher frequency
-    osc.frequency.exponentialRampToValueAtTime(180, now + 0.15);
-    osc.type = 'sine';
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.exponentialRampToValueAtTime(80, now + 0.2);
     
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.08, now + 0.03);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    gain.gain.linearRampToValueAtTime(0.1, now + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
     
     osc.connect(gain);
     gain.connect(ctx.destination);
     
     osc.start(now);
-    osc.stop(now + 0.2);
+    osc.stop(now + 0.3);
   }
 }
 
@@ -1101,23 +1080,9 @@ function startPlinko(binId, gameState) {
         currentPuck.vx -= 1.6 * dotProduct * nx;
         currentPuck.vy -= 1.6 * dotProduct * ny;
         
-        // Add slight randomness
-        currentPuck.vx += (Math.random() - 0.5) * 0.8;
-        currentPuck.vy += (Math.random() - 0.5) * 0.4;
-        
-        // Particles
-        for (let i = 0; i < 4; i++) {
-          particles.push({
-            x: currentPuck.x,
-            y: currentPuck.y,
-            vx: (Math.random() - 0.5) * 4,
-            vy: (Math.random() - 0.5) * 4,
-            life: 20,
-            maxLife: 20,
-            size: 2,
-            color: '#00BCD4'
-          });
-        }
+        // Increased randomness for more varied paths
+        currentPuck.vx += (Math.random() - 0.5) * 1.2; // Increased from 0.8 to 1.2
+        currentPuck.vy += (Math.random() - 0.5) * 0.6; // Increased from 0.4 to 0.6
       }
     });
     
@@ -1320,8 +1285,9 @@ function startPlinko(binId, gameState) {
       return;
     }
     
-    // Drop straight down from current position
-    currentPuck.vx = 0;
+    // Add slight horizontal velocity variation based on release position
+    const releaseVariation = (currentPuck.x - W/2) / (W/2) * 0.8;
+    currentPuck.vx = releaseVariation;
     currentPuck.vy = 0.5;
     
     lastTime = performance.now();
