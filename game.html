@@ -158,9 +158,9 @@
   .game-container {
     position: relative;
     width: 70vw;
-    height: 80vh;
+    height: 85vh;
     max-width: 900px;
-    max-height: 1100px;
+    max-height: 1200px;
   }
 
   .canvas-wrapper {
@@ -757,9 +757,9 @@ function startPlinko(binId, gameState) {
   function initPegs() {
     pegs = [];
     
-    // EXPANDED vertical play area to accommodate taller diamonds
-    const playAreaTop = 0.10;    // Start higher (was 0.15)
-    const playAreaBottom = 0.78; // Extend lower (was 0.75)
+    // EXPANDED vertical play area with larger drop zone at top
+    const playAreaTop = 0.05;    // Increased drop zone (was 0.10)
+    const playAreaBottom = 0.80; // Extended bottom (was 0.78)
     const playAreaLeft = 0.02;
     const playAreaRight = 0.98;
     
@@ -772,17 +772,14 @@ function startPlinko(binId, gameState) {
     // Calculate vertical spacing in normalized coordinates
     const normalizedVerticalSpacing = (endY - startY) / (NUM_ROWS - 1);
     
-    // Calculate minimum required horizontal spacing based on puck size
-    const minGapPixels = (PUCK_RADIUS * 2) + 20;
-    const minNormalizedHorizontalSpacing = minGapPixels / W;
-    
-    // CRITICAL FIX: Make horizontal spacing MUCH smaller than vertical spacing
-    // To create tall narrow diamonds (2-2.5x taller than wide), use 0.4-0.45x ratio
-    // This means vertical spacing will be 2.2-2.5x the horizontal spacing
-    const normalizedHorizontalSpacing = Math.max(
-      minNormalizedHorizontalSpacing * 1.5,
-      normalizedVerticalSpacing * 0.42  // Changed from 0.65 to 0.42
-    );
+    // CORRECTED HORIZONTAL SPACING CALCULATION
+    // For diamonds that are 1.7x taller than wide:
+    // Diamond height = 2 × verticalSpacing
+    // Diamond width = horizontalSpacing
+    // height/width = 1.7
+    // Therefore: (2 × verticalSpacing) / horizontalSpacing = 1.7
+    // horizontalSpacing = (2 × verticalSpacing) / 1.7 ≈ 1.18 × verticalSpacing
+    const normalizedHorizontalSpacing = normalizedVerticalSpacing * 1.18;
     
     for (let row = 0; row < NUM_ROWS; row++) {
       // Alternate rows for triangular staggered pattern
@@ -889,9 +886,9 @@ function startPlinko(binId, gameState) {
   }
 
   function drawSidewallTeeth() {
-    // Define the playable area (matching initPegs - UPDATED VALUES)
-    const playAreaTop = 0.10;
-    const playAreaBottom = 0.78;
+    // Define the playable area (matching initPegs)
+    const playAreaTop = 0.05;
+    const playAreaBottom = 0.80;
     const playAreaLeft = 0.02;
     const playAreaRight = 0.98;
     
@@ -1361,8 +1358,8 @@ function startPlinko(binId, gameState) {
     isDragging = false;
     holderCanvas.style.transform = 'scale(1)';
     
-    // Check if at top of board
-    const topThreshold = H * 0.10;  // Updated to match new playAreaTop
+    // Check if at top of board - updated to match new larger drop zone
+    const topThreshold = H * 0.05;
     
     if (currentPuck.y > topThreshold) {
       // Too low - reset
