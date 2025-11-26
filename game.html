@@ -435,6 +435,7 @@ class AudioSystem {
   constructor() {
     this.audioContext = null;
     this.initialized = false;
+    this.soundOption = 1; // Default to option 1
   }
 
   init() {
@@ -447,41 +448,64 @@ class AudioSystem {
     }
   }
 
+  setSoundOption(option) {
+    if (option >= 1 && option <= 3) {
+      this.soundOption = option;
+    }
+  }
+
   playPegHit(intensity = 0.5) {
     if (!this.initialized) return;
     
+    // Call the appropriate sound function based on selected option
+    switch(this.soundOption) {
+      case 1:
+        this.playMetallicPing(intensity);
+        break;
+      case 2:
+        this.playHollowTap(intensity);
+        break;
+      case 3:
+        this.playDampedRing(intensity);
+        break;
+      default:
+        this.playMetallicPing(intensity);
+    }
+  }
+
+  // Option 1: Metallic ping with higher frequencies
+  playMetallicPing(intensity = 0.5) {
     const ctx = this.audioContext;
     const now = ctx.currentTime;
     
-    // Aluminum disc hitting aluminum peg - lower frequencies, hollow sound
     const osc1 = ctx.createOscillator();
     const osc2 = ctx.createOscillator();
     const gain = ctx.createGain();
     const filter = ctx.createBiquadFilter();
     
-    // Lower frequencies for hollow metallic sound
-    const baseFreq1 = 180 + (intensity * 100);
-    const baseFreq2 = 220 + (intensity * 80);
+    // Higher frequencies for metallic ping
+    const baseFreq1 = 400 + (intensity * 200);
+    const baseFreq2 = 600 + (intensity * 150);
     
     osc1.frequency.setValueAtTime(baseFreq1, now);
-    osc1.frequency.exponentialRampToValueAtTime(120, now + 0.1);
+    osc1.frequency.exponentialRampToValueAtTime(200, now + 0.15);
     
     osc2.frequency.setValueAtTime(baseFreq2, now);
-    osc2.frequency.exponentialRampToValueAtTime(150, now + 0.08);
+    osc2.frequency.exponentialRampToValueAtTime(300, now + 0.12);
     
-    // Use different wave types for hollow metallic quality
-    osc1.type = 'sine';
-    osc2.type = 'triangle';
+    // Square and sawtooth waves for metallic character
+    osc1.type = 'square';
+    osc2.type = 'sawtooth';
     
-    // Bandpass filter to create hollow aluminum sound
-    filter.frequency.setValueAtTime(300, now);
+    // Bandpass filter to emphasize metallic qualities
+    filter.frequency.setValueAtTime(800, now);
     filter.type = 'bandpass';
-    filter.Q.setValueAtTime(2, now);
+    filter.Q.setValueAtTime(5, now);
     
-    // Lower volume overall with quick decay
+    // Quick attack, moderate decay
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.08 * intensity, now + 0.001); // Lower peak volume
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    gain.gain.linearRampToValueAtTime(0.1 * intensity, now + 0.002);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
     
     osc1.connect(filter);
     osc2.connect(filter);
@@ -490,8 +514,130 @@ class AudioSystem {
     
     osc1.start(now);
     osc2.start(now);
-    osc1.stop(now + 0.12);
-    osc2.stop(now + 0.12);
+    osc1.stop(now + 0.2);
+    osc2.stop(now + 0.2);
+  }
+
+  // Option 2: Hollow tap sound with lower frequencies
+  playHollowTap(intensity = 0.5) {
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+    
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    
+    // Lower frequencies for hollow sound
+    const baseFreq1 = 120 + (intensity * 80);
+    const baseFreq2 = 180 + (intensity * 60);
+    
+    osc1.frequency.setValueAtTime(baseFreq1, now);
+    osc1.frequency.exponentialRampToValueAtTime(80, now + 0.1);
+    
+    osc2.frequency.setValueAtTime(baseFreq2, now);
+    osc2.frequency.exponentialRampToValueAtTime(100, now + 0.08);
+    
+    // Triangle waves for hollow character
+    osc1.type = 'triangle';
+    osc2.type = 'triangle';
+    
+    // Lowpass filter to remove high frequencies
+    filter.frequency.setValueAtTime(300, now);
+    filter.type = 'lowpass';
+    filter.Q.setValueAtTime(1, now);
+    
+    // Very quick attack and decay
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.08 * intensity, now + 0.001);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+    
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 0.08);
+    osc2.stop(now + 0.08);
+  }
+
+  // Option 3: Damped ring with noise component
+  playDampedRing(intensity = 0.5) {
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+    
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const noise = ctx.createBufferSource();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    const noiseFilter = ctx.createBiquadFilter();
+    
+    // Create noise buffer
+    const bufferSize = ctx.sampleRate * 0.1;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    
+    noise.buffer = buffer;
+    
+    // Oscillator frequencies
+    const baseFreq1 = 250 + (intensity * 100);
+    const baseFreq2 = 350 + (intensity * 80);
+    
+    osc1.frequency.setValueAtTime(baseFreq1, now);
+    osc1.frequency.exponentialRampToValueAtTime(150, now + 0.25);
+    
+    osc2.frequency.setValueAtTime(baseFreq2, now);
+    osc2.frequency.exponentialRampToValueAtTime(200, now + 0.2);
+    
+    // Sine waves for clean tone
+    osc1.type = 'sine';
+    osc2.type = 'sine';
+    
+    // Filter for oscillators
+    filter.frequency.setValueAtTime(500, now);
+    filter.type = 'bandpass';
+    filter.Q.setValueAtTime(3, now);
+    
+    // Filter for noise (high frequencies only)
+    noiseFilter.frequency.setValueAtTime(800, now);
+    noiseFilter.type = 'highpass';
+    
+    // Gain envelope with longer decay
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.07 * intensity, now + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    
+    // Connect oscillators
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(gain);
+    
+    // Connect noise with separate gain
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.02 * intensity, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+    
+    noise.connect(noiseFilter);
+    noiseFilter.connect(noiseGain);
+    noiseGain.connect(gain);
+    
+    gain.connect(ctx.destination);
+    
+    // Start all sources
+    osc1.start(now);
+    osc2.start(now);
+    noise.start(now);
+    
+    osc1.stop(now + 0.3);
+    osc2.stop(now + 0.3);
+    noise.stop(now + 0.05);
   }
 
   playWin() {
