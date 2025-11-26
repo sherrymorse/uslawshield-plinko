@@ -841,6 +841,9 @@ function startPlinko(binId, gameState) {
     // Draw triangular pattern background
     drawTrianglePattern();
     
+    // Draw sidewall teeth FIRST (before pegs so they're in the background)
+    drawSidewallTeeth();
+    
     // Draw pegs
     pegs.forEach(peg => {
       // Peg shadow
@@ -880,6 +883,54 @@ function startPlinko(binId, gameState) {
     needsRedraw = true;
     drawBoard();
     needsRedraw = false;
+  }
+
+  function drawSidewallTeeth() {
+    // Define the playable area (matching initPegs)
+    const playAreaTop = 0.15;
+    const playAreaBottom = 0.75;
+    const playAreaLeft = 0.02;
+    const playAreaRight = 0.98;
+    
+    const startY = playAreaTop;
+    const endY = playAreaBottom;
+    const startX = playAreaLeft;
+    const endX = playAreaRight;
+    
+    const normalizedVerticalSpacing = (endY - startY) / (NUM_ROWS - 1);
+    
+    // Tooth dimensions
+    const toothDepth = W * 0.035; // How far teeth protrude inward
+    const toothHeight = normalizedVerticalSpacing * H; // Height of each tooth
+    
+    ctx.fillStyle = '#FFFFFF';
+    ctx.strokeStyle = '#D4A76A';
+    ctx.lineWidth = 2;
+    
+    // Draw teeth on offset rows (row 1, 3, 5, 7, 9, 11) from row 1 to row NUM_ROWS-2
+    for (let row = 1; row < NUM_ROWS - 1; row += 2) {
+      const rowY = (startY + row * normalizedVerticalSpacing) * H;
+      const prevRowY = (startY + (row - 1) * normalizedVerticalSpacing) * H;
+      const nextRowY = (startY + (row + 1) * normalizedVerticalSpacing) * H;
+      
+      // Left side tooth (pointing right)
+      ctx.beginPath();
+      ctx.moveTo(0, prevRowY);
+      ctx.lineTo(toothDepth, rowY);
+      ctx.lineTo(0, nextRowY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      
+      // Right side tooth (pointing left)
+      ctx.beginPath();
+      ctx.moveTo(W, prevRowY);
+      ctx.lineTo(W - toothDepth, rowY);
+      ctx.lineTo(W, nextRowY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
   }
 
   function drawTrianglePattern() {
