@@ -760,8 +760,8 @@ function startPlinko(binId, gameState) {
     // Define the playable area as percentages of the board
     const playAreaTop = 0.15;    // 15% from top
     const playAreaBottom = 0.75; // 75% from top
-    const playAreaLeft = 0.02;   // Reduced from 0.05 to 0.02 to eliminate left gap
-    const playAreaRight = 0.98;  // Increased from 0.95 to 0.98 to use full width
+    const playAreaLeft = 0.02;   // 2% from left
+    const playAreaRight = 0.98;  // 98% from left
     
     // Calculate normalized positions
     const startY = playAreaTop;
@@ -769,17 +769,19 @@ function startPlinko(binId, gameState) {
     const startX = playAreaLeft;
     const endX = playAreaRight;
     
-    // Calculate normalized spacing for perfect triangular grid
+    // Calculate normalized spacing - INCREASED spacing to ensure puck fits between pegs
     const normalizedVerticalSpacing = (endY - startY) / (NUM_ROWS - 1);
-    // For equilateral triangles, horizontal spacing = vertical spacing * 2 / √3
-    const normalizedHorizontalSpacing = normalizedVerticalSpacing * 2 / Math.sqrt(3);
+    // Significantly increase horizontal spacing to ensure puck can pass between pegs
+    // Puck diameter is 64px, so we need gap > 64px between peg centers
+    const minRequiredSpacing = (PUCK_RADIUS * 2 + 10) / W; // Add 10px buffer
+    const normalizedHorizontalSpacing = Math.max(normalizedVerticalSpacing * 2 / Math.sqrt(3), minRequiredSpacing);
     
     for (let row = 0; row < NUM_ROWS; row++) {
       // Every row is offset for triangular pattern
       const isOffsetRow = row % 2 === 1;
       const rowY = startY + row * normalizedVerticalSpacing;
       
-      // Calculate how many pegs fit in this row with full coverage
+      // Calculate how many pegs fit in this row with the increased spacing
       const availableWidth = endX - startX;
       const numPegs = Math.floor(availableWidth / normalizedHorizontalSpacing) + 1;
       
@@ -793,7 +795,7 @@ function startPlinko(binId, gameState) {
         const normalizedX = rowStartX + col * normalizedHorizontalSpacing + horizontalOffset;
         const normalizedY = rowY;
         
-        // Only create peg if it fits within the play area (no right-side gap either)
+        // Only create peg if it fits within the play area
         if (normalizedX <= endX) {
           // Convert normalized coordinates to actual pixel positions
           const x = normalizedX * W;
