@@ -760,8 +760,8 @@ function startPlinko(binId, gameState) {
     // Define the playable area as percentages of the board
     const playAreaTop = 0.15;    // 15% from top
     const playAreaBottom = 0.75; // 75% from top
-    const playAreaLeft = 0.05;   // 5% from left
-    const playAreaRight = 0.95;  // 95% from left
+    const playAreaLeft = 0.02;   // Reduced from 0.05 to 0.02 to eliminate left gap
+    const playAreaRight = 0.98;  // Increased from 0.95 to 0.98 to use full width
     
     // Calculate normalized positions
     const startY = playAreaTop;
@@ -779,13 +779,12 @@ function startPlinko(binId, gameState) {
       const isOffsetRow = row % 2 === 1;
       const rowY = startY + row * normalizedVerticalSpacing;
       
-      // Calculate how many pegs fit in this row
+      // Calculate how many pegs fit in this row with full coverage
       const availableWidth = endX - startX;
       const numPegs = Math.floor(availableWidth / normalizedHorizontalSpacing) + 1;
       
-      // Center the row within the playable area
-      const rowWidth = (numPegs - 1) * normalizedHorizontalSpacing;
-      const rowStartX = startX + (availableWidth - rowWidth) / 2;
+      // Start the row at the very left edge to eliminate left gap
+      const rowStartX = startX;
       
       // Apply horizontal offset for staggered rows
       const horizontalOffset = isOffsetRow ? normalizedHorizontalSpacing / 2 : 0;
@@ -794,15 +793,18 @@ function startPlinko(binId, gameState) {
         const normalizedX = rowStartX + col * normalizedHorizontalSpacing + horizontalOffset;
         const normalizedY = rowY;
         
-        // Convert normalized coordinates to actual pixel positions
-        const x = normalizedX * W;
-        const y = normalizedY * H;
-        
-        pegs.push({
-          x: x,
-          y: y,
-          lastHit: 0
-        });
+        // Only create peg if it fits within the play area (no right-side gap either)
+        if (normalizedX <= endX) {
+          // Convert normalized coordinates to actual pixel positions
+          const x = normalizedX * W;
+          const y = normalizedY * H;
+          
+          pegs.push({
+            x: x,
+            y: y,
+            lastHit: 0
+          });
+        }
       }
     }
   }
