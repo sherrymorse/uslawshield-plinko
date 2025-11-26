@@ -584,12 +584,29 @@ function startPlinko(binId, gameState) {
   // Populate legend
   updateLegend(gameState.currentBoard);
   
+  // ==================== GAME CONSTANTS ====================
+  const PUCK_RADIUS = 32;
+  const PEG_RADIUS = 7;
+  const NUM_ROWS = 12;
+  
+  const getCurrentPrizes = () => PRIZE_CONFIG[gameState.currentBoard].prizes;
+  
+  // ==================== GAME STATE - DECLARE BEFORE FUNCTIONS ====================
+  let pegs = [];
+  let currentPuck = null;
+  let isDragging = false;
+  let animationId = null;
+  let particles = [];
+  let lastTime = 0;
+  let gameActive = true;
+  let W, H;
+  
   // Resize canvas
   const resizeCanvas = () => {
     const container = canvas.parentElement;
     const rect = container.getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
+    canvas.width = W = rect.width;
+    canvas.height = H = rect.height;
     if (gameActive) {
       initPegs();
       drawBoard();
@@ -598,25 +615,6 @@ function startPlinko(binId, gameState) {
   
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
-  
-  const W = canvas.width;
-  const H = canvas.height;
-  
-  // ==================== GAME CONSTANTS ====================
-  const PUCK_RADIUS = 32;
-  const PEG_RADIUS = 7;
-  const NUM_ROWS = 12;
-  
-  const getCurrentPrizes = () => PRIZE_CONFIG[gameState.currentBoard].prizes;
-  
-  // ==================== GAME STATE ====================
-  let pegs = [];
-  let currentPuck = null;
-  let isDragging = false;
-  let animationId = null;
-  let particles = [];
-  let lastTime = 0;
-  let gameActive = true;
   
   // ==================== PEG INITIALIZATION ====================
   function initPegs() {
