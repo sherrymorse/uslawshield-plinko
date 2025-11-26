@@ -762,20 +762,20 @@ function startPlinko(binId, gameState) {
     // Increased vertical spacing for better clearance
     const verticalSpacing = (endY - startY) / (NUM_ROWS - 1);
     
-    // Significantly increased horizontal spacing for proper clearance
-    const horizontalSpacing = W / 5.5; // Increased from 6.5 to 5.5 for more space
+    // Optimized horizontal spacing to utilize full width
+    const horizontalSpacing = W / 8; // Increased peg count to fill space
     
     for (let row = 0; row < NUM_ROWS; row++) {
       // Alternating rows have offset for triangular pattern
       const isOffsetRow = row % 2 === 1;
-      const numPegs = isOffsetRow ? 6 : 7; // Reduced peg count for better spacing
+      const numPegs = isOffsetRow ? 9 : 10; // Increased peg count to fill side space
       
-      // Calculate offset for centered triangular pattern with proper margins
+      // Calculate offset for centered triangular pattern with minimal margins
       const totalWidth = (numPegs - 1) * horizontalSpacing;
       const startX = (W - totalWidth) / 2;
       
-      // Add side margins to ensure pegs don't get too close to edges
-      const margin = horizontalSpacing * 0.8;
+      // Reduced side margins to utilize full width
+      const margin = horizontalSpacing * 0.3;
       
       for (let col = 0; col < numPegs; col++) {
         const x = Math.max(margin, Math.min(W - margin, startX + col * horizontalSpacing));
