@@ -808,21 +808,26 @@ function startPlinko(binId, gameState) {
         // Calculate tooth depth based on available space
         const toothDepth = PEG_SPACING_X * 0.6;
         
-        // Left tooth - peak at the position where a peg would be
+        // Calculate the positions where teeth should point (halfway between pegs)
+        // For 7-peg rows, the teeth should point to the positions where pegs would be in an 8-peg row
+        const leftToothX = startX;
+        const rightToothX = startX + totalWidth;
+        
+        // Left tooth - peak at the position where a peg would be in an 8-peg row
         teeth.push({
           points: [
             { x: BOARD_LEFT - toothDepth, y: prevRowY },
-            { x: startX, y: rowY }, // Sharpest point where peg should be
+            { x: leftToothX, y: rowY }, // Sharpest point where peg should be
             { x: BOARD_LEFT - toothDepth, y: nextRowY }
           ],
           row: row
         });
         
-        // Right tooth - peak at the position where a peg would be
+        // Right tooth - peak at the position where a peg would be in an 8-peg row
         teeth.push({
           points: [
             { x: BOARD_RIGHT + toothDepth, y: prevRowY },
-            { x: startX + totalWidth, y: rowY }, // Sharpest point where peg should be
+            { x: rightToothX, y: rowY }, // Sharpest point where peg should be
             { x: BOARD_RIGHT + toothDepth, y: nextRowY }
           ],
           row: row
