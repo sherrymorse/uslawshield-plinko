@@ -743,11 +743,10 @@ function startPlinko(binId, gameState) {
     pegs = [];
     lastRowPegPositions = [];
     
-    // Match the reference image: pegs extend to absolute edges, teeth point to gaps in odd rows
     const playAreaTop = 0.10;
     const playAreaBottom = 0.85;
-    const playAreaLeft = 0.0;   // Absolute left edge (0% from left)
-    const playAreaRight = 1.0;  // Absolute right edge (100% width)
+    const playAreaLeft = 0.05;
+    const playAreaRight = 0.95;
     
     const startY = playAreaTop;
     const endY = playAreaBottom;
@@ -758,10 +757,7 @@ function startPlinko(binId, gameState) {
     
     const numSlots = getCurrentPrizes().length;
     const availableWidth = endX - startX;
-    
-    // Key insight from reference: horizontal spacing based on number of slots
-    // This creates the diamond pattern where pegs align with slot boundaries
-    const normalizedHorizontalSpacing = availableWidth / numSlots;
+    const normalizedHorizontalSpacing = availableWidth / (numSlots - 1);
     
     for (let row = 0; row < NUM_ROWS; row++) {
       const isOffsetRow = row % 2 === 1;
@@ -769,12 +765,10 @@ function startPlinko(binId, gameState) {
       const rowY = startY + row * normalizedVerticalSpacing;
       
       if (isOffsetRow) {
-        // Offset rows start at 0.5 spacing and have 7 pegs
-        // This creates the gaps where teeth point to
         const rowStartX = startX + normalizedHorizontalSpacing * 0.5;
         
         for (let col = 0; col < numPegs; col++) {
-          const normalizedX = rowStartX + (col + 1) * normalizedHorizontalSpacing;
+          const normalizedX = rowStartX + col * normalizedHorizontalSpacing;
           const normalizedY = rowY;
           
           const x = normalizedX * W;
@@ -787,9 +781,8 @@ function startPlinko(binId, gameState) {
           });
         }
       } else {
-        // Even rows have 8 pegs starting at full spacing intervals
         for (let col = 0; col < numPegs; col++) {
-          const normalizedX = startX + (col + 1) * normalizedHorizontalSpacing;
+          const normalizedX = startX + col * normalizedHorizontalSpacing;
           const normalizedY = rowY;
           
           const x = normalizedX * W;
@@ -866,39 +859,50 @@ function startPlinko(binId, gameState) {
   function drawSidewallTeeth() {
     const playAreaTop = 0.10;
     const playAreaBottom = 0.85;
+    const playAreaLeft = 0.05;
+    const playAreaRight = 0.95;
     
     const startY = playAreaTop;
     const endY = playAreaBottom;
+    const startX = playAreaLeft;
+    const endX = playAreaRight;
     
     const normalizedVerticalSpacing = (endY - startY) / (NUM_ROWS - 1);
     
-    // Teeth extend outward from the edges (not inward)
-    const toothDepth = W * 0.035;
+    const numSlots = getCurrentPrizes().length;
+    const availableWidth = endX - startX;
+    const normalizedHorizontalSpacing = availableWidth / (numSlots - 1);
     
-    ctx.fillStyle = '#FFFFFF';
-    ctx.strokeStyle = '#D4A76A';
+    const toothWidth = normalizedHorizontalSpacing * W * 0.6;
+    
+    ctx.fillStyle = '#D4A76A';
+    ctx.strokeStyle = '#B8956A';
     ctx.lineWidth = 2;
     
-    // Teeth point to the gaps in odd-numbered rows (rows with 7 pegs)
-    for (let row = 1; row < NUM_ROWS - 1; row += 2) {
+    // Draw teeth for odd-numbered rows (rows with 7 pegs)
+    for (let row = 1; row < NUM_ROWS; row += 2) {
       const rowY = (startY + row * normalizedVerticalSpacing) * H;
       const prevRowY = (startY + (row - 1) * normalizedVerticalSpacing) * H;
       const nextRowY = (startY + (row + 1) * normalizedVerticalSpacing) * H;
       
-      // Left tooth - extends outward from left edge
+      // Left tooth - points to where a peg would be (at startX)
+      const leftToothX = startX * W;
+      
       ctx.beginPath();
-      ctx.moveTo(0, prevRowY);
-      ctx.lineTo(-toothDepth, rowY);
-      ctx.lineTo(0, nextRowY);
+      ctx.moveTo(leftToothX, prevRowY);
+      ctx.lineTo(leftToothX - toothWidth, rowY);
+      ctx.lineTo(leftToothX, nextRowY);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
       
-      // Right tooth - extends outward from right edge
+      // Right tooth - points to where a peg would be (at endX)
+      const rightToothX = endX * W;
+      
       ctx.beginPath();
-      ctx.moveTo(W, prevRowY);
-      ctx.lineTo(W + toothDepth, rowY);
-      ctx.lineTo(W, nextRowY);
+      ctx.moveTo(rightToothX, prevRowY);
+      ctx.lineTo(rightToothX + toothWidth, rowY);
+      ctx.lineTo(rightToothX, nextRowY);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
@@ -1078,16 +1082,14 @@ function startPlinko(binId, gameState) {
     currentPuck.vx *= 0.995;
     currentPuck.vy *= 0.996;
     
-    // Wall boundaries at absolute edges (with small margin for puck radius)
-    const wallMargin = PUCK_RADIUS + 5;
-    const leftBoundary = 0;
-    const rightBoundary = W;
+    const leftBoundary = 0.05 * W;
+    const rightBoundary = 0.95 * W;
     
-    if (currentPuck.x < leftBoundary + wallMargin) {
-      currentPuck.x = leftBoundary + wallMargin;
+    if (currentPuck.x < leftBoundary + PUCK_RADIUS) {
+      currentPuck.x = leftBoundary + PUCK_RADIUS;
       currentPuck.vx = Math.abs(currentPuck.vx) * 0.7;
-    } else if (currentPuck.x > rightBoundary - wallMargin) {
-      currentPuck.x = rightBoundary - wallMargin;
+    } else if (currentPuck.x > rightBoundary - PUCK_RADIUS) {
+      currentPuck.x = rightBoundary - PUCK_RADIUS;
       currentPuck.vx = -Math.abs(currentPuck.vx) * 0.7;
     }
     
