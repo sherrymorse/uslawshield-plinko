@@ -1253,7 +1253,7 @@ function startPlinko(binId, gameState) {
     document.getElementById('winStats').textContent = statsText;
     document.getElementById('winAnnouncement').classList.add('show');
     
-    // Celebration particles
+    // Celebration particles - FIXED SYNTAX ERROR HERE
     for (let i = 0; i < 80; i++) {
       const angle = (Math.PI * 2 * i) / 80;
       const speed = Math.random() * 8 + 4;
@@ -1265,7 +1265,7 @@ function startPlinko(binId, gameState) {
         vy: Math.sin(angle) * speed - 4,
         life: 50,
         maxLife: 50,
-        size = 3,
+        size: 3,
         color: prize.color
       });
     }
