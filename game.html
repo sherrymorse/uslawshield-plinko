@@ -810,8 +810,8 @@ function startPlinko(binId, gameState) {
         
         // Calculate the positions where teeth should point (halfway between pegs)
         // For 7-peg rows, the teeth should point to the positions where pegs would be in an 8-peg row
-        const leftToothX = startX;
-        const rightToothX = startX + totalWidth;
+        const leftToothX = startX - (PEG_SPACING_X / 2);
+        const rightToothX = startX + totalWidth + (PEG_SPACING_X / 2);
         
         // Left tooth - peak at the position where a peg would be in an 8-peg row
         teeth.push({
