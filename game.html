@@ -760,7 +760,6 @@ function startPlinko(binId, gameState) {
     lastRowPegPositions = [];
     
     // Play area bounds - NARROWED HORIZONTAL AREA to prevent straight drops
-    // Keeping the same vertical boundaries but narrowing horizontal
     const playAreaTop = 0.10;  // Increased from 0.05 to 0.10
     const playAreaBottom = 0.85; // Increased from 0.80 to 0.85
     const playAreaLeft = 0.10;   // NARROWED from 0.02 to 0.10
@@ -981,16 +980,19 @@ function startPlinko(binId, gameState) {
     const slotHeight = H * 0.12;  // DECREASED from 0.18 to 0.12
     const bottomY = H - slotHeight;
     
-    // Calculate slot boundaries: left edge, 8 pegs as boundaries, right edge
-    const slotBoundaries = [0];
+    // Calculate slot boundaries using the SAME NARROWED BOUNDARIES as the play area
+    const slotBoundaries = [];
+    
+    // Start with the narrowed left boundary
+    slotBoundaries.push(W * 0.10);  // NARROWED from 0 to W * 0.10
     
     // Add peg positions as boundaries
     lastRowPegPositions.forEach(pegX => {
       slotBoundaries.push(pegX);
     });
     
-    // Add right edge
-    slotBoundaries.push(W);
+    // End with the narrowed right boundary
+    slotBoundaries.push(W * 0.90);  // NARROWED from W to W * 0.90
     
     prizes.forEach((prize, index) => {
       const leftX = slotBoundaries[index];
@@ -1024,8 +1026,8 @@ function startPlinko(binId, gameState) {
     ctx.strokeStyle = '#FFFFFF';
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(0, bottomY);
-    ctx.lineTo(W, bottomY);
+    ctx.moveTo(W * 0.10, bottomY);  // NARROWED from 0
+    ctx.lineTo(W * 0.90, bottomY);  // NARROWED from W
     ctx.stroke();
   }
 
@@ -1210,12 +1212,16 @@ function startPlinko(binId, gameState) {
   async function handlePuckLanding() {
     const prizes = getCurrentPrizes();
     
-    // Calculate slot boundaries: left edge, 8 pegs, right edge = 9 slots
-    const slotBoundaries = [0];
+    // Calculate slot boundaries using the SAME NARROWED BOUNDARIES
+    const slotBoundaries = [];
+    slotBoundaries.push(W * 0.10);  // NARROWED from 0
+    
+    // Add peg positions as boundaries
     lastRowPegPositions.forEach(pegX => {
       slotBoundaries.push(pegX);
     });
-    slotBoundaries.push(W);
+    
+    slotBoundaries.push(W * 0.90);  // NARROWED from W
     
     // Determine which slot the puck landed in
     let slotIndex = 0;
