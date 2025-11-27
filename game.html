@@ -728,7 +728,7 @@ function startPlinko(binId, gameState) {
   // Dynamic sizing variables
   let PUCK_RADIUS, PEG_RADIUS, PEG_SPACING_X, PEG_SPACING_Y;
   let BOARD_TOP, BOARD_BOTTOM, BOARD_LEFT, BOARD_RIGHT;
-  let PRIZE_START_X, PRIZE_TOTAL_WIDTH, PRIZE_ZONE_TOP;
+  let PRIZE_START_X, PRIZE_TOTAL_WIDTH;
   
   const resizeCanvas = () => {
     const container = canvas.parentElement;
@@ -739,28 +739,23 @@ function startPlinko(binId, gameState) {
     // Calculate the dynamic play area based on available space
     const numSlots = getCurrentPrizes().length;
     
-    // Define margins - prizes will span full width
+    // Define margins as percentages of canvas dimensions
     const MARGIN_TOP = H * 0.10;
-    const PRIZE_ZONE_HEIGHT = H * 0.15; // Height reserved for prize slots
-    const PEG_ZONE_HEIGHT = H - MARGIN_TOP - PRIZE_ZONE_HEIGHT; // Available height for pegs
+    const MARGIN_BOTTOM = H * 0.15;
+    const MARGIN_SIDES = 0; // Remove side margins for full-width prizes
     
-    // Prize zone spans full width
-    PRIZE_START_X = 0;
-    PRIZE_TOTAL_WIDTH = W;
-    PRIZE_ZONE_TOP = H - PRIZE_ZONE_HEIGHT;
-    
-    // Board boundaries for pegs - need to leave space for teeth
-    BOARD_LEFT = 0;
-    BOARD_RIGHT = W;
+    // Calculate play area boundaries
+    BOARD_LEFT = MARGIN_SIDES;
+    BOARD_RIGHT = W - MARGIN_SIDES;
     BOARD_TOP = MARGIN_TOP;
-    BOARD_BOTTOM = PRIZE_ZONE_TOP - (PEG_ZONE_HEIGHT * 0.08); // Leave gap before prizes
+    BOARD_BOTTOM = H - MARGIN_BOTTOM;
     
-    // Calculate available play area for pegs
-    const playAreaWidth = W;
+    // Calculate available play area
+    const playAreaWidth = BOARD_RIGHT - BOARD_LEFT;
     const playAreaHeight = BOARD_BOTTOM - BOARD_TOP;
     
-    // Calculate dynamic spacing based on play area - prizes span full width
-    PEG_SPACING_X = playAreaWidth / numSlots;
+    // Calculate dynamic spacing based on play area
+    PEG_SPACING_X = playAreaWidth / (numSlots - 0.5); // Adjusted for full width
     PEG_SPACING_Y = playAreaHeight / (NUM_ROWS - 1);
     
     // Calculate puck and peg sizes relative to spacing
@@ -783,9 +778,13 @@ function startPlinko(binId, gameState) {
     
     const numSlots = getCurrentPrizes().length;
     
-    // Center the peg arrangement based on prize slots
-    const totalPegWidth = (numSlots - 1) * PEG_SPACING_X;
-    const startX = (W - totalPegWidth) / 2;
+    // Calculate the starting position to use the full width
+    const totalWidth = (numSlots - 1) * PEG_SPACING_X;
+    const startX = BOARD_LEFT + (PEG_SPACING_X / 2); // Start from left edge
+    
+    // Calculate prize slot boundaries to use full width
+    PRIZE_START_X = BOARD_LEFT;
+    PRIZE_TOTAL_WIDTH = BOARD_RIGHT - BOARD_LEFT;
     
     for (let row = 0; row < NUM_ROWS; row++) {
       const isOffsetRow = row % 2 === 1;
@@ -817,7 +816,7 @@ function startPlinko(binId, gameState) {
         // Calculate the positions where teeth should point (halfway between pegs)
         // For 7-peg rows, the teeth should point to positions exactly halfway between the edge and first peg
         const leftToothX = startX - (PEG_SPACING_X / 2);
-        const rightToothX = startX + totalPegWidth + (PEG_SPACING_X / 2);
+        const rightToothX = startX + totalWidth + (PEG_SPACING_X / 2);
         
         // Left tooth - peak at the position where a peg would be in an 8-peg row
         teeth.push({
@@ -960,10 +959,11 @@ function startPlinko(binId, gameState) {
   function drawPrizeSlots() {
     const prizes = getCurrentPrizes();
     const slotCount = prizes.length;
+    const slotHeight = H * 0.15;
+    const bottomY = H - slotHeight;
     
-    // Use the dynamically calculated prize slot boundaries spanning full width
+    // Use the full width for prize slots
     const slotWidth = PRIZE_TOTAL_WIDTH / slotCount;
-    const slotHeight = H - PRIZE_ZONE_TOP;
     
     prizes.forEach((prize, index) => {
       const leftX = PRIZE_START_X + index * slotWidth;
@@ -971,8 +971,8 @@ function startPlinko(binId, gameState) {
       
       ctx.fillStyle = prize.color;
       ctx.beginPath();
-      ctx.moveTo(leftX, PRIZE_ZONE_TOP);
-      ctx.lineTo(rightX, PRIZE_ZONE_TOP);
+      ctx.moveTo(leftX, bottomY);
+      ctx.lineTo(rightX, bottomY);
       ctx.lineTo(rightX, H);
       ctx.lineTo(leftX, H);
       ctx.closePath();
@@ -986,15 +986,14 @@ function startPlinko(binId, gameState) {
       ctx.font = `bold ${Math.min(48, slotWidth * 0.4)}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(prize.symbol, leftX + slotWidth / 2, PRIZE_ZONE_TOP + slotHeight * 0.5);
+      ctx.fillText(prize.symbol, leftX + slotWidth / 2, bottomY + slotHeight * 0.5);
     });
     
-    // Draw top border line
     ctx.strokeStyle = '#FFFFFF';
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(0, PRIZE_ZONE_TOP);
-    ctx.lineTo(W, PRIZE_ZONE_TOP);
+    ctx.moveTo(PRIZE_START_X, bottomY);
+    ctx.lineTo(PRIZE_START_X + PRIZE_TOTAL_WIDTH, bottomY);
     ctx.stroke();
   }
 
@@ -1199,10 +1198,22 @@ function startPlinko(binId, gameState) {
       }
     });
     
-    // Check if puck has reached the prize zone
-    if (currentPuck.y + PUCK_RADIUS > PRIZE_ZONE_TOP) {
-      handlePuckLanding();
-      return;
+    // Check if puck has fallen into a prize slot
+    const slotHeight = H * 0.15;
+    const slotTop = H - slotHeight;
+    
+    if (currentPuck.y + PUCK_RADIUS > slotTop) {
+      // Let the puck continue falling into the slot until it reaches the bottom
+      if (currentPuck.y < H - PUCK_RADIUS) {
+        // Puck is still falling through the slot
+        drawBoard();
+        animationId = requestAnimationFrame(updatePhysics);
+        return;
+      } else {
+        // Puck has reached the bottom of the slot
+        handlePuckLanding();
+        return;
+      }
     }
     
     drawBoard();
@@ -1213,7 +1224,7 @@ function startPlinko(binId, gameState) {
     const prizes = getCurrentPrizes();
     const slotCount = prizes.length;
     
-    // Use the dynamically calculated prize slot boundaries for landing detection
+    // Use the full width for prize slot detection
     const slotWidth = PRIZE_TOTAL_WIDTH / slotCount;
     
     let slotIndex = Math.floor((currentPuck.x - PRIZE_START_X) / slotWidth);
@@ -1222,9 +1233,9 @@ function startPlinko(binId, gameState) {
     const prize = prizes[slotIndex];
     
     const slotCenterX = PRIZE_START_X + (slotIndex * slotWidth) + (slotWidth / 2);
-    const slotHeight = H - PRIZE_ZONE_TOP;
+    // Position puck at the bottom of the slot (natural resting position)
     currentPuck.x = slotCenterX;
-    currentPuck.y = PRIZE_ZONE_TOP + (slotHeight / 2);
+    currentPuck.y = H - PUCK_RADIUS;
     
     audioSystem.playWin();
     
@@ -1243,7 +1254,7 @@ function startPlinko(binId, gameState) {
       
       particles.push({
         x: slotCenterX,
-        y: PRIZE_ZONE_TOP + (slotHeight / 2),
+        y: H - (H * 0.15) / 2,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed - 4,
         life: 50,
