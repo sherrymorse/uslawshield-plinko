@@ -743,11 +743,11 @@ function startPlinko(binId, gameState) {
     pegs = [];
     lastRowPegPositions = [];
     
-    // EXPANDED PEG AREA - now matching the full canvas width minus small margin for teeth
+    // MAXIMUM PEG AREA EXPANSION - nearly full width
     const playAreaTop = 0.10;
     const playAreaBottom = 0.85;
-    const playAreaLeft = 0.05;   // EXPANDED from 0.10 to 0.05
-    const playAreaRight = 0.95;  // EXPANDED from 0.90 to 0.95
+    const playAreaLeft = 0.02;   // MAXIMALLY EXPANDED - nearly edge to edge
+    const playAreaRight = 0.98;  // MAXIMALLY EXPANDED - nearly edge to edge
     
     const startY = playAreaTop;
     const endY = playAreaBottom;
@@ -861,8 +861,8 @@ function startPlinko(binId, gameState) {
   function drawSidewallTeeth() {
     const playAreaTop = 0.10;
     const playAreaBottom = 0.85;
-    const playAreaLeft = 0.05;   // EXPANDED to match peg area
-    const playAreaRight = 0.95;  // EXPANDED to match peg area
+    const playAreaLeft = 0.02;   // MAXIMALLY EXPANDED to match peg area
+    const playAreaRight = 0.98;  // MAXIMALLY EXPANDED to match peg area
     
     const startY = playAreaTop;
     const endY = playAreaBottom;
@@ -1075,8 +1075,8 @@ function startPlinko(binId, gameState) {
     currentPuck.vy *= 0.996;
     
     const wallMargin = PUCK_RADIUS + 5;
-    const leftBoundary = W * 0.05;   // EXPANDED boundary to match peg area
-    const rightBoundary = W * 0.95;  // EXPANDED boundary to match peg area
+    const leftBoundary = W * 0.02;   // MAXIMALLY EXPANDED boundary
+    const rightBoundary = W * 0.98;  // MAXIMALLY EXPANDED boundary
     
     if (currentPuck.x < leftBoundary + wallMargin) {
       currentPuck.x = leftBoundary + wallMargin;
