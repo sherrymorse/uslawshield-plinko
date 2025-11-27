@@ -743,11 +743,12 @@ function startPlinko(binId, gameState) {
     pegs = [];
     lastRowPegPositions = [];
     
-    // MAXIMUM PEG AREA EXPANSION - nearly full width
+    // ABSOLUTE MAXIMUM PEG AREA - edge to edge with minimal offset for peg radius
     const playAreaTop = 0.10;
     const playAreaBottom = 0.85;
-    const playAreaLeft = 0.02;   // MAXIMALLY EXPANDED - nearly edge to edge
-    const playAreaRight = 0.98;  // MAXIMALLY EXPANDED - nearly edge to edge
+    const pegRadiusOffset = (PEG_RADIUS * 1.5) / W; // Just enough to prevent peg clipping
+    const playAreaLeft = pegRadiusOffset;      // ABSOLUTE EDGE (with tiny margin for peg)
+    const playAreaRight = 1.0 - pegRadiusOffset; // ABSOLUTE EDGE (with tiny margin for peg)
     
     const startY = playAreaTop;
     const endY = playAreaBottom;
@@ -861,17 +862,13 @@ function startPlinko(binId, gameState) {
   function drawSidewallTeeth() {
     const playAreaTop = 0.10;
     const playAreaBottom = 0.85;
-    const playAreaLeft = 0.02;   // MAXIMALLY EXPANDED to match peg area
-    const playAreaRight = 0.98;  // MAXIMALLY EXPANDED to match peg area
     
     const startY = playAreaTop;
     const endY = playAreaBottom;
-    const startX = playAreaLeft;
-    const endX = playAreaRight;
     
     const normalizedVerticalSpacing = (endY - startY) / (NUM_ROWS - 1);
     
-    const toothDepth = W * 0.035;
+    const toothDepth = W * 0.02; // Smaller teeth since pegs go to edge
     const toothHeight = normalizedVerticalSpacing * H;
     
     ctx.fillStyle = '#FFFFFF';
@@ -1075,8 +1072,9 @@ function startPlinko(binId, gameState) {
     currentPuck.vy *= 0.996;
     
     const wallMargin = PUCK_RADIUS + 5;
-    const leftBoundary = W * 0.02;   // MAXIMALLY EXPANDED boundary
-    const rightBoundary = W * 0.98;  // MAXIMALLY EXPANDED boundary
+    const pegRadiusOffset = (PEG_RADIUS * 1.5) / W;
+    const leftBoundary = W * pegRadiusOffset;           // ABSOLUTE EDGE boundary
+    const rightBoundary = W * (1.0 - pegRadiusOffset); // ABSOLUTE EDGE boundary
     
     if (currentPuck.x < leftBoundary + wallMargin) {
       currentPuck.x = leftBoundary + wallMargin;
