@@ -728,6 +728,7 @@ function startPlinko(binId, gameState) {
   // Dynamic sizing variables
   let PUCK_RADIUS, PEG_RADIUS, PEG_SPACING_X, PEG_SPACING_Y;
   let BOARD_TOP, BOARD_BOTTOM, BOARD_LEFT, BOARD_RIGHT;
+  let PRIZE_START_X, PRIZE_TOTAL_WIDTH;
   
   const resizeCanvas = () => {
     const container = canvas.parentElement;
@@ -781,6 +782,10 @@ function startPlinko(binId, gameState) {
     const totalWidth = (numSlots - 1) * PEG_SPACING_X;
     const startX = (W - totalWidth) / 2;
     
+    // Calculate prize slot boundaries to align with peg arrangement
+    PRIZE_START_X = startX - (PEG_SPACING_X / 2);
+    PRIZE_TOTAL_WIDTH = totalWidth + PEG_SPACING_X;
+    
     for (let row = 0; row < NUM_ROWS; row++) {
       const isOffsetRow = row % 2 === 1;
       const numPegs = isOffsetRow ? numSlots - 1 : numSlots;
@@ -809,7 +814,7 @@ function startPlinko(binId, gameState) {
         const toothDepth = PEG_SPACING_X * 0.6;
         
         // Calculate the positions where teeth should point (halfway between pegs)
-        // For 7-peg rows, the teeth should point to the positions where pegs would be in an 8-peg row
+        // For 7-peg rows, the teeth should point to positions exactly halfway between the edge and first peg
         const leftToothX = startX - (PEG_SPACING_X / 2);
         const rightToothX = startX + totalWidth + (PEG_SPACING_X / 2);
         
@@ -957,11 +962,12 @@ function startPlinko(binId, gameState) {
     const slotHeight = H * 0.15;
     const bottomY = H - slotHeight;
     
-    const slotWidth = W / slotCount;
+    // Use the dynamically calculated prize slot boundaries
+    const slotWidth = PRIZE_TOTAL_WIDTH / slotCount;
     
     prizes.forEach((prize, index) => {
-      const leftX = index * slotWidth;
-      const rightX = (index + 1) * slotWidth;
+      const leftX = PRIZE_START_X + index * slotWidth;
+      const rightX = PRIZE_START_X + (index + 1) * slotWidth;
       
       ctx.fillStyle = prize.color;
       ctx.beginPath();
@@ -986,8 +992,8 @@ function startPlinko(binId, gameState) {
     ctx.strokeStyle = '#FFFFFF';
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(0, bottomY);
-    ctx.lineTo(W, bottomY);
+    ctx.moveTo(PRIZE_START_X, bottomY);
+    ctx.lineTo(PRIZE_START_X + PRIZE_TOTAL_WIDTH, bottomY);
     ctx.stroke();
   }
 
@@ -1204,14 +1210,16 @@ function startPlinko(binId, gameState) {
   async function handlePuckLanding() {
     const prizes = getCurrentPrizes();
     const slotCount = prizes.length;
-    const slotWidth = W / slotCount;
     
-    let slotIndex = Math.floor(currentPuck.x / slotWidth);
+    // Use the dynamically calculated prize slot boundaries for landing detection
+    const slotWidth = PRIZE_TOTAL_WIDTH / slotCount;
+    
+    let slotIndex = Math.floor((currentPuck.x - PRIZE_START_X) / slotWidth);
     slotIndex = Math.max(0, Math.min(prizes.length - 1, slotIndex));
     
     const prize = prizes[slotIndex];
     
-    const slotCenterX = (slotIndex * slotWidth) + (slotWidth / 2);
+    const slotCenterX = PRIZE_START_X + (slotIndex * slotWidth) + (slotWidth / 2);
     currentPuck.x = slotCenterX;
     currentPuck.y = H - (H * 0.15) + (PUCK_RADIUS / 2);
     
