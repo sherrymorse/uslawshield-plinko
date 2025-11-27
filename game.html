@@ -707,10 +707,8 @@ function startPlinko(binId, gameState) {
   
   updateLegend(gameState.currentBoard);
   
-  // Fixed peg configuration - exactly as specified
+  // Fixed configuration
   const NUM_ROWS = 13;
-  const PUCK_RADIUS = 32;
-  const PEG_RADIUS = 7;
   
   const getCurrentPrizes = () => PRIZE_CONFIG[gameState.currentBoard].prizes;
   
@@ -727,11 +725,30 @@ function startPlinko(binId, gameState) {
   let canDragPuck = true;
   let needsRedraw = true;
   
+  // Dynamic sizing variables
+  let PUCK_RADIUS, PEG_RADIUS, PEG_SPACING_X, PEG_SPACING_Y;
+  
   const resizeCanvas = () => {
     const container = canvas.parentElement;
     const rect = container.getBoundingClientRect();
     canvas.width = W = rect.width;
     canvas.height = H = rect.height;
+    
+    // Calculate dynamic sizes based on available space
+    const numSlots = getCurrentPrizes().length;
+    
+    // Calculate horizontal spacing to fill width
+    PEG_SPACING_X = W / (numSlots + 0.5);
+    
+    // Calculate vertical spacing to use most of the height
+    const playAreaTop = H * 0.10;
+    const playAreaBottom = H * 0.88; // More space for the board
+    PEG_SPACING_Y = (playAreaBottom - playAreaTop) / (NUM_ROWS - 1);
+    
+    // Calculate puck and peg sizes relative to spacing
+    PUCK_RADIUS = Math.min(PEG_SPACING_X * 0.35, PEG_SPACING_Y * 0.35);
+    PEG_RADIUS = PUCK_RADIUS * 0.25;
+    
     if (gameActive) {
       initPegs();
       drawBoard();
@@ -747,21 +764,21 @@ function startPlinko(binId, gameState) {
     lastRowPegPositions = [];
     
     const numSlots = getCurrentPrizes().length;
-    const totalWidth = (numSlots - 1) * 80; // Fixed spacing
+    const totalWidth = (numSlots - 1) * PEG_SPACING_X;
     const startX = (W - totalWidth) / 2;
     const startY = H * 0.10;
     
     for (let row = 0; row < NUM_ROWS; row++) {
       const isOffsetRow = row % 2 === 1;
       const numPegs = isOffsetRow ? numSlots - 1 : numSlots;
-      const rowY = startY + row * 60; // Fixed vertical spacing
+      const rowY = startY + row * PEG_SPACING_Y;
       
       if (isOffsetRow) {
         // Offset rows (7 pegs)
-        const rowStartX = startX + 40; // Half of 80px spacing
+        const rowStartX = startX + PEG_SPACING_X / 2;
         
         for (let col = 0; col < numPegs; col++) {
-          const x = rowStartX + col * 80;
+          const x = rowStartX + col * PEG_SPACING_X;
           const y = rowY;
           
           pegs.push({
@@ -772,24 +789,24 @@ function startPlinko(binId, gameState) {
         }
         
         // Create teeth for offset rows (7-pegs rows)
-        const prevRowY = startY + (row - 1) * 60;
-        const nextRowY = startY + (row + 1) * 60;
+        const prevRowY = startY + (row - 1) * PEG_SPACING_Y;
+        const nextRowY = startY + (row + 1) * PEG_SPACING_Y;
         
-        // Left tooth
+        // Left tooth - peak at the position where a peg would be
         teeth.push({
           points: [
             { x: 0, y: prevRowY },
-            { x: startX + 40, y: rowY }, // Sharpest point where peg should be
+            { x: startX, y: rowY }, // Sharpest point where peg should be
             { x: 0, y: nextRowY }
           ],
           row: row
         });
         
-        // Right tooth
+        // Right tooth - peak at the position where a peg would be
         teeth.push({
           points: [
             { x: W, y: prevRowY },
-            { x: startX + totalWidth - 40, y: rowY }, // Sharpest point where peg should be
+            { x: startX + totalWidth, y: rowY }, // Sharpest point where peg should be
             { x: W, y: nextRowY }
           ],
           row: row
@@ -797,7 +814,7 @@ function startPlinko(binId, gameState) {
       } else {
         // Even rows (8 pegs)
         for (let col = 0; col < numPegs; col++) {
-          const x = startX + col * 80;
+          const x = startX + col * PEG_SPACING_X;
           const y = rowY;
           
           pegs.push({
