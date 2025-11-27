@@ -707,18 +707,15 @@ function startPlinko(binId, gameState) {
   
   updateLegend(gameState.currentBoard);
   
-  // Define base sizes that will scale with the canvas
-  const BASE_PUCK_RADIUS = 32;
-  const BASE_PEG_RADIUS = 7;
+  // Fixed peg configuration - exactly as specified
   const NUM_ROWS = 13;
-  
-  // Define base spacing that will scale with the canvas
-  const BASE_PEG_SPACING_X = 80;
-  const BASE_PEG_SPACING_Y = 60;
+  const PUCK_RADIUS = 32;
+  const PEG_RADIUS = 7;
   
   const getCurrentPrizes = () => PRIZE_CONFIG[gameState.currentBoard].prizes;
   
   let pegs = [];
+  let teeth = [];
   let lastRowPegPositions = [];
   let currentPuck = null;
   let isDragging = false;
@@ -730,24 +727,11 @@ function startPlinko(binId, gameState) {
   let canDragPuck = true;
   let needsRedraw = true;
   
-  // Dynamic sizes that will scale with the canvas
-  let PUCK_RADIUS, PEG_RADIUS, PEG_SPACING_X, PEG_SPACING_Y;
-  
   const resizeCanvas = () => {
     const container = canvas.parentElement;
     const rect = container.getBoundingClientRect();
     canvas.width = W = rect.width;
     canvas.height = H = rect.height;
-    
-    // Calculate scaling factor based on canvas width
-    const scaleFactor = Math.min(1, W / 900); // 900px is our base reference width
-    
-    // Scale all elements proportionally
-    PUCK_RADIUS = BASE_PUCK_RADIUS * scaleFactor;
-    PEG_RADIUS = BASE_PEG_RADIUS * scaleFactor;
-    PEG_SPACING_X = BASE_PEG_SPACING_X * scaleFactor;
-    PEG_SPACING_Y = BASE_PEG_SPACING_Y * scaleFactor;
-    
     if (gameActive) {
       initPegs();
       drawBoard();
@@ -759,28 +743,25 @@ function startPlinko(binId, gameState) {
   
   function initPegs() {
     pegs = [];
+    teeth = [];
     lastRowPegPositions = [];
     
-    // Calculate the starting position to center the peg grid
     const numSlots = getCurrentPrizes().length;
-    const totalWidth = (numSlots - 1) * PEG_SPACING_X;
+    const totalWidth = (numSlots - 1) * 80; // Fixed spacing
     const startX = (W - totalWidth) / 2;
-    
-    // Calculate the vertical starting position
-    const totalHeight = (NUM_ROWS - 1) * PEG_SPACING_Y;
-    const startY = H * 0.10; // 10% from top
+    const startY = H * 0.10;
     
     for (let row = 0; row < NUM_ROWS; row++) {
       const isOffsetRow = row % 2 === 1;
       const numPegs = isOffsetRow ? numSlots - 1 : numSlots;
-      const rowY = startY + row * PEG_SPACING_Y;
+      const rowY = startY + row * 60; // Fixed vertical spacing
       
       if (isOffsetRow) {
-        // Offset rows - positioned between the pegs of the row above
-        const rowStartX = startX + PEG_SPACING_X / 2;
+        // Offset rows (7 pegs)
+        const rowStartX = startX + 40; // Half of 80px spacing
         
         for (let col = 0; col < numPegs; col++) {
-          const x = rowStartX + col * PEG_SPACING_X;
+          const x = rowStartX + col * 80;
           const y = rowY;
           
           pegs.push({
@@ -789,10 +770,34 @@ function startPlinko(binId, gameState) {
             lastHit: 0
           });
         }
+        
+        // Create teeth for offset rows (7-pegs rows)
+        const prevRowY = startY + (row - 1) * 60;
+        const nextRowY = startY + (row + 1) * 60;
+        
+        // Left tooth
+        teeth.push({
+          points: [
+            { x: 0, y: prevRowY },
+            { x: startX + 40, y: rowY }, // Sharpest point where peg should be
+            { x: 0, y: nextRowY }
+          ],
+          row: row
+        });
+        
+        // Right tooth
+        teeth.push({
+          points: [
+            { x: W, y: prevRowY },
+            { x: startX + totalWidth - 40, y: rowY }, // Sharpest point where peg should be
+            { x: W, y: nextRowY }
+          ],
+          row: row
+        });
       } else {
-        // Even rows - full width
+        // Even rows (8 pegs)
         for (let col = 0; col < numPegs; col++) {
-          const x = startX + col * PEG_SPACING_X;
+          const x = startX + col * 80;
           const y = rowY;
           
           pegs.push({
@@ -828,7 +833,7 @@ function startPlinko(binId, gameState) {
     ctx.fillRect(0, 0, W, H);
     
     drawTrianglePattern();
-    drawSidewallTeeth();
+    drawTeeth();
     
     pegs.forEach(peg => {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
@@ -863,47 +868,20 @@ function startPlinko(binId, gameState) {
     needsRedraw = false;
   }
 
-  function drawSidewallTeeth() {
-    const numSlots = getCurrentPrizes().length;
-    const totalWidth = (numSlots - 1) * PEG_SPACING_X;
-    const startX = (W - totalWidth) / 2;
-    const startY = H * 0.10;
-    
-    // Teeth extend inward from the canvas edges
-    const toothDepth = W * 0.05;
-    
+  function drawTeeth() {
     ctx.fillStyle = '#D4A76A';
     ctx.strokeStyle = '#B8956A';
     ctx.lineWidth = 2;
     
-    // Teeth point to the gaps in odd-numbered rows (rows with numSlots-1 pegs)
-    for (let row = 1; row < NUM_ROWS - 1; row += 2) {
-      const rowY = startY + row * PEG_SPACING_Y;
-      const prevRowY = startY + (row - 1) * PEG_SPACING_Y;
-      const nextRowY = startY + (row + 1) * PEG_SPACING_Y;
-      
-      // Left tooth - peak at the position between first two pegs of the row above
-      const leftPeakX = startX + PEG_SPACING_X / 2;
-      
+    teeth.forEach(tooth => {
       ctx.beginPath();
-      ctx.moveTo(0, prevRowY);
-      ctx.lineTo(leftPeakX, rowY);
-      ctx.lineTo(0, nextRowY);
+      ctx.moveTo(tooth.points[0].x, tooth.points[0].y);
+      ctx.lineTo(tooth.points[1].x, tooth.points[1].y);
+      ctx.lineTo(tooth.points[2].x, tooth.points[2].y);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
-      
-      // Right tooth - peak at the position between last two pegs of the row above
-      const rightPeakX = startX + (numSlots - 1) * PEG_SPACING_X - PEG_SPACING_X / 2;
-      
-      ctx.beginPath();
-      ctx.moveTo(W, prevRowY);
-      ctx.lineTo(rightPeakX, rowY);
-      ctx.lineTo(W, nextRowY);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-    }
+    });
   }
 
   function drawTrianglePattern() {
@@ -1092,8 +1070,61 @@ function startPlinko(binId, gameState) {
       currentPuck.vx = -Math.abs(currentPuck.vx) * 0.7;
     }
     
+    // Teeth collision detection
     const currentTime = Date.now();
     
+    teeth.forEach(tooth => {
+      // Check if puck is near this tooth
+      const toothCenterX = (tooth.points[0].x + tooth.points[1].x + tooth.points[2].x) / 3;
+      const toothCenterY = (tooth.points[0].y + tooth.points[1].y + tooth.points[2].y) / 3;
+      const distanceToTooth = Math.sqrt(
+        (currentPuck.x - toothCenterX) ** 2 + (currentPuck.y - toothCenterY) ** 2
+      );
+      
+      if (distanceToTooth < PUCK_RADIUS * 3) {
+        // More detailed collision detection with triangle
+        for (let i = 0; i < tooth.points.length; i++) {
+          const p1 = tooth.points[i];
+          const p2 = tooth.points[(i + 1) % tooth.points.length];
+          
+          // Calculate distance from puck to line segment
+          const lineLength = Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
+          const t = Math.max(0, Math.min(1, 
+            ((currentPuck.x - p1.x) * (p2.x - p1.x) + 
+             (currentPuck.y - p1.y) * (p2.y - p1.y)) / (lineLength * lineLength)
+          ));
+          
+          const closestX = p1.x + t * (p2.x - p1.x);
+          const closestY = p1.y + t * (p2.y - p1.y);
+          
+          const distance = Math.sqrt(
+            (currentPuck.x - closestX) ** 2 + (currentPuck.y - closestY) ** 2
+          );
+          
+          if (distance < PUCK_RADIUS + 2) {
+            // Collision detected with tooth edge
+            const nx = (currentPuck.x - closestX) / distance;
+            const ny = (currentPuck.y - closestY) / distance;
+            
+            const overlap = PUCK_RADIUS + 2 - distance;
+            currentPuck.x += nx * overlap;
+            currentPuck.y += ny * overlap;
+            
+            const dotProduct = currentPuck.vx * nx + currentPuck.vy * ny;
+            currentPuck.vx -= 1.6 * dotProduct * nx;
+            currentPuck.vy -= 1.6 * dotProduct * ny;
+            
+            const speed = Math.sqrt(currentPuck.vx ** 2 + currentPuck.vy ** 2);
+            const intensity = Math.min(1, speed / 10);
+            audioSystem.playPegHit(intensity);
+            
+            break;
+          }
+        }
+      }
+    });
+    
+    // Peg collision detection
     pegs.forEach(peg => {
       if (currentTime - peg.lastHit < 100) return;
       
