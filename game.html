@@ -760,10 +760,11 @@ function startPlinko(binId, gameState) {
     lastRowPegPositions = [];
     
     // Play area bounds - NARROWED HORIZONTAL AREA to prevent straight drops
+    // Keeping the same vertical boundaries but narrowing horizontal
     const playAreaTop = 0.10;  // Increased from 0.05 to 0.10
     const playAreaBottom = 0.85; // Increased from 0.80 to 0.85
-    const playAreaLeft = 0.08;   // NARROWED from 0.02 to 0.08
-    const playAreaRight = 0.92;  // NARROWED from 0.98 to 0.92
+    const playAreaLeft = 0.10;   // NARROWED from 0.02 to 0.10
+    const playAreaRight = 0.90;  // NARROWED from 0.98 to 0.90
     
     // Calculate normalized positions
     const startY = playAreaTop;
@@ -782,7 +783,7 @@ function startPlinko(binId, gameState) {
     const normalizedHorizontalSpacing = availableWidth / numSlots;
     
     for (let row = 0; row < NUM_ROWS; row++) {
-      // Alternates between 8 and 7 pegs
+      // Alternates between 8 and 7 pegs - KEEPING EXACT SAME LOGIC
       const isOffsetRow = row % 2 === 1;
       const numPegs = isOffsetRow ? 7 : 8;
       const rowY = startY + row * normalizedVerticalSpacing;
@@ -900,8 +901,8 @@ function startPlinko(binId, gameState) {
     // Define the playable area (matching initPegs)
     const playAreaTop = 0.10;  // Increased from 0.05 to 0.10
     const playAreaBottom = 0.85; // Increased from 0.80 to 0.85
-    const playAreaLeft = 0.08;   // NARROWED from 0.02 to 0.08
-    const playAreaRight = 0.92;  // NARROWED from 0.98 to 0.92
+    const playAreaLeft = 0.10;   // NARROWED from 0.02 to 0.10
+    const playAreaRight = 0.90;  // NARROWED from 0.98 to 0.90
     
     const startY = playAreaTop;
     const endY = playAreaBottom;
@@ -1148,8 +1149,8 @@ function startPlinko(binId, gameState) {
     
     // Wall collisions with energy loss - USING NARROWER BOUNDARIES
     const wallMargin = PUCK_RADIUS + 5;
-    const leftBoundary = W * 0.08;   // NARROWED from 0 to W * 0.08
-    const rightBoundary = W * 0.92;  // NARROWED from W to W * 0.92
+    const leftBoundary = W * 0.10;   // NARROWED from 0 to W * 0.10
+    const rightBoundary = W * 0.90;  // NARROWED from W to W * 0.90
     
     if (currentPuck.x < leftBoundary + wallMargin) {
       currentPuck.x = leftBoundary + wallMargin;
