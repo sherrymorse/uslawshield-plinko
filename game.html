@@ -733,6 +733,18 @@ function startPlinko(binId, gameState) {
   const resizeCanvas = () => {
     const container = canvas.parentElement;
     const rect = container.getBoundingClientRect();
+    
+    // Store old puck position if it exists
+    let oldPuckNormalized = null;
+    if (currentPuck) {
+      oldPuckNormalized = {
+        x: currentPuck.x / W,
+        y: currentPuck.y / H,
+        vx: currentPuck.vx,
+        vy: currentPuck.vy
+      };
+    }
+    
     canvas.width = W = rect.width;
     canvas.height = H = rect.height;
     
@@ -745,6 +757,15 @@ function startPlinko(binId, gameState) {
     
     if (gameActive) {
       initPegs();
+      
+      // Restore puck position if it existed
+      if (oldPuckNormalized && currentPuck) {
+        currentPuck.x = oldPuckNormalized.x * W;
+        currentPuck.y = oldPuckNormalized.y * H;
+        currentPuck.vx = oldPuckNormalized.vx;
+        currentPuck.vy = oldPuckNormalized.vy;
+      }
+      
       drawBoard();
     }
   };
@@ -1012,7 +1033,7 @@ function startPlinko(binId, gameState) {
     
     ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
     ctx.beginPath();
-    ctx.arc(x - 8, y - 8, PUCK_RADIUS * 0.3, 0, Math.PI * 2);
+    ctx.arc(x - 8 * SCALE_FACTOR, y - 8 * SCALE_FACTOR, PUCK_RADIUS * 0.3, 0, Math.PI * 2);
     ctx.fill();
     
     ctx.fillStyle = '#FFFFFF';
