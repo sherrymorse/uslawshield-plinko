@@ -728,7 +728,7 @@ function startPlinko(binId, gameState) {
   // Dynamic sizing variables
   let PUCK_RADIUS, PEG_RADIUS, PEG_SPACING_X, PEG_SPACING_Y;
   let BOARD_TOP, BOARD_BOTTOM, BOARD_LEFT, BOARD_RIGHT;
-  let PRIZE_START_X, PRIZE_TOTAL_WIDTH;
+  let PRIZE_START_X, PRIZE_TOTAL_WIDTH, PRIZE_ZONE_TOP;
   
   const resizeCanvas = () => {
     const container = canvas.parentElement;
@@ -742,7 +742,7 @@ function startPlinko(binId, gameState) {
     // Define margins as percentages of canvas dimensions
     const MARGIN_TOP = H * 0.10;
     const MARGIN_BOTTOM = H * 0.15;
-    const MARGIN_SIDES = W * 0.05;
+    const MARGIN_SIDES = 0; // No side margins - prizes span full width
     
     // Calculate play area boundaries
     BOARD_LEFT = MARGIN_SIDES;
@@ -754,13 +754,16 @@ function startPlinko(binId, gameState) {
     const playAreaWidth = BOARD_RIGHT - BOARD_LEFT;
     const playAreaHeight = BOARD_BOTTOM - BOARD_TOP;
     
-    // Calculate dynamic spacing based on play area
-    PEG_SPACING_X = playAreaWidth / (numSlots + 0.5);
+    // Calculate dynamic spacing based on play area - prizes span full width
+    PEG_SPACING_X = playAreaWidth / numSlots;
     PEG_SPACING_Y = playAreaHeight / (NUM_ROWS - 1);
     
     // Calculate puck and peg sizes relative to spacing
     PUCK_RADIUS = Math.min(PEG_SPACING_X * 0.35, PEG_SPACING_Y * 0.35);
     PEG_RADIUS = PUCK_RADIUS * 0.22;
+    
+    // Prize zone starts where pegs end, with small gap
+    PRIZE_ZONE_TOP = BOARD_BOTTOM + (PEG_SPACING_Y * 0.3);
     
     if (gameActive) {
       initPegs();
@@ -778,13 +781,13 @@ function startPlinko(binId, gameState) {
     
     const numSlots = getCurrentPrizes().length;
     
-    // Calculate the starting position to perfectly center the peg arrangement
-    const totalWidth = (numSlots - 1) * PEG_SPACING_X;
-    const startX = (W - totalWidth) / 2;
+    // Calculate prize slot boundaries - prizes span full canvas width
+    PRIZE_START_X = 0;
+    PRIZE_TOTAL_WIDTH = W;
     
-    // Calculate prize slot boundaries to align with peg arrangement
-    PRIZE_START_X = startX - (PEG_SPACING_X / 2);
-    PRIZE_TOTAL_WIDTH = totalWidth + PEG_SPACING_X;
+    // Center the peg arrangement based on prize slots
+    const totalPegWidth = (numSlots - 1) * PEG_SPACING_X;
+    const startX = (W - totalPegWidth) / 2;
     
     for (let row = 0; row < NUM_ROWS; row++) {
       const isOffsetRow = row % 2 === 1;
@@ -816,7 +819,7 @@ function startPlinko(binId, gameState) {
         // Calculate the positions where teeth should point (halfway between pegs)
         // For 7-peg rows, the teeth should point to positions exactly halfway between the edge and first peg
         const leftToothX = startX - (PEG_SPACING_X / 2);
-        const rightToothX = startX + totalWidth + (PEG_SPACING_X / 2);
+        const rightToothX = startX + totalPegWidth + (PEG_SPACING_X / 2);
         
         // Left tooth - peak at the position where a peg would be in an 8-peg row
         teeth.push({
@@ -959,11 +962,10 @@ function startPlinko(binId, gameState) {
   function drawPrizeSlots() {
     const prizes = getCurrentPrizes();
     const slotCount = prizes.length;
-    const slotHeight = H * 0.15;
-    const bottomY = H - slotHeight;
     
-    // Use the dynamically calculated prize slot boundaries
+    // Use the dynamically calculated prize slot boundaries spanning full width
     const slotWidth = PRIZE_TOTAL_WIDTH / slotCount;
+    const slotHeight = H - PRIZE_ZONE_TOP;
     
     prizes.forEach((prize, index) => {
       const leftX = PRIZE_START_X + index * slotWidth;
@@ -971,8 +973,8 @@ function startPlinko(binId, gameState) {
       
       ctx.fillStyle = prize.color;
       ctx.beginPath();
-      ctx.moveTo(leftX, bottomY);
-      ctx.lineTo(rightX, bottomY);
+      ctx.moveTo(leftX, PRIZE_ZONE_TOP);
+      ctx.lineTo(rightX, PRIZE_ZONE_TOP);
       ctx.lineTo(rightX, H);
       ctx.lineTo(leftX, H);
       ctx.closePath();
@@ -986,14 +988,15 @@ function startPlinko(binId, gameState) {
       ctx.font = `bold ${Math.min(48, slotWidth * 0.4)}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(prize.symbol, leftX + slotWidth / 2, bottomY + slotHeight * 0.5);
+      ctx.fillText(prize.symbol, leftX + slotWidth / 2, PRIZE_ZONE_TOP + slotHeight * 0.5);
     });
     
+    // Draw top border line
     ctx.strokeStyle = '#FFFFFF';
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(PRIZE_START_X, bottomY);
-    ctx.lineTo(PRIZE_START_X + PRIZE_TOTAL_WIDTH, bottomY);
+    ctx.moveTo(0, PRIZE_ZONE_TOP);
+    ctx.lineTo(W, PRIZE_ZONE_TOP);
     ctx.stroke();
   }
 
@@ -1198,7 +1201,8 @@ function startPlinko(binId, gameState) {
       }
     });
     
-    if (currentPuck.y + PUCK_RADIUS > H - H * 0.15) {
+    // Check if puck has reached the prize zone
+    if (currentPuck.y + PUCK_RADIUS > PRIZE_ZONE_TOP) {
       handlePuckLanding();
       return;
     }
@@ -1220,8 +1224,9 @@ function startPlinko(binId, gameState) {
     const prize = prizes[slotIndex];
     
     const slotCenterX = PRIZE_START_X + (slotIndex * slotWidth) + (slotWidth / 2);
+    const slotHeight = H - PRIZE_ZONE_TOP;
     currentPuck.x = slotCenterX;
-    currentPuck.y = H - (H * 0.15) + (PUCK_RADIUS / 2);
+    currentPuck.y = PRIZE_ZONE_TOP + (slotHeight / 2);
     
     audioSystem.playWin();
     
@@ -1240,7 +1245,7 @@ function startPlinko(binId, gameState) {
       
       particles.push({
         x: slotCenterX,
-        y: H - H * 0.075,
+        y: PRIZE_ZONE_TOP + (slotHeight / 2),
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed - 4,
         life: 50,
