@@ -777,6 +777,10 @@ function startPlinko(binId, gameState) {
     
     const numSlots = getCurrentPrizes().length;
     
+    // Calculate the starting position to perfectly center the peg arrangement
+    const totalWidth = (numSlots - 1) * PEG_SPACING_X;
+    const startX = (W - totalWidth) / 2;
+    
     for (let row = 0; row < NUM_ROWS; row++) {
       const isOffsetRow = row % 2 === 1;
       const numPegs = isOffsetRow ? numSlots - 1 : numSlots;
@@ -784,7 +788,7 @@ function startPlinko(binId, gameState) {
       
       if (isOffsetRow) {
         // Offset rows (7 pegs) - positioned between pegs of row above
-        const rowStartX = BOARD_LEFT + PEG_SPACING_X / 2;
+        const rowStartX = startX + PEG_SPACING_X / 2;
         
         for (let col = 0; col < numPegs; col++) {
           const x = rowStartX + col * PEG_SPACING_X;
@@ -808,7 +812,7 @@ function startPlinko(binId, gameState) {
         teeth.push({
           points: [
             { x: BOARD_LEFT - toothDepth, y: prevRowY },
-            { x: BOARD_LEFT, y: rowY }, // Sharpest point where peg should be
+            { x: startX, y: rowY }, // Sharpest point where peg should be
             { x: BOARD_LEFT - toothDepth, y: nextRowY }
           ],
           row: row
@@ -818,7 +822,7 @@ function startPlinko(binId, gameState) {
         teeth.push({
           points: [
             { x: BOARD_RIGHT + toothDepth, y: prevRowY },
-            { x: BOARD_RIGHT, y: rowY }, // Sharpest point where peg should be
+            { x: startX + totalWidth, y: rowY }, // Sharpest point where peg should be
             { x: BOARD_RIGHT + toothDepth, y: nextRowY }
           ],
           row: row
@@ -826,7 +830,7 @@ function startPlinko(binId, gameState) {
       } else {
         // Even rows (8 pegs)
         for (let col = 0; col < numPegs; col++) {
-          const x = BOARD_LEFT + col * PEG_SPACING_X;
+          const x = startX + col * PEG_SPACING_X;
           const y = rowY;
           
           pegs.push({
