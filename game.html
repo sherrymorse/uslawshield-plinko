@@ -6,12 +6,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
 <style>
-  * { 
-    margin: 0; 
-    padding: 0; 
-    box-sizing: border-box; 
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
-  
+
   body {
     font-family: 'Montserrat', sans-serif;
     background: #1a1a2e;
@@ -329,17 +329,17 @@
       padding: 10px;
       gap: 15px;
     }
-    
+
     .side-panel {
       width: 100%;
       max-width: 400px;
     }
-    
+
     .game-container {
       width: 95vw;
       height: 70vh;
     }
-    
+
     .title {
       font-size: 2em;
     }
@@ -450,40 +450,40 @@ class AudioSystem {
 
   playPegHit(intensity = 0.5) {
     if (!this.initialized) return;
-    
+
     const ctx = this.audioContext;
     const now = ctx.currentTime;
-    
+
     const osc1 = ctx.createOscillator();
     const osc2 = ctx.createOscillator();
     const gain = ctx.createGain();
     const filter = ctx.createBiquadFilter();
-    
+
     const baseFreq1 = 180 + (intensity * 100);
     const baseFreq2 = 220 + (intensity * 80);
-    
+
     osc1.frequency.setValueAtTime(baseFreq1, now);
     osc1.frequency.exponentialRampToValueAtTime(120, now + 0.1);
-    
+
     osc2.frequency.setValueAtTime(baseFreq2, now);
     osc2.frequency.exponentialRampToValueAtTime(150, now + 0.08);
-    
+
     osc1.type = 'sine';
     osc2.type = 'triangle';
-    
+
     filter.frequency.setValueAtTime(300, now);
     filter.type = 'bandpass';
     filter.Q.setValueAtTime(2, now);
-    
+
     gain.gain.setValueAtTime(0, now);
     gain.gain.linearRampToValueAtTime(0.08 * intensity, now + 0.001);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-    
+
     osc1.connect(filter);
     osc2.connect(filter);
     filter.connect(gain);
     gain.connect(ctx.destination);
-    
+
     osc1.start(now);
     osc2.start(now);
     osc1.stop(now + 0.12);
@@ -492,25 +492,25 @@ class AudioSystem {
 
   playWin() {
     if (!this.initialized) return;
-    
+
     const ctx = this.audioContext;
     const now = ctx.currentTime;
-    
+
     for (let i = 0; i < 6; i++) {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      
+
       const freq = 300 + (i * 120);
       osc.frequency.setValueAtTime(freq, now + i * 0.08);
       osc.type = 'sine';
-      
+
       gain.gain.setValueAtTime(0, now + i * 0.08);
       gain.gain.linearRampToValueAtTime(0.15, now + i * 0.08 + 0.05);
       gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.4);
-      
+
       osc.connect(gain);
       gain.connect(ctx.destination);
-      
+
       osc.start(now + i * 0.08);
       osc.stop(now + i * 0.08 + 0.4);
     }
@@ -518,23 +518,23 @@ class AudioSystem {
 
   playDropSound() {
     if (!this.initialized) return;
-    
+
     const ctx = this.audioContext;
     const now = ctx.currentTime;
-    
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    
+
     osc.frequency.setValueAtTime(150, now);
     osc.frequency.exponentialRampToValueAtTime(80, now + 0.2);
-    
+
     gain.gain.setValueAtTime(0, now);
     gain.gain.linearRampToValueAtTime(0.1, now + 0.05);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-    
+
     osc.connect(gain);
     gain.connect(ctx.destination);
-    
+
     osc.start(now);
     osc.stop(now + 0.3);
   }
@@ -570,36 +570,36 @@ function showError(message) {
 async function initGame(binId) {
   try {
     console.log('Loading game with ID:', binId);
-    
+
     document.body.classList.add('loading');
-    
+
     const gameState = await readGameBin(binId);
-    
+
     if (!gameState) {
       throw new Error('Game state is null - bin may not exist or API keys may be invalid');
     }
-    
+
     if (!gameState.currentBoard) {
       gameState.currentBoard = 'A';
     }
-    
+
     if (typeof gameState.pucksRemaining !== 'number') {
       throw new Error('Invalid game state - pucksRemaining is not a number');
     }
-    
+
     if (!gameState.results) {
       gameState.results = [];
     }
-    
+
     gameState.playerConnected = true;
     gameState.lastUpdated = new Date().toISOString();
-    
+
     await updateGameBin(binId, gameState);
-    
+
     document.body.classList.remove('loading');
-    
+
     startPlinko(binId, gameState);
-    
+
   } catch (error) {
     console.error('Error in initGame:', error);
     document.body.classList.remove('loading');
@@ -610,21 +610,21 @@ async function initGame(binId) {
 async function updateGameBin(binId, data) {
   try {
     console.log('Updating bin:', binId, 'with data:', data);
-    
+
     const response = await fetch(`${JSONBIN_CONFIG.BASE_URL}/${binId}`, {
       method: 'PUT',
       headers: JSONBIN_CONFIG.HEADERS,
       body: JSON.stringify(data)
     });
-    
+
     console.log('Update response status:', response.status);
-    
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Update error:', errorText);
       throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
-    
+
     const result = await response.json();
     console.log('Update successful:', result);
     return result;
@@ -637,30 +637,30 @@ async function updateGameBin(binId, data) {
 async function readGameBin(binId) {
   try {
     console.log('Fetching from JSONBin:', `${JSONBIN_CONFIG.BASE_URL}/${binId}/latest`);
-    
+
     const response = await fetch(`${JSONBIN_CONFIG.BASE_URL}/${binId}/latest`, {
       headers: {
         'X-Master-Key': JSONBIN_CONFIG.HEADERS['X-Master-Key'],
         'X-Access-Key': JSONBIN_CONFIG.HEADERS['X-Access-Key']
       }
     });
-    
+
     console.log('Response status:', response.status);
-    
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error('API Error Response:', errorText);
       throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
-    
+
     const data = await response.json();
     console.log('Raw API response:', data);
-    
+
     if (!data.record) {
       console.error('No record field in response');
       throw new Error('Invalid API response - missing record field');
     }
-    
+
     return data.record;
   } catch (error) {
     console.error('Error in readGameBin:', error);
@@ -689,7 +689,7 @@ function showTemporaryMessage(message, duration = 2000) {
   `;
   messageEl.textContent = message;
   document.body.appendChild(messageEl);
-  
+
   setTimeout(() => {
     if (messageEl.parentNode) {
       document.body.removeChild(messageEl);
@@ -701,19 +701,22 @@ function showTemporaryMessage(message, duration = 2000) {
 function startPlinko(binId, gameState) {
   const canvas = document.getElementById('plinkoCanvas');
   const ctx = canvas.getContext('2d');
-  
+
   const holderCanvas = document.getElementById('puckHolderCanvas');
   const holderCtx = holderCanvas.getContext('2d');
-  
+
   updateLegend(gameState.currentBoard);
-  
-  // Fixed configuration
-  const NUM_ROWS = 13;
-  
+
+  // FIXED SIZE CONSTANTS - Scale everything relative to a reference canvas height
+  const REFERENCE_HEIGHT = 1000; // Reference height for calculations
+  const NUM_ROWS = 13;           // Always 13 rows
+  const PEGS_PER_EVEN_ROW = 8;   // 8 pegs in even rows (including first and last)
+  const PEGS_PER_ODD_ROW = 7;    // 7 pegs in odd rows
+  const HORIZONTAL_SLOTS = PEGS_PER_EVEN_ROW + 1; // 9 logical horizontal slots (pegs + 1)
+
   const getCurrentPrizes = () => PRIZE_CONFIG[gameState.currentBoard].prizes;
-  
+
   let pegs = [];
-  let teeth = [];
   let lastRowPegPositions = [];
   let currentPuck = null;
   let isDragging = false;
@@ -724,105 +727,133 @@ function startPlinko(binId, gameState) {
   let W, H;
   let canDragPuck = true;
   let needsRedraw = true;
-  
-  // Dynamic sizing variables
-  let PUCK_RADIUS, PEG_RADIUS, PEG_SPACING_X, PEG_SPACING_Y;
-  
+
+  // Scale factor and derived sizes
+  let SCALE_FACTOR = 1;
+  let PUCK_RADIUS = 32;
+  let PEG_RADIUS = 7;
+
   const resizeCanvas = () => {
     const container = canvas.parentElement;
     const rect = container.getBoundingClientRect();
+
+    if (rect.width === 0 || rect.height === 0) return;
+
+    // Store old puck position if it exists
+    let oldPuckNormalized = null;
+    if (currentPuck) {
+      oldPuckNormalized = {
+        x: currentPuck.x / W,
+        y: currentPuck.y / H,
+        vx: currentPuck.vx,
+        vy: currentPuck.vy
+      };
+    }
+
     canvas.width = W = rect.width;
     canvas.height = H = rect.height;
-    
-    // Calculate dynamic sizes based on available space
-    const numSlots = getCurrentPrizes().length;
-    
-    // Calculate horizontal spacing to fill width
-    PEG_SPACING_X = W / (numSlots + 0.5);
-    
-    // Calculate vertical spacing to use most of the height
-    const playAreaTop = H * 0.10;
-    const playAreaBottom = H * 0.88; // More space for the board
-    PEG_SPACING_Y = (playAreaBottom - playAreaTop) / (NUM_ROWS - 1);
-    
-    // Calculate puck and peg sizes relative to spacing
-    PUCK_RADIUS = Math.min(PEG_SPACING_X * 0.35, PEG_SPACING_Y * 0.35);
-    PEG_RADIUS = PUCK_RADIUS * 0.25;
-    
+
+    // Calculate scale factor based on canvas height
+    SCALE_FACTOR = H / REFERENCE_HEIGHT;
+
+    // Horizontal spacing is purely based on the logical 9 slots so density is constant
+    const normalizedHorizontalSpacing = 1 / HORIZONTAL_SLOTS;
+    const baseSpacingPx = normalizedHorizontalSpacing * W;
+
+    // Maintain original vertical-based puck size, but ensure the diameter is always
+    // slightly wider than the peg gap horizontally so density/behavior is consistent
+    const basePuckRadiusFromHeight = 32 * SCALE_FACTOR;
+    const minPuckRadiusForCoverage = baseSpacingPx * 0.55; // diameter ~ 1.1 * spacing
+    PUCK_RADIUS = Math.max(basePuckRadiusFromHeight, minPuckRadiusForCoverage);
+
+    // Peg size scales with both height and horizontal spacing
+    PEG_RADIUS = Math.max(7 * SCALE_FACTOR, baseSpacingPx * 0.12);
+
     if (gameActive) {
       initPegs();
+
+      // Restore puck position if it existed
+      if (oldPuckNormalized && currentPuck) {
+        currentPuck.x = oldPuckNormalized.x * W;
+        currentPuck.y = oldPuckNormalized.y * H;
+        currentPuck.vx = oldPuckNormalized.vx;
+        currentPuck.vy = oldPuckNormalized.vy;
+      }
+
       drawBoard();
     }
   };
-  
+
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
-  
+
+  // Also observe container size changes (e.g. orientation, layout shifts)
+  if ('ResizeObserver' in window) {
+    const ro = new ResizeObserver(() => resizeCanvas());
+    ro.observe(canvas.parentElement);
+  }
+
   function initPegs() {
     pegs = [];
-    teeth = [];
     lastRowPegPositions = [];
-    
-    const numSlots = getCurrentPrizes().length;
-    const totalWidth = (numSlots - 1) * PEG_SPACING_X;
-    const startX = (W - totalWidth) / 2;
-    const startY = H * 0.10;
-    
+
+    // Peg field as normalized coordinates: 10% to 85% of height, full width
+    const playAreaTop = 0.10;
+    const playAreaBottom = 0.85;
+    const playAreaLeft = 0.0;   // Absolute left edge (0% from left)
+    const playAreaRight = 1.0;  // Absolute right edge (100% width)
+
+    const startY = playAreaTop;
+    const endY = playAreaBottom;
+    const startX = playAreaLeft;
+    const endX = playAreaRight;
+
+    const normalizedVerticalSpacing = (endY - startY) / (NUM_ROWS - 1);
+
+    // 9 logical horizontal slots define the density
+    const numSlots = HORIZONTAL_SLOTS;
+    const availableWidth = endX - startX;
+    const normalizedHorizontalSpacing = availableWidth / numSlots;
+
     for (let row = 0; row < NUM_ROWS; row++) {
-      const isOffsetRow = row % 2 === 1;
-      const numPegs = isOffsetRow ? numSlots - 1 : numSlots;
-      const rowY = startY + row * PEG_SPACING_Y;
-      
+      const isOffsetRow = row % 2 === 1; // odd rows have 7 pegs
+      const numPegs = isOffsetRow ? PEGS_PER_ODD_ROW : PEGS_PER_EVEN_ROW;
+      const rowY = startY + row * normalizedVerticalSpacing;
+
       if (isOffsetRow) {
-        // Offset rows (7 pegs)
-        const rowStartX = startX + PEG_SPACING_X / 2;
-        
+        // Offset rows: 7 pegs centered between the 8-peg row above/below
+        // positions at 1.5, 2.5, ..., 7.5 of the horizontal slot spacing
+        const rowStartX = startX + normalizedHorizontalSpacing * 0.5;
+
         for (let col = 0; col < numPegs; col++) {
-          const x = rowStartX + col * PEG_SPACING_X;
-          const y = rowY;
-          
+          const normalizedX = rowStartX + (col + 1) * normalizedHorizontalSpacing;
+          const normalizedY = rowY;
+
+          const x = normalizedX * W;
+          const y = normalizedY * H;
+
           pegs.push({
             x: x,
             y: y,
             lastHit: 0
           });
         }
-        
-        // Create teeth for offset rows (7-pegs rows)
-        const prevRowY = startY + (row - 1) * PEG_SPACING_Y;
-        const nextRowY = startY + (row + 1) * PEG_SPACING_Y;
-        
-        // Left tooth - peak at the position where a peg would be
-        teeth.push({
-          points: [
-            { x: 0, y: prevRowY },
-            { x: startX, y: rowY }, // Sharpest point where peg should be
-            { x: 0, y: nextRowY }
-          ],
-          row: row
-        });
-        
-        // Right tooth - peak at the position where a peg would be
-        teeth.push({
-          points: [
-            { x: W, y: prevRowY },
-            { x: startX + totalWidth, y: rowY }, // Sharpest point where peg should be
-            { x: W, y: nextRowY }
-          ],
-          row: row
-        });
       } else {
-        // Even rows (8 pegs)
+        // Even rows: 8 pegs at 1..8 of the 9 horizontal slots
         for (let col = 0; col < numPegs; col++) {
-          const x = startX + col * PEG_SPACING_X;
-          const y = rowY;
-          
+          const normalizedX = startX + (col + 1) * normalizedHorizontalSpacing;
+          const normalizedY = rowY;
+
+          const x = normalizedX * W;
+          const y = normalizedY * H;
+
           pegs.push({
             x: x,
             y: y,
             lastHit: 0
           });
-          
+
+          // Track the last row's peg positions for reference if needed
           if (row === NUM_ROWS - 1) {
             lastRowPegPositions.push(x);
           }
@@ -834,8 +865,8 @@ function startPlinko(binId, gameState) {
   function updateLegend(board) {
     const prizes = PRIZE_CONFIG[board].prizes;
     const legendContent = document.getElementById('legendContent');
-    
-    legendContent.innerHTML = prizes.map((prize, index) => `
+
+    legendContent.innerHTML = prizes.map((prize) => `
       <div class="prize-item" style="border-left-color: ${prize.color}">
         <div class="prize-symbol">${prize.symbol}</div>
         <div class="prize-name">${prize.name}</div>
@@ -845,37 +876,37 @@ function startPlinko(binId, gameState) {
 
   function drawBoard() {
     if (!needsRedraw && !currentPuck && particles.length === 0) return;
-    
+
     ctx.fillStyle = '#F5E6D3';
     ctx.fillRect(0, 0, W, H);
-    
+
     drawTrianglePattern();
-    drawTeeth();
-    
+    drawSidewallTeeth();
+
     pegs.forEach(peg => {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
       ctx.beginPath();
       ctx.arc(peg.x + 1, peg.y + 1, PEG_RADIUS, 0, Math.PI * 2);
       ctx.fill();
-      
+
       ctx.fillStyle = '#D4A76A';
       ctx.beginPath();
       ctx.arc(peg.x, peg.y, PEG_RADIUS, 0, Math.PI * 2);
       ctx.fill();
-      
+
       ctx.fillStyle = '#E8C9A0';
       ctx.beginPath();
       ctx.arc(peg.x - 2, peg.y - 2, PEG_RADIUS * 0.4, 0, Math.PI * 2);
       ctx.fill();
     });
-    
+
     drawPrizeSlots();
     drawParticles();
-    
+
     if (currentPuck) {
       drawPuck(currentPuck.x, currentPuck.y);
     }
-    
+
     needsRedraw = false;
   }
 
@@ -885,35 +916,71 @@ function startPlinko(binId, gameState) {
     needsRedraw = false;
   }
 
-  function drawTeeth() {
+  function drawSidewallTeeth() {
+    const playAreaTop = 0.10;
+    const playAreaBottom = 0.85;
+
+    const startY = playAreaTop;
+    const endY = playAreaBottom;
+
+    const normalizedVerticalSpacing = (endY - startY) / (NUM_ROWS - 1);
+
+    // Use the same logical slots as the peg grid so the teeth always
+    // point exactly where the "missing" pegs would be on 7-peg rows.
+    const numSlots = HORIZONTAL_SLOTS;
+    const normalizedHorizontalSpacing = 1.0 / numSlots;
+
+    // Teeth extend inward from the canvas edges
+    const toothDepth = W * 0.05;
+
     ctx.fillStyle = '#D4A76A';
     ctx.strokeStyle = '#B8956A';
     ctx.lineWidth = 2;
-    
-    teeth.forEach(tooth => {
+
+    // Teeth point to the gaps in odd-numbered rows (rows with 7 pegs)
+    // The peak of each tooth is at X position where a peg WOULD be (at 0.5 spacing)
+    for (let row = 1; row < NUM_ROWS - 1; row += 2) {
+      const rowY = (startY + row * normalizedVerticalSpacing) * H;
+      const prevRowY = (startY + (row - 1) * normalizedVerticalSpacing) * H;
+      const nextRowY = (startY + (row + 1) * normalizedVerticalSpacing) * H;
+
+      // Left tooth - peak at 0.5 spacing position (imaginary missing peg)
+      const leftPeakX = (normalizedHorizontalSpacing * 0.5) * W;
+
       ctx.beginPath();
-      ctx.moveTo(tooth.points[0].x, tooth.points[0].y);
-      ctx.lineTo(tooth.points[1].x, tooth.points[1].y);
-      ctx.lineTo(tooth.points[2].x, tooth.points[2].y);
+      ctx.moveTo(0, prevRowY);
+      ctx.lineTo(leftPeakX, rowY);
+      ctx.lineTo(0, nextRowY);
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
-    });
+
+      // Right tooth - peak at (numSlots - 0.5) spacing position (imaginary missing peg)
+      const rightPeakX = (1.0 - normalizedHorizontalSpacing * 0.5) * W;
+
+      ctx.beginPath();
+      ctx.moveTo(W, prevRowY);
+      ctx.lineTo(rightPeakX, rowY);
+      ctx.lineTo(W, nextRowY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
   }
 
   function drawTrianglePattern() {
     ctx.strokeStyle = 'rgba(180, 150, 120, 0.3)';
     ctx.lineWidth = 1;
-    
-    const triangleSize = 30;
+
+    const triangleSize = 30 * SCALE_FACTOR;
     const rows = Math.ceil(H / (triangleSize * 0.866)) + 1;
     const cols = Math.ceil(W / triangleSize) + 1;
-    
+
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         const x = col * triangleSize + (row % 2 === 0 ? 0 : triangleSize / 2);
         const y = row * triangleSize * 0.866;
-        
+
         ctx.beginPath();
         if ((row + col) % 2 === 0) {
           ctx.moveTo(x, y);
@@ -932,16 +999,18 @@ function startPlinko(binId, gameState) {
 
   function drawPrizeSlots() {
     const prizes = getCurrentPrizes();
-    const slotCount = prizes.length;
+    const slotCount = HORIZONTAL_SLOTS; // lock to logical density (8 pegs -> 9 slots)
     const slotHeight = H * 0.12;
     const bottomY = H - slotHeight;
-    
+
     const slotWidth = W / slotCount;
-    
-    prizes.forEach((prize, index) => {
+
+    // If prize count ever diverges from 9, clamp gracefully
+    for (let index = 0; index < slotCount; index++) {
+      const prize = prizes[Math.min(index, prizes.length - 1)];
       const leftX = index * slotWidth;
       const rightX = (index + 1) * slotWidth;
-      
+
       ctx.fillStyle = prize.color;
       ctx.beginPath();
       ctx.moveTo(leftX, bottomY);
@@ -950,18 +1019,18 @@ function startPlinko(binId, gameState) {
       ctx.lineTo(leftX, H);
       ctx.closePath();
       ctx.fill();
-      
+
       ctx.strokeStyle = '#FFFFFF';
       ctx.lineWidth = 4;
       ctx.stroke();
-      
+
       ctx.fillStyle = '#FFFFFF';
-      ctx.font = `bold ${Math.min(48, slotWidth * 0.4)}px Arial`;
+      ctx.font = `bold ${Math.min(48 * SCALE_FACTOR, slotWidth * 0.4)}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(prize.symbol, leftX + slotWidth / 2, bottomY + slotHeight * 0.5);
-    });
-    
+    }
+
     ctx.strokeStyle = '#FFFFFF';
     ctx.lineWidth = 4;
     ctx.beginPath();
@@ -975,23 +1044,23 @@ function startPlinko(binId, gameState) {
     ctx.beginPath();
     ctx.arc(x + 3, y + 3, PUCK_RADIUS, 0, Math.PI * 2);
     ctx.fill();
-    
+
     ctx.fillStyle = '#FF3333';
     ctx.beginPath();
     ctx.arc(x, y, PUCK_RADIUS, 0, Math.PI * 2);
     ctx.fill();
-    
+
     ctx.strokeStyle = '#FFFFFF';
     ctx.lineWidth = 4;
     ctx.stroke();
-    
+
     ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
     ctx.beginPath();
-    ctx.arc(x - 8, y - 8, PUCK_RADIUS * 0.3, 0, Math.PI * 2);
+    ctx.arc(x - 8 * SCALE_FACTOR, y - 8 * SCALE_FACTOR, PUCK_RADIUS * 0.3, 0, Math.PI * 2);
     ctx.fill();
-    
+
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 16px Montserrat';
+    ctx.font = `bold ${16 * SCALE_FACTOR}px Montserrat`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('USL', x, y);
@@ -999,36 +1068,36 @@ function startPlinko(binId, gameState) {
 
   function drawPuckInHolder() {
     holderCtx.clearRect(0, 0, 120, 120);
-    
+
     if (gameState.pucksRemaining > 0 && !currentPuck) {
       const centerX = 60;
       const centerY = 60;
-      
+
       if (gameState.pucksRemaining > 0) {
         holderCanvas.classList.add('has-pucks');
       } else {
         holderCanvas.classList.remove('has-pucks');
       }
-      
+
       holderCtx.fillStyle = 'rgba(0, 0, 0, 0.3)';
       holderCtx.beginPath();
       holderCtx.arc(centerX + 2, centerY + 2, 30, 0, Math.PI * 2);
       holderCtx.fill();
-      
+
       holderCtx.fillStyle = '#FF3333';
       holderCtx.beginPath();
       holderCtx.arc(centerX, centerY, 30, 0, Math.PI * 2);
       holderCtx.fill();
-      
+
       holderCtx.strokeStyle = '#FFFFFF';
       holderCtx.lineWidth = 3;
       holderCtx.stroke();
-      
+
       holderCtx.fillStyle = 'rgba(255, 255, 255, 0.5)';
       holderCtx.beginPath();
       holderCtx.arc(centerX - 6, centerY - 6, 8, 0, Math.PI * 2);
       holderCtx.fill();
-      
+
       holderCtx.fillStyle = '#FFFFFF';
       holderCtx.font = 'bold 14px Montserrat';
       holderCtx.textAlign = 'center';
@@ -1045,40 +1114,40 @@ function startPlinko(binId, gameState) {
       p.x += p.vx;
       p.y += p.vy;
       p.vy += 0.2;
-      
+
       if (p.life <= 0) return false;
-      
+
       const alpha = p.life / p.maxLife;
       ctx.globalAlpha = alpha;
       ctx.fillStyle = p.color;
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
       ctx.fill();
-      
+
       return true;
     });
-    
+
     ctx.globalAlpha = 1;
   }
 
   function updatePhysics(timestamp) {
     if (!currentPuck || !gameActive) return;
-    
+
     const deltaTime = Math.min(16, timestamp - lastTime) / 16;
     lastTime = timestamp;
-    
+
     currentPuck.vy += 0.5 * deltaTime;
     currentPuck.x += currentPuck.vx * deltaTime;
     currentPuck.y += currentPuck.vy * deltaTime;
-    
+
     currentPuck.vx *= 0.995;
     currentPuck.vy *= 0.996;
-    
+
     // Wall boundaries at absolute edges (with small margin for puck radius)
     const wallMargin = PUCK_RADIUS + 5;
     const leftBoundary = 0;
     const rightBoundary = W;
-    
+
     if (currentPuck.x < leftBoundary + wallMargin) {
       currentPuck.x = leftBoundary + wallMargin;
       currentPuck.vx = Math.abs(currentPuck.vx) * 0.7;
@@ -1086,131 +1155,79 @@ function startPlinko(binId, gameState) {
       currentPuck.x = rightBoundary - wallMargin;
       currentPuck.vx = -Math.abs(currentPuck.vx) * 0.7;
     }
-    
-    // Teeth collision detection
+
     const currentTime = Date.now();
-    
-    teeth.forEach(tooth => {
-      // Check if puck is near this tooth
-      const toothCenterX = (tooth.points[0].x + tooth.points[1].x + tooth.points[2].x) / 3;
-      const toothCenterY = (tooth.points[0].y + tooth.points[1].y + tooth.points[2].y) / 3;
-      const distanceToTooth = Math.sqrt(
-        (currentPuck.x - toothCenterX) ** 2 + (currentPuck.y - toothCenterY) ** 2
-      );
-      
-      if (distanceToTooth < PUCK_RADIUS * 3) {
-        // More detailed collision detection with triangle
-        for (let i = 0; i < tooth.points.length; i++) {
-          const p1 = tooth.points[i];
-          const p2 = tooth.points[(i + 1) % tooth.points.length];
-          
-          // Calculate distance from puck to line segment
-          const lineLength = Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
-          const t = Math.max(0, Math.min(1, 
-            ((currentPuck.x - p1.x) * (p2.x - p1.x) + 
-             (currentPuck.y - p1.y) * (p2.y - p1.y)) / (lineLength * lineLength)
-          ));
-          
-          const closestX = p1.x + t * (p2.x - p1.x);
-          const closestY = p1.y + t * (p2.y - p1.y);
-          
-          const distance = Math.sqrt(
-            (currentPuck.x - closestX) ** 2 + (currentPuck.y - closestY) ** 2
-          );
-          
-          if (distance < PUCK_RADIUS + 2) {
-            // Collision detected with tooth edge
-            const nx = (currentPuck.x - closestX) / distance;
-            const ny = (currentPuck.y - closestY) / distance;
-            
-            const overlap = PUCK_RADIUS + 2 - distance;
-            currentPuck.x += nx * overlap;
-            currentPuck.y += ny * overlap;
-            
-            const dotProduct = currentPuck.vx * nx + currentPuck.vy * ny;
-            currentPuck.vx -= 1.6 * dotProduct * nx;
-            currentPuck.vy -= 1.6 * dotProduct * ny;
-            
-            const speed = Math.sqrt(currentPuck.vx ** 2 + currentPuck.vy ** 2);
-            const intensity = Math.min(1, speed / 10);
-            audioSystem.playPegHit(intensity);
-            
-            break;
-          }
-        }
-      }
-    });
-    
-    // Peg collision detection
+
     pegs.forEach(peg => {
       if (currentTime - peg.lastHit < 100) return;
-      
+
       const dx = currentPuck.x - peg.x;
       const dy = currentPuck.y - peg.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
       const minDistance = PUCK_RADIUS + PEG_RADIUS + 2;
-      
+
       if (distance < minDistance) {
         peg.lastHit = currentTime;
-        
+
         const speed = Math.sqrt(currentPuck.vx ** 2 + currentPuck.vy ** 2);
         const intensity = Math.min(1, speed / 10);
         audioSystem.playPegHit(intensity);
-        
+
         const nx = dx / distance;
         const ny = dy / distance;
-        
+
         const overlap = minDistance - distance;
         currentPuck.x += nx * overlap;
         currentPuck.y += ny * overlap;
-        
+
         const dotProduct = currentPuck.vx * nx + currentPuck.vy * ny;
         currentPuck.vx -= 1.6 * dotProduct * nx;
         currentPuck.vy -= 1.6 * dotProduct * ny;
-        
+
         currentPuck.vx += (Math.random() - 0.5) * 1.2;
         currentPuck.vy += (Math.random() - 0.5) * 0.6;
       }
     });
-    
+
     if (currentPuck.y + PUCK_RADIUS > H - H * 0.12) {
       handlePuckLanding();
       return;
     }
-    
+
     drawBoard();
     animationId = requestAnimationFrame(updatePhysics);
   }
 
   async function handlePuckLanding() {
     const prizes = getCurrentPrizes();
-    const slotCount = prizes.length;
+    const slotCount = HORIZONTAL_SLOTS;
     const slotWidth = W / slotCount;
-    
+
     let slotIndex = Math.floor(currentPuck.x / slotWidth);
-    slotIndex = Math.max(0, Math.min(prizes.length - 1, slotIndex));
-    
-    const prize = prizes[slotIndex];
-    
+    slotIndex = Math.max(0, Math.min(slotCount - 1, slotIndex));
+
+    const prizeIndex = Math.min(slotIndex, prizes.length - 1);
+    const prize = prizes[prizeIndex];
+
     const slotCenterX = (slotIndex * slotWidth) + (slotWidth / 2);
     currentPuck.x = slotCenterX;
     currentPuck.y = H - (H * 0.12) + (PUCK_RADIUS / 2);
-    
+
     audioSystem.playWin();
-    
+
     const totalPucks = gameState.results.length + 1;
     const currentBoardWins = gameState.results.filter(r => r.board === gameState.currentBoard).length + 1;
     const statsText = `Win ${currentBoardWins} of ${totalPucks} pucks`;
-    
+
     document.getElementById('winSymbol').textContent = prize.symbol;
     document.getElementById('winPrize').textContent = prize.name;
     document.getElementById('winStats').textContent = statsText;
     document.getElementById('winAnnouncement').classList.add('show');
-    
+
     for (let i = 0; i < 80; i++) {
       const angle = (Math.PI * 2 * i) / 80;
       const speed = Math.random() * 8 + 4;
-      
+
       particles.push({
         x: slotCenterX,
         y: H - H * 0.06,
@@ -1222,7 +1239,7 @@ function startPlinko(binId, gameState) {
         color: prize.color
       });
     }
-    
+
     if (!gameState.results) gameState.results = [];
     gameState.results.push({
       board: gameState.currentBoard,
@@ -1233,36 +1250,36 @@ function startPlinko(binId, gameState) {
       },
       timestamp: new Date().toISOString()
     });
-    
+
     gameState.pucksRemaining--;
     gameState.lastUpdated = new Date().toISOString();
-    
+
     await saveState();
-    
-    if (gameState.boardConfig === 'BOTH' && gameState.currentBoard === 'A' && 
+
+    if (gameState.boardConfig === 'BOTH' && gameState.currentBoard === 'A' &&
         gameState.pucksRemaining <= gameState.puckCountB) {
       gameState.currentBoard = 'B';
       updateLegend('B');
       initPegs();
       showTemporaryMessage('Switching to Board B!', 2000);
     }
-    
+
     if (gameState.pucksRemaining <= 0) {
       gameActive = false;
       setTimeout(() => {
         document.getElementById('gameOverScreen').style.display = 'block';
       }, 2000);
     }
-    
+
     currentPuck = null;
-    
+
     setTimeout(() => {
       canDragPuck = true;
     }, 500);
-    
+
     updateDisplay();
     drawPuckInHolder();
-    
+
     cancelAnimationFrame(animationId);
     drawBoard();
   }
@@ -1287,7 +1304,7 @@ function startPlinko(binId, gameState) {
     const rect = targetCanvas.getBoundingClientRect();
     const scaleX = targetCanvas.width / rect.width;
     const scaleY = targetCanvas.height / rect.height;
-    
+
     let clientX, clientY;
     if (e.touches && e.touches.length > 0) {
       clientX = e.touches[0].clientX;
@@ -1296,7 +1313,7 @@ function startPlinko(binId, gameState) {
       clientX = e.clientX;
       clientY = e.clientY;
     }
-    
+
     return {
       x: (clientX - rect.left) * scaleX,
       y: (clientY - rect.top) * scaleY
@@ -1305,27 +1322,27 @@ function startPlinko(binId, gameState) {
 
   function handleHolderMouseDown(e) {
     if (!gameActive || currentPuck || gameState.pucksRemaining === 0 || !canDragPuck) return;
-    
+
     audioSystem.init();
-    
+
     const coords = getCanvasCoords(e, holderCanvas);
     const distance = Math.sqrt((coords.x - 60) ** 2 + (coords.y - 60) ** 2);
-    
+
     if (distance < 35) {
       isDragging = true;
       canDragPuck = false;
-      
+
       holderCanvas.style.transform = 'scale(0.9)';
-      
+
       audioSystem.playDropSound();
-      
+
       currentPuck = {
         x: W / 2,
         y: 50,
         vx: 0,
         vy: 0
       };
-      
+
       drawPuckInHolder();
       drawBoard();
     }
@@ -1333,7 +1350,7 @@ function startPlinko(binId, gameState) {
 
   function handleCanvasMove(e) {
     if (!isDragging || !currentPuck) return;
-    
+
     const coords = getCanvasCoords(e, canvas);
     currentPuck.x = Math.max(PUCK_RADIUS, Math.min(W - PUCK_RADIUS, coords.x));
     currentPuck.y = Math.max(PUCK_RADIUS, Math.min(H - PUCK_RADIUS, coords.y));
@@ -1342,12 +1359,12 @@ function startPlinko(binId, gameState) {
 
   function handleRelease(e) {
     if (!isDragging || !currentPuck) return;
-    
+
     isDragging = false;
     holderCanvas.style.transform = 'scale(1)';
-    
+
     const topThreshold = H * 0.10;
-    
+
     if (currentPuck.y > topThreshold) {
       currentPuck = null;
       canDragPuck = true;
@@ -1355,11 +1372,11 @@ function startPlinko(binId, gameState) {
       drawBoard();
       return;
     }
-    
-    const releaseVariation = (currentPuck.x - W/2) / (W/2) * 0.8;
+
+    const releaseVariation = (currentPuck.x - W / 2) / (W / 2) * 0.8;
     currentPuck.vx = releaseVariation;
     currentPuck.vy = 0.5;
-    
+
     lastTime = performance.now();
     animationId = requestAnimationFrame(updatePhysics);
     saveState();
@@ -1374,7 +1391,7 @@ function startPlinko(binId, gameState) {
   canvas.addEventListener('mousemove', handleCanvasMove);
   canvas.addEventListener('mouseup', handleRelease);
   canvas.addEventListener('mouseleave', handleRelease);
-  
+
   canvas.addEventListener('touchmove', (e) => {
     e.preventDefault();
     handleCanvasMove(e);
