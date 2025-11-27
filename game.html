@@ -707,8 +707,8 @@ function startPlinko(binId, gameState) {
   
   updateLegend(gameState.currentBoard);
   
-  const PUCK_RADIUS = 32;
-  const PEG_RADIUS = 7;
+  // FIXED SIZE CONSTANTS - Scale everything relative to a reference canvas height
+  const REFERENCE_HEIGHT = 1000; // Reference height for calculations
   const NUM_ROWS = 13;
   
   const getCurrentPrizes = () => PRIZE_CONFIG[gameState.currentBoard].prizes;
@@ -725,11 +725,24 @@ function startPlinko(binId, gameState) {
   let canDragPuck = true;
   let needsRedraw = true;
   
+  // Scale factor and derived sizes
+  let SCALE_FACTOR = 1;
+  let PUCK_RADIUS = 32;
+  let PEG_RADIUS = 7;
+  
   const resizeCanvas = () => {
     const container = canvas.parentElement;
     const rect = container.getBoundingClientRect();
     canvas.width = W = rect.width;
     canvas.height = H = rect.height;
+    
+    // Calculate scale factor based on canvas height
+    SCALE_FACTOR = H / REFERENCE_HEIGHT;
+    
+    // Scale all sizes proportionally
+    PUCK_RADIUS = 32 * SCALE_FACTOR;
+    PEG_RADIUS = 7 * SCALE_FACTOR;
+    
     if (gameActive) {
       initPegs();
       drawBoard();
@@ -917,7 +930,7 @@ function startPlinko(binId, gameState) {
     ctx.strokeStyle = 'rgba(180, 150, 120, 0.3)';
     ctx.lineWidth = 1;
     
-    const triangleSize = 30;
+    const triangleSize = 30 * SCALE_FACTOR;
     const rows = Math.ceil(H / (triangleSize * 0.866)) + 1;
     const cols = Math.ceil(W / triangleSize) + 1;
     
@@ -968,7 +981,7 @@ function startPlinko(binId, gameState) {
       ctx.stroke();
       
       ctx.fillStyle = '#FFFFFF';
-      ctx.font = `bold ${Math.min(48, slotWidth * 0.4)}px Arial`;
+      ctx.font = `bold ${Math.min(48 * SCALE_FACTOR, slotWidth * 0.4)}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(prize.symbol, leftX + slotWidth / 2, bottomY + slotHeight * 0.5);
@@ -1003,7 +1016,7 @@ function startPlinko(binId, gameState) {
     ctx.fill();
     
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 16px Montserrat';
+    ctx.font = `bold ${16 * SCALE_FACTOR}px Montserrat`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('USL', x, y);
