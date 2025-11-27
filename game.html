@@ -724,7 +724,7 @@ function startPlinko(binId, gameState) {
   let particles = [];
   let lastTime = 0;
   let gameActive = true;
-  let W, H;
+  let W = 0, H = 0;
   let canDragPuck = true;
   let needsRedraw = true;
 
@@ -737,11 +737,13 @@ function startPlinko(binId, gameState) {
     const container = canvas.parentElement;
     const rect = container.getBoundingClientRect();
 
-    if (rect.width === 0 || rect.height === 0) return;
+    // Fallback in case the layout hasn't fully resolved yet
+    const width = rect.width || window.innerWidth * 0.7 || 600;
+    const height = rect.height || window.innerHeight || 900;
 
     // Store old puck position if it exists
     let oldPuckNormalized = null;
-    if (currentPuck) {
+    if (currentPuck && W > 0 && H > 0) {
       oldPuckNormalized = {
         x: currentPuck.x / W,
         y: currentPuck.y / H,
@@ -750,8 +752,8 @@ function startPlinko(binId, gameState) {
       };
     }
 
-    canvas.width = W = rect.width;
-    canvas.height = H = rect.height;
+    canvas.width = W = width;
+    canvas.height = H = height;
 
     // Calculate scale factor based on canvas height
     SCALE_FACTOR = H / REFERENCE_HEIGHT;
@@ -786,12 +788,6 @@ function startPlinko(binId, gameState) {
 
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
-
-  // Also observe container size changes (e.g. orientation, layout shifts)
-  if ('ResizeObserver' in window) {
-    const ro = new ResizeObserver(() => resizeCanvas());
-    ro.observe(canvas.parentElement);
-  }
 
   function initPegs() {
     pegs = [];
@@ -929,9 +925,6 @@ function startPlinko(binId, gameState) {
     // point exactly where the "missing" pegs would be on 7-peg rows.
     const numSlots = HORIZONTAL_SLOTS;
     const normalizedHorizontalSpacing = 1.0 / numSlots;
-
-    // Teeth extend inward from the canvas edges
-    const toothDepth = W * 0.05;
 
     ctx.fillStyle = '#D4A76A';
     ctx.strokeStyle = '#B8956A';
@@ -1409,3 +1402,4 @@ function startPlinko(binId, gameState) {
 </script>
 </body>
 </html>
+
