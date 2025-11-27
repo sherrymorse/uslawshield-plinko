@@ -759,7 +759,7 @@ function startPlinko(binId, gameState) {
     pegs = [];
     lastRowPegPositions = [];
     
-    // Play area bounds - NARROWED HORIZONTAL AREA to prevent straight drops
+    // Play area bounds - KEEPING THE NARROWED AREA but extending slots to edges
     const playAreaTop = 0.10;  // Increased from 0.05 to 0.10
     const playAreaBottom = 0.85; // Increased from 0.80 to 0.85
     const playAreaLeft = 0.10;   // NARROWED from 0.02 to 0.10
@@ -980,19 +980,17 @@ function startPlinko(binId, gameState) {
     const slotHeight = H * 0.12;  // DECREASED from 0.18 to 0.12
     const bottomY = H - slotHeight;
     
-    // Calculate slot boundaries using the SAME NARROWED BOUNDARIES as the play area
-    const slotBoundaries = [];
+    // Calculate slot boundaries - EXTENDING TO CANVAS EDGES to eliminate gaps
+    const slotBoundaries = [0];  // Start at canvas left edge
     
-    // Start with the narrowed left boundary
-    slotBoundaries.push(W * 0.10);  // NARROWED from 0 to W * 0.10
+    // Calculate the spacing for equal slots across the entire canvas width
+    const totalWidth = W;
+    const slotWidth = totalWidth / slotCount;
     
-    // Add peg positions as boundaries
-    lastRowPegPositions.forEach(pegX => {
-      slotBoundaries.push(pegX);
-    });
-    
-    // End with the narrowed right boundary
-    slotBoundaries.push(W * 0.90);  // NARROWED from W to W * 0.90
+    // Create equal slots from edge to edge
+    for (let i = 0; i <= slotCount; i++) {
+      slotBoundaries.push(i * slotWidth);
+    }
     
     prizes.forEach((prize, index) => {
       const leftX = slotBoundaries[index];
@@ -1022,12 +1020,12 @@ function startPlinko(binId, gameState) {
       ctx.fillText(prize.symbol, leftX + slotWidth / 2, bottomY + slotHeight * 0.5);
     });
     
-    // Top border
+    // Top border - EXTENDING FULL WIDTH
     ctx.strokeStyle = '#FFFFFF';
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(W * 0.10, bottomY);  // NARROWED from 0
-    ctx.lineTo(W * 0.90, bottomY);  // NARROWED from W
+    ctx.moveTo(0, bottomY);  // From left edge
+    ctx.lineTo(W, bottomY);  // To right edge
     ctx.stroke();
   }
 
@@ -1149,7 +1147,7 @@ function startPlinko(binId, gameState) {
     currentPuck.vx *= 0.995;
     currentPuck.vy *= 0.996;
     
-    // Wall collisions with energy loss - USING NARROWER BOUNDARIES
+    // Wall collisions with energy loss - KEEPING NARROWER BOUNDARIES for gameplay
     const wallMargin = PUCK_RADIUS + 5;
     const leftBoundary = W * 0.10;   // NARROWED from 0 to W * 0.10
     const rightBoundary = W * 0.90;  // NARROWED from W to W * 0.90
@@ -1212,16 +1210,15 @@ function startPlinko(binId, gameState) {
   async function handlePuckLanding() {
     const prizes = getCurrentPrizes();
     
-    // Calculate slot boundaries using the SAME NARROWED BOUNDARIES
+    // Calculate slot boundaries - USING FULL CANVAS WIDTH for landing detection
+    const slotCount = prizes.length;
+    const totalWidth = W;
+    const slotWidth = totalWidth / slotCount;
+    
     const slotBoundaries = [];
-    slotBoundaries.push(W * 0.10);  // NARROWED from 0
-    
-    // Add peg positions as boundaries
-    lastRowPegPositions.forEach(pegX => {
-      slotBoundaries.push(pegX);
-    });
-    
-    slotBoundaries.push(W * 0.90);  // NARROWED from W
+    for (let i = 0; i <= slotCount; i++) {
+      slotBoundaries.push(i * slotWidth);
+    }
     
     // Determine which slot the puck landed in
     let slotIndex = 0;
@@ -1268,7 +1265,7 @@ function startPlinko(binId, gameState) {
         vy: Math.sin(angle) * speed - 4,
         life: 50,
         maxLife: 50,
-        size: 3,
+        size = 3,
         color: prize.color
       });
     }
