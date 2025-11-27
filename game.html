@@ -454,13 +454,11 @@ class AudioSystem {
     const ctx = this.audioContext;
     const now = ctx.currentTime;
     
-    // Aluminum disc hitting aluminum peg - lower frequencies, hollow sound
     const osc1 = ctx.createOscillator();
     const osc2 = ctx.createOscillator();
     const gain = ctx.createGain();
     const filter = ctx.createBiquadFilter();
     
-    // Lower frequencies for hollow metallic sound
     const baseFreq1 = 180 + (intensity * 100);
     const baseFreq2 = 220 + (intensity * 80);
     
@@ -470,16 +468,13 @@ class AudioSystem {
     osc2.frequency.setValueAtTime(baseFreq2, now);
     osc2.frequency.exponentialRampToValueAtTime(150, now + 0.08);
     
-    // Use different wave types for hollow metallic quality
     osc1.type = 'sine';
     osc2.type = 'triangle';
     
-    // Bandpass filter to create hollow aluminum sound
     filter.frequency.setValueAtTime(300, now);
     filter.type = 'bandpass';
     filter.Q.setValueAtTime(2, now);
     
-    // Lower volume overall with quick decay
     gain.gain.setValueAtTime(0, now);
     gain.gain.linearRampToValueAtTime(0.08 * intensity, now + 0.001);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
@@ -501,7 +496,6 @@ class AudioSystem {
     const ctx = this.audioContext;
     const now = ctx.currentTime;
     
-    // Festive win sound with ascending tones
     for (let i = 0; i < 6; i++) {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -528,7 +522,6 @@ class AudioSystem {
     const ctx = this.audioContext;
     const now = ctx.currentTime;
     
-    // Sound for when puck is dropped
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     
@@ -750,10 +743,11 @@ function startPlinko(binId, gameState) {
     pegs = [];
     lastRowPegPositions = [];
     
+    // EXPANDED PEG AREA - now matching the full canvas width minus small margin for teeth
     const playAreaTop = 0.10;
     const playAreaBottom = 0.85;
-    const playAreaLeft = 0.10;
-    const playAreaRight = 0.90;
+    const playAreaLeft = 0.05;   // EXPANDED from 0.10 to 0.05
+    const playAreaRight = 0.95;  // EXPANDED from 0.90 to 0.95
     
     const startY = playAreaTop;
     const endY = playAreaBottom;
@@ -867,8 +861,8 @@ function startPlinko(binId, gameState) {
   function drawSidewallTeeth() {
     const playAreaTop = 0.10;
     const playAreaBottom = 0.85;
-    const playAreaLeft = 0.10;
-    const playAreaRight = 0.90;
+    const playAreaLeft = 0.05;   // EXPANDED to match peg area
+    const playAreaRight = 0.95;  // EXPANDED to match peg area
     
     const startY = playAreaTop;
     const endY = playAreaBottom;
@@ -942,7 +936,6 @@ function startPlinko(binId, gameState) {
     const slotHeight = H * 0.12;
     const bottomY = H - slotHeight;
     
-    // KEY FIX: Calculate slot width to span full canvas
     const slotWidth = W / slotCount;
     
     prizes.forEach((prize, index) => {
@@ -1082,8 +1075,8 @@ function startPlinko(binId, gameState) {
     currentPuck.vy *= 0.996;
     
     const wallMargin = PUCK_RADIUS + 5;
-    const leftBoundary = W * 0.10;
-    const rightBoundary = W * 0.90;
+    const leftBoundary = W * 0.05;   // EXPANDED boundary to match peg area
+    const rightBoundary = W * 0.95;  // EXPANDED boundary to match peg area
     
     if (currentPuck.x < leftBoundary + wallMargin) {
       currentPuck.x = leftBoundary + wallMargin;
@@ -1140,7 +1133,6 @@ function startPlinko(binId, gameState) {
     const slotCount = prizes.length;
     const slotWidth = W / slotCount;
     
-    // Determine which slot based on full canvas width
     let slotIndex = Math.floor(currentPuck.x / slotWidth);
     slotIndex = Math.max(0, Math.min(prizes.length - 1, slotIndex));
     
