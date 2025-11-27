@@ -707,13 +707,14 @@ function startPlinko(binId, gameState) {
   
   updateLegend(gameState.currentBoard);
   
-  const PUCK_RADIUS = 32;
-  const PEG_RADIUS = 7;
+  // Define base sizes that will scale with the canvas
+  const BASE_PUCK_RADIUS = 32;
+  const BASE_PEG_RADIUS = 7;
   const NUM_ROWS = 13;
   
-  // Fixed peg spacing - using absolute pixel values
-  const PEG_SPACING_X = 80;
-  const PEG_SPACING_Y = 60;
+  // Define base spacing that will scale with the canvas
+  const BASE_PEG_SPACING_X = 80;
+  const BASE_PEG_SPACING_Y = 60;
   
   const getCurrentPrizes = () => PRIZE_CONFIG[gameState.currentBoard].prizes;
   
@@ -729,11 +730,24 @@ function startPlinko(binId, gameState) {
   let canDragPuck = true;
   let needsRedraw = true;
   
+  // Dynamic sizes that will scale with the canvas
+  let PUCK_RADIUS, PEG_RADIUS, PEG_SPACING_X, PEG_SPACING_Y;
+  
   const resizeCanvas = () => {
     const container = canvas.parentElement;
     const rect = container.getBoundingClientRect();
     canvas.width = W = rect.width;
     canvas.height = H = rect.height;
+    
+    // Calculate scaling factor based on canvas width
+    const scaleFactor = Math.min(1, W / 900); // 900px is our base reference width
+    
+    // Scale all elements proportionally
+    PUCK_RADIUS = BASE_PUCK_RADIUS * scaleFactor;
+    PEG_RADIUS = BASE_PEG_RADIUS * scaleFactor;
+    PEG_SPACING_X = BASE_PEG_SPACING_X * scaleFactor;
+    PEG_SPACING_Y = BASE_PEG_SPACING_Y * scaleFactor;
+    
     if (gameActive) {
       initPegs();
       drawBoard();
